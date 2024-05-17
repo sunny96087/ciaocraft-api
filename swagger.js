@@ -6,14 +6,14 @@ const doc = {
     info: {
         version: "1.0.0",
         title: "ciaocraft api",
-        description: "六角課程專題用 api"
+        description: "六角課程團體專題用 api"
     },
     // * 開發
-    host: 'localhost:3666',
-    schemes: ['http', 'https'],
+    // host: 'localhost:3666',
+    // schemes: ['http', 'https'],
     // * 部署
-    // host: "express-community.onrender.com",
-    // schemes: ['https'],
+    host: "ciaocraft-api.onrender.com",
+    schemes: ['https'],
 
     basePath: "/",
     tags: [ // by default: empty Array
@@ -51,4 +51,4 @@ swaggerAutogen(outputFile, endpointsFiles, doc); // swaggerAutogen 的方法
 
 // Demo
 // http://localhost:3666/v1
-// https://
+// https://ciaocraft-api.onrender.com
