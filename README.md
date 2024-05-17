@@ -1,15 +1,15 @@
-# 社群網站 Chat! - api
+# DIY 課程預約網站 CiaoCraft - api
 
-六角 Node.js 入門班主線任務後端 api
+六角 Node.js 入門班團體專題後端 api
 
 ## 瀏覽網站
-[社群網站 - Chat!](https://community-web-4l2.pages.dev/)
+[CiaoCraft]()
 
 ## 前端 github
-[Link](https://github.com/sunny96087/community_web)
+[Link]()
 
-## api swagger (手下留情不要亂測試)
-[Link](https://express-community.onrender.com/v1/)
+## api swagger
+[Link]()
 
 ## 技術 & 套件
 > Node.js + Express
@@ -26,8 +26,8 @@
 > firebase Storage
 
 ## 開發者
-
 > 2fish
+> shuan
 
-### 聯絡我
-> [Email](mailto:yain13142013@gmail.com)
+### 聯絡我們
+> [Email](mailto:yu13142013@gmail.com)
