@@ -7,7 +7,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { isAuth, generateSendJWT } = require("../utils/auth");
 const Vendor = require("../models/vendor");
-const { Course, CourseItem, Comment } = require("../models/course");
+const { Course, CourseItem, CourseComment } = require("../models/course");
 
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });

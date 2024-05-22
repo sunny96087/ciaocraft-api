@@ -21,7 +21,7 @@ const courseSchema = new mongoose.Schema(
       },
     ],
     // * 關聯評論
-    comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
+    comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "CourseComment" }],
     // 課程類型
     courseType: [String],
     // 課程名稱
@@ -91,7 +91,7 @@ const CourseItem = mongoose.model("CourseItem", courseItemSchema);
 // todo 定義課程評論模型
 /*
  */
-const commentSchema = new mongoose.Schema(
+const courseCommentSchema = new mongoose.Schema(
   {
     memberId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -149,7 +149,7 @@ const commentSchema = new mongoose.Schema(
   }
 );
 
-const Comment = mongoose.model("Comment", commentSchema);
+const CourseComment = mongoose.model("CourseComment", courseCommentSchema);
 
 // ? 查詢時自動填充相關的欄位
 
@@ -175,13 +175,13 @@ courseItemSchema.pre("findOne", function () {
   this.populate("courseId");
 });
 
-commentSchema.pre("find", function () {
+courseCommentSchema.pre("find", function () {
   this.populate("memberId").populate("courseId");
 });
 
-commentSchema.pre("findOne", function () {
+courseCommentSchema.pre("findOne", function () {
   this.populate("memberId").populate("courseId");
 });
 
 // 導出
-module.exports = { Course, CourseItem, Comment };
+module.exports = { Course, CourseItem, CourseComment };

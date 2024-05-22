@@ -313,3 +313,5 @@ router.get(
     #swagger.description = '取得單筆賣家綜合資料 (需計算學員數、全部課程、師資) (Front)' 
   */
 );
+
+module.exports = router;
