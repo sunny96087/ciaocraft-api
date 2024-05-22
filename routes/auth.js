@@ -37,7 +37,7 @@ router.post(
     */
 );
 router.post(
-    '/login',
+    '/signin',
     handleErrorAsync(authController.login)
     /** 
       #swagger.tags = ['Auth']
@@ -61,14 +61,14 @@ router.post(
       }
     */
 );
-router.get(
+router.post(
     '/checkAccountExist',
     handleErrorAsync(authController.checkAccountExist)
     /** 
       #swagger.tags = ['Auth']
       #swagger.description = '檢查帳號是否已註冊'
     
-      #swagger.parameters['user'] = {
+      #swagger.parameters['account'] = {
           in: 'body',
           required: true,
           schema: {
