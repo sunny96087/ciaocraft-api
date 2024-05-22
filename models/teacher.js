@@ -44,14 +44,7 @@ const teacherSchema = new mongoose.Schema(
       {
         platform: {
           type: String,
-          enum: [
-            "facebook",
-            "instagram",
-            "website",
-            "twitter",
-            "youtube",
-            "linkedin",
-          ],
+          enum: ["facebook", "instagram", "website"],
           required: [true, "社群平台未填寫"],
         },
         link: String,
@@ -66,6 +59,7 @@ const teacherSchema = new mongoose.Schema(
   {
     versionKey: false,
     timestamps: true,
+    virtuals: true, // 虛擬屬性
   }
 );
 

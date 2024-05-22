@@ -49,6 +49,7 @@ const courseSchema = new mongoose.Schema(
   {
     versionKey: false,
     timestamps: true,
+    virtuals: true, // 虛擬屬性
   }
 );
 
