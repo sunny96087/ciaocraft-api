@@ -284,9 +284,9 @@ const vendorController = {
     const data = await Vendor.findOne({ account });
 
     if (!data) {
-      handleSuccess(res, null, "該 account 可以使用");
+      handleSuccess(res, null, "該帳號可以使用");
     } else {
-      return next(appError(400, "該 account 已經被註冊"));
+      return next(appError(400, "該帳號已經被註冊"));
     }
   },
 
@@ -294,7 +294,8 @@ const vendorController = {
   getVendor: async function (req, res, next) {
     const vendorId = req.params.vendorId;
 
-    const vendor = await Vendor.findById(vendorId);
+    const vendor = await Vendor.findById(vendorId)
+    .select("-reviewLinks -reviewBrief -reviewImages -status -createdAt -updatedAt -__v");
     if (!vendor) {
       return next(appError(400, "找不到該賣家"));
     }

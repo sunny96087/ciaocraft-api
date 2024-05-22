@@ -68,7 +68,6 @@ const vendorSchema = new mongoose.Schema(
     // 品牌頭像
     avatar: {
       type: String,
-      required: [true, "avatar 為必填"],
     },
     // 形象圖片
     bannerImage: {
@@ -97,31 +96,27 @@ const vendorSchema = new mongoose.Schema(
     // 銀行名稱
     bankName: {
       type: String,
-      required: [true, "bankName 為必填"],
     },
     // 銀行代碼
     bankCode: {
       type: String,
-      required: [true, "bankCode 為必填"],
     },
     // 分行名稱
     bankBranch: {
       type: String,
-      required: [true, "bankBranchCode 為必填"],
     },
     // 銀行戶名
     bankAccountName: {
       type: String,
-      required: [true, "bankAccountName 為必填"],
     },
     // 銀行帳號
     bankAccount: {
       type: String,
-      required: [true, "bankAccount 為必填"],
     },
     // 狀態
     status: {
       type: Number,
+      default: 0,
       enum: [0, 1, 2], // 0: 審核中 1: 啟用 2: 停權
     },
     // 地址
@@ -135,6 +130,7 @@ const vendorSchema = new mongoose.Schema(
     // 登入時間
     loginAt: {
       type: Date,
+      select: false,
     },
     // 關聯課程
     courseId: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
@@ -154,11 +150,11 @@ vendorSchema.post("save", function (error, doc, next) {
 });
 
 vendorSchema.pre("find", function () {
-  this.populate("courses");
+  this.populate("courseId");
 });
 
 vendorSchema.pre("findOne", function () {
-  this.populate("courses");
+  this.populate("courseId");
 });
 
 const Vendor = mongoose.model("Vendor", vendorSchema);

@@ -277,17 +277,20 @@ router.post(
                 type: 'array',
                 items: {
                     type: 'string'
-                }
+                },
+                required: true
             },
             reviewBrief: {
                 type: 'string',
                 description: '審核用簡介',
+                required: true
             },
             reviewImages: {
                 type: 'array',
                 items: {
                     type: 'string'
                 }
+                required: true
             },
         }
     }
