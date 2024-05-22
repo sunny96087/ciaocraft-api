@@ -9,14 +9,18 @@ const doc = {
         description: "六角課程團體專題用 api"
     },
     // * 開發
-    // host: 'localhost:3666',
-    // schemes: ['http', 'https'],
+    host: 'localhost:3666',
+    schemes: ['http', 'https'],
     // * 部署
-    host: "ciaocraft-api.onrender.com",
-    schemes: ['https'],
+    // host: "ciaocraft-api.onrender.com",
+    // schemes: ['https'],
 
     basePath: "/",
     tags: [ // by default: empty Array
+      {
+        name: "HR",
+        description: "--- 分隔線 - 以下是參考的 ---"
+      },
       {
         name: "Index",
         description: "首頁"
