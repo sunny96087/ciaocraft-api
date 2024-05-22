@@ -1,14 +1,3 @@
-/*
-    主線任務頁面：
-    - 登入
-    - 註冊
-    - 全體動態牆
-    - 追蹤名單
-    - 個人資料 ( 改密碼、改資料 )
-    - 張貼動態
-    - 我按讚的貼文
-    - 個人牆
- */
 // ? 套件引入
 var createError = require("http-errors"); // 引入 http-errors 模組，用於創建 HTTP 錯誤對象
 var express = require("express"); // 引入 express 模組，用於創建 Express 應用程式
@@ -18,19 +7,11 @@ var morgan = require("morgan"); // 引入 morgan 中間件，用於日誌記錄
 var cors = require("cors"); // 引入允許跨網域套件 cors
 const logger = require("./logger"); // 引入 logger.js => Winston 日誌
 const deleteExpiredAccounts = require("./utils/cronJobs"); // 引入 cronJobs.js 定時任務
-
-// swagger
-const swaggerUi = require("swagger-ui-express");
+const swaggerUi = require("swagger-ui-express"); // swagger
 const swaggerFile = require("./swagger_output.json");
-
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
-
-// ? 引入自訂元件
-const handleError = require("./utils/handleError");
-const handleSuccess = require("./utils/handleSuccess");
-const appError = require("./utils/appError");
 
 // 創建 Express 應用程式實例
 var app = express();
@@ -64,6 +45,8 @@ const postsRouter = require("./routes/posts");
 var usersRouter = require("./routes/users");
 const uploadRouter = require("./routes/upload");
 const emailRouter = require("./routes/email");
+
+const vendorsRouter = require("./routes/vendors");
 
 // 預設首頁
 var indexRouter = require("./routes/index");
@@ -107,6 +90,8 @@ app.use("/users", usersRouter);
 app.use("/posts", postsRouter);
 app.use("/upload", uploadRouter);
 app.use("/email", emailRouter);
+
+app.use("/vendors", vendorsRouter);
 
 app.use((req, res, next) => {
   // 設置 CSP 頭部

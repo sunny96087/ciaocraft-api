@@ -9,12 +9,9 @@ const teacherSchema = new mongoose.Schema(
       ref: "Vendor",
     },
     // 關聯課程類型
-    courseTypeId: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "CourseType",
-      },
-    ],
+    courseType: {
+      type: [String],
+    },
     // 關聯課程
     courseId: [
       {
@@ -65,6 +62,14 @@ const teacherSchema = new mongoose.Schema(
 
 // 創建師資模型
 const Teacher = mongoose.model("Teacher", teacherSchema);
+
+teacherSchema.pre("find", function () {
+  this.populate("courses");
+});
+
+teacherSchema.pre("findOne", function () {
+  this.populate("courses");
+});
 
 // 導出
 module.exports = Teacher;
