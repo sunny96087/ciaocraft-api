@@ -1,25 +1,27 @@
 const mongoose = require("mongoose");
 
-// 定義課程模型
+// todo 定義課程模型
 const courseSchema = new mongoose.Schema(
   {
-    // 關聯廠商
+    // * 關聯廠商
     vendorId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Vendor",
     },
-    // 關聯教師
+    // * 關聯教師
     teacherId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Teacher",
     },
-    // 關聯課程時間
-    courseTimes: [
+    // * 關聯課程時間
+    CourseItemId: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "CourseTime",
+        ref: "CourseItem",
       },
     ],
+    // * 關聯評論
+    comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
     // 課程類型
     courseType: [String],
     // 課程名稱
@@ -56,7 +58,7 @@ const courseSchema = new mongoose.Schema(
 // 創建課程模型
 const Course = mongoose.model("Course", courseSchema);
 
-// 定義課程項目模型
+// todo 定義課程項目模型
 const courseItemSchema = new mongoose.Schema(
   {
     // 關聯課程
@@ -86,5 +88,100 @@ const courseItemSchema = new mongoose.Schema(
 // 創建課程項目模型
 const CourseItem = mongoose.model("CourseItem", courseItemSchema);
 
+// todo 定義課程評論模型
+/*
+ */
+const commentSchema = new mongoose.Schema(
+  {
+    memberId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Member",
+      required: [true, "memberId 為必填"],
+    },
+    courseId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Course",
+      required: [true, "courseId 為必填"],
+    },
+    content: {
+      type: String,
+      required: [true, "content 為必填"],
+    },
+    images: {
+      type: [String],
+      validate: {
+        validator: function (v) {
+          return v.length <= 5;
+        },
+        message: (props) =>
+          `最多只可存 5 張圖片，現有 ${props.value.length} 張`,
+      },
+    },
+    tags: {
+      type: [
+        {
+          type: String,
+          enum: ["師生互動", "教學環境", "專業度", "其他"],
+        },
+      ],
+      validate: {
+        validator: function (v) {
+          return v.every((tag) =>
+            ["師生互動", "教學環境", "專業度", "其他"].includes(tag)
+          );
+        },
+        message: (props) => `${props.value} 非有效 tags 值`,
+      },
+    },
+    rating: {
+      type: Number,
+      default: 1,
+    },
+    likes: {
+      type: Number,
+      default: 0,
+    },
+  },
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
+);
+
+const Comment = mongoose.model("Comment", commentSchema);
+
+// ? 查詢時自動填充相關的欄位
+
+courseSchema.pre("find", function () {
+  this.populate("vendorId")
+    .populate("teacherId")
+    .populate("CourseItemId")
+    .populate("comments");
+});
+
+courseSchema.pre("findOne", function () {
+  this.populate("vendorId")
+    .populate("teacherId")
+    .populate("CourseItemId")
+    .populate("comments");
+});
+
+courseItemSchema.pre("find", function () {
+  this.populate("courseId");
+});
+
+courseItemSchema.pre("findOne", function () {
+  this.populate("courseId");
+});
+
+commentSchema.pre("find", function () {
+  this.populate("memberId").populate("courseId");
+});
+
+commentSchema.pre("findOne", function () {
+  this.populate("memberId").populate("courseId");
+});
+
 // 導出
-module.exports = { Course, CourseItem };
+module.exports = { Course, CourseItem, Comment };

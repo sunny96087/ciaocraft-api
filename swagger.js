@@ -9,14 +9,18 @@ const doc = {
         description: "六角課程團體專題用 api"
     },
     // * 開發
-    host: 'localhost:3666',
-    schemes: ['http', 'https'],
+    // host: 'localhost:3666',
+    // schemes: ['http', 'https'],
     // * 部署
-    // host: "ciaocraft-api.onrender.com",
-    // schemes: ['https'],
+    host: "ciaocraft-api.onrender.com",
+    schemes: ['https'],
 
     basePath: "/",
     tags: [ // by default: empty Array
+      {
+        name: "Vendors",
+        description: "賣家 (廠商)"
+      },
       {
         name: "HR",
         description: "--- 分隔線 - 以下是參考的 ---"
@@ -46,6 +50,7 @@ const doc = {
 
 const outputFile = './swagger_output.json'; // 輸出的文件名稱
 const endpointsFiles = ['./app.js',
+'./controllers/vendorsController.js',
 './controllers/usersController.js',
 './controllers/postsController.js',
 './controllers/uploadController.js',

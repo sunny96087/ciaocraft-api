@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 // const { validate } = require("./user");
-const { login } = require("../controllers/authController");
+// const { login } = require("../controllers/authController");
 
 const vendorSchema = new mongoose.Schema(
   {
@@ -19,7 +19,7 @@ const vendorSchema = new mongoose.Schema(
     // 密碼
     password: {
       type: String,
-      //   required: [true, "password 為必填"],
+      select: false,
     },
     // 申請人名稱
     representative: {
@@ -55,7 +55,7 @@ const vendorSchema = new mongoose.Schema(
     },
     // 審核用圖片
     reviewImages: {
-      trype: [String],
+      type: [String],
       validate: {
         validator: function (v) {
           return v.length <= 5;
@@ -136,6 +136,8 @@ const vendorSchema = new mongoose.Schema(
     loginAt: {
       type: Date,
     },
+    // 關聯課程
+    courseId: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
   },
   {
     timestamps: true,
@@ -143,12 +145,20 @@ const vendorSchema = new mongoose.Schema(
   }
 );
 
-userSchema.post("save", function (error, doc, next) {
+vendorSchema.post("save", function (error, doc, next) {
   if (error.name === "MongoError" && error.code === 11000) {
     next(new Error("該帳號已存在"));
   } else {
     next(error);
   }
+});
+
+vendorSchema.pre("find", function () {
+  this.populate("courses");
+});
+
+vendorSchema.pre("findOne", function () {
+  this.populate("courses");
 });
 
 const Vendor = mongoose.model("Vendor", vendorSchema);

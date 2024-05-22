@@ -1,4 +1,3 @@
-const express = require("express"); // 引入 Express 框架
 const dayjs = require("dayjs");
 const tools = require("../utils/tools");
 const appError = require("../utils/appError");
@@ -6,7 +5,7 @@ const handleSuccess = require("../utils/handleSuccess"); // 引入自訂的成�
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { isAuth, generateSendJWT } = require("../utils/auth");
+const { isAuth, generateSendJWT } = require("../utils/vendorAuth");
 const User = require("../models/user"); // 引入 Post 模型
 const { Post, Comment } = require("../models/post");
 const dotenv = require("dotenv");
