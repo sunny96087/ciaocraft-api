@@ -38,18 +38,17 @@ const orderSchema = new mongoose.Schema(
             required: [true, "totalPrice 為必填"]
         },
         paymentType: {
-            type: int,
+            type: Number,
             enum: [1, 2], // 1: atm, 2: 金流
             default: 1,
         },
         paidStatus: {
-            type: int,
+            type: Number,
             enum: [0, 1, 2], // 0:待付款, 1: 已付款, 2: 已取消
             default: 0,
         },
         location: {
             type: String,
-            required: [true, "location 為必填"]
         },
         lastFiveDigits: {
             type: String,
