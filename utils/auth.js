@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const appError = require("../utils/appError");
 const handleErrorAsync = require("../utils/handleErrorAsync");
 const express = require("express");
-const User = require("../models/user");
+const Member = require("../models/member");
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
 
@@ -22,8 +22,6 @@ const isAuth = handleErrorAsync(async (req, res, next) => {
     return next(appError(401, "你尚未登入！"));
   }
 
-  //   console.log(token);
-
   // 驗證 token 正確性
   const decoded = await new Promise((resolve, reject) => {
     jwt.verify(token, process.env.JWT_SECRET, (err, payload) => {
@@ -35,10 +33,13 @@ const isAuth = handleErrorAsync(async (req, res, next) => {
       }
     });
   });
-  const currentUser = await User.findById(decoded.id);
+  
+  const currentUser = await Member.findById(decoded.id);
+  if (!currentUser) {
+    return next(appError(401, "帳號不存在"));
+  }
 
   req.user = currentUser;
-  // console.log(req.user);
   next();
 });
 const generateSendJWT = (user, statusCode, res, message) => {
