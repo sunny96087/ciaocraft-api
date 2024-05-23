@@ -7,11 +7,9 @@ const memberSchema = new mongoose.Schema(
         account: {
             type: String,
             unique: true,
-            required: [true, 'account 為必填']
         },
         password: {
             type: String,
-            required: [true, 'password 為必填']
         },
         name: {
             type: String,
@@ -28,7 +26,7 @@ const memberSchema = new mongoose.Schema(
             default: 'other',
         },
         birthday: {
-            type: String,
+            type: Date,
         },
         photo: {
             type: String,
@@ -42,21 +40,23 @@ const memberSchema = new mongoose.Schema(
             default: 0,
         },
         interests: {
-            type: [{
-                type: String,
-                enum: ['工藝手作', '烹飪烘烤', '藝術人文', '生活品味']
-            }],
+            type: [String],
             validate: {
                 validator: function (v) {
                     return v.every(interest => ['工藝手作', '烹飪烘烤', '藝術人文', '生活品味'].includes(interest));
                 },
                 message: props => `${props.value} 非有效 tags 值`
-            }
+            },
+            default: ['工藝手作']
         },
         collections: [{
             type: mongoose.Schema.Types.ObjectId,
             ref: "Course",
         }],
+        isAdmin: {
+            type: Boolean,
+            default: false,
+        },
         loginAt: {
             type: Date,
         }

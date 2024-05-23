@@ -7,12 +7,35 @@ const collectionController = require("../controllers/collectionsController");
 router.post(
     "/",
     handleErrorAsync(collectionController.newCollection)
+    /* #swagger.tags = ['Collection']
+       #swagger.description = '新增收藏'
+       #swagger.parameters['collection'] = {
+           in: 'body',
+           required: true,
+           schema: {
+               courseId: { 
+                   type: 'string',
+                   description: '課程 ID',
+                   required: true
+               }
+           }
+       }
+    
+    */
 );
 
 // 刪除收藏
 router.delete(
     "/:collectionId",
     handleErrorAsync(collectionController.deleteCollection)
+    /* #swagger.tags = ['Collection']
+       #swagger.description = '刪除收藏'
+       #swagger.parameters['collectionId'] = {
+           in: 'path',
+           required: true,
+           type: 'string'
+       }
+    */
 );
 
 module.exports = router;
