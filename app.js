@@ -173,7 +173,7 @@ app.use(function (err, req, res, next) {
   // 確保錯誤有一個狀態碼，如果沒有，則設置為 500
   err.statusCode = err.statusCode || 500;
   // 是否為開發環境
-  if (process.env.NODE_ENV === "dev") {
+  if (process.env.NODE_ENV.trim() == "dev") {
     // 是開發環境，使用開發環境 錯誤處理
     return resErrorDev(err, res);
   }

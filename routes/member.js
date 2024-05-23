@@ -33,7 +33,7 @@ router.patch(
                     items: {
                         type: 'string'
                     },
-                    description: '興趣；目前僅可帶陣列中有包含的內容 ['工藝手作', '烹飪烘烤', '藝術人文', '生活品味'] '
+                    description: '興趣；目前僅可帶入: 工藝手作,烹飪烘烤,藝術人文, 生活品味'
                 },
                 name: {
                     type: 'string',
