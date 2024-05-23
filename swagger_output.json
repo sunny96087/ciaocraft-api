@@ -1579,7 +1579,10 @@
     },
     "/members/memberOne": {
       "get": {
-        "description": "",
+        "tags": [
+          "Member"
+        ],
+        "description": "取得登入會員資料",
         "parameters": [
           {
             "name": "token",
@@ -1594,7 +1597,10 @@
         }
       },
       "patch": {
-        "description": "",
+        "tags": [
+          "Member"
+        ],
+        "description": "修改登入會員資料，欄位只需填寫要修改的部分",
         "parameters": [
           {
             "name": "token",
@@ -1609,10 +1615,84 @@
         }
       }
     },
-    "/members/collections": {
+    "/members/memberOne/collections": {
       "get": {
-        "description": "",
+        "tags": [
+          "Member"
+        ],
+        "description": "取得登入會員收藏",
         "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Member"
+        ],
+        "description": "新增收藏",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "collection",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "courseId": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "課程 ID"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/members/memberOne/collections/{collectionId}": {
+      "delete": {
+        "tags": [
+          "Member"
+        ],
+        "description": "刪除收藏",
+        "parameters": [
+          {
+            "name": "collectionId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
           {
             "name": "token",
             "in": "header",
@@ -1626,9 +1706,12 @@
         }
       }
     },
-    "/members/orders": {
+    "/members/memberOne/orders": {
       "get": {
-        "description": "",
+        "tags": [
+          "Member"
+        ],
+        "description": "取得登入會員訂單",
         "parameters": [
           {
             "name": "token",
@@ -1643,14 +1726,61 @@
         }
       }
     },
-    "/members/password": {
+    "/members/memberOne/password": {
       "put": {
-        "description": "",
+        "tags": [
+          "Member"
+        ],
+        "description": "修改會員密碼",
         "parameters": [
           {
             "name": "token",
             "in": "header",
             "type": "string"
+          },
+          {
+            "name": "password",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "newPassword": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "新密碼; 密碼需包含英文及數字，且至少 8 碼"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                },
+                "confirmPassword": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "確認新密碼"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
           }
         ],
         "responses": {
@@ -1723,7 +1853,39 @@
     },
     "/collections/": {
       "post": {
-        "description": "",
+        "tags": [
+          "Collection"
+        ],
+        "description": "新增收藏",
+        "parameters": [
+          {
+            "name": "collection",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "courseId": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "課程 ID"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
         "responses": {
           "default": {
             "description": ""
@@ -1733,7 +1895,10 @@
     },
     "/collections/{collectionId}": {
       "delete": {
-        "description": "",
+        "tags": [
+          "Collection"
+        ],
+        "description": "刪除收藏",
         "parameters": [
           {
             "name": "collectionId",
