@@ -54,6 +54,7 @@ const orderRouter = require("./routes/order");
 const platformRouter = require("./routes/platform");
 const collectionRouter = require("./routes/collection");
 const courseRouter = require("./routes/course");
+const teacherRouter = require("./routes/teachers");
 
 // 預設首頁
 var indexRouter = require("./routes/index");
@@ -107,6 +108,7 @@ app.use("/platforms", platformRouter);
 app.use("/courses", courseRouter);
 
 app.use("/vendors", vendorsRouter);
+app.use("/teachers", teacherRouter);
 
 app.use((req, res, next) => {
   // 設置 CSP 頭部

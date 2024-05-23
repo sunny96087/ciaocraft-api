@@ -5,7 +5,7 @@ const appError = require("../utils/appError");
 // 檢查欄位內容不得為空
 function checkFieldsNotEmpty(data, fields) {
   for (const field of fields) {
-    if (data[field] && data[field].trim().length === 0) {
+    if (data[field] && typeof data[field] === 'string' && data[field].trim().length === 0) {
       return `欄位 ${field} 不能為空`;
     }
   }
