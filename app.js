@@ -53,6 +53,7 @@ const feedbackRouter = require("./routes/feedback");
 const orderRouter = require("./routes/order");
 const platformRouter = require("./routes/platform");
 const collectionRouter = require("./routes/collection");
+const courseRouter = require("./routes/course");
 
 // 預設首頁
 var indexRouter = require("./routes/index");
@@ -103,6 +104,7 @@ app.use("/orders", orderRouter);
 app.use("/collections", collectionRouter);
 app.use("/feedbacks", feedbackRouter);
 app.use("/platforms", platformRouter);
+app.use("/courses", courseRouter);
 
 app.use("/vendors", vendorsRouter);
 
@@ -142,6 +144,7 @@ const resErrorProd = (err, res) => {
   } else {
     // 不是 已定義的，使用 Winston 日誌器記錄錯誤
     logger.error("出現重大錯誤", { error: err });
+    // logger.error("出現重大錯誤", { error: err.stack });
     // 回應 通用錯誤訊息 JSON
     res.status(500).json({
       status: "error",
