@@ -22,7 +22,7 @@ const teacherSchema = new mongoose.Schema(
     // 名稱
     name: {
       type: String,
-      // required: [true, "名稱未填寫"],
+      required: [true, "名稱未填寫"],
     },
     // 介紹
     description: String,
@@ -30,7 +30,7 @@ const teacherSchema = new mongoose.Schema(
     status: {
       type: Number,
       default: 1,
-      enum: [0, 1], // 0: 停用, 1: 啟用
+      enum: [0, 1, 2], // 0: 停用 1: 啟用 2: 刪除
     },
     // 頭像
     photo: String,
@@ -63,7 +63,7 @@ const teacherSchema = new mongoose.Schema(
 // 創建師資模型
 const Teacher = mongoose.model("Teacher", teacherSchema);
 
-// 
+//
 teacherSchema.pre("find", function () {
   this.populate("courseId");
   this.populate("vendorId");
@@ -73,7 +73,6 @@ teacherSchema.pre("findOne", function () {
   this.populate("courseId");
   this.populate("vendorId");
 });
-
 
 // 導出
 module.exports = Teacher;

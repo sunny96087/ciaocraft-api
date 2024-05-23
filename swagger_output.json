@@ -21,6 +21,18 @@
       "description": "賣家 (平台管理員)"
     },
     {
+      "name": "VTeachers-front",
+      "description": "老師 (前台)"
+    },
+    {
+      "name": "Teachers-back",
+      "description": "老師 (後台)"
+    },
+    {
+      "name": "Teachers-manage",
+      "description": "老師 (平台管理員)"
+    },
+    {
       "name": "HR",
       "description": "--- 分隔線 - 以下是參考的 ---"
     },
@@ -2467,6 +2479,419 @@
             "name": "vendorId",
             "in": "path",
             "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/teachers/admin": {
+      "get": {
+        "tags": [
+          "Teachers-back"
+        ],
+        "description": "取得所有老師 (Back)",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/teachers/{teacherId}": {
+      "get": {
+        "tags": [
+          "Teachers-front"
+        ],
+        "description": "取得單筆老師資料 (Front)",
+        "parameters": [
+          {
+            "name": "teacherId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Teachers-back"
+        ],
+        "description": "編輯老師 (Back)",
+        "parameters": [
+          {
+            "name": "teacherId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "token",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "updateTeacher",
+            "in": "body",
+            "description": "老師資訊",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "object"
+                },
+                "properties": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "老師名稱"
+                        },
+                        "required": {
+                          "type": "boolean",
+                          "example": true
+                        }
+                      }
+                    },
+                    "description": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "老師描述"
+                        }
+                      }
+                    },
+                    "photo": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "老師頭像"
+                        }
+                      }
+                    },
+                    "intro": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "老師簡述 (編輯器)"
+                        }
+                      }
+                    },
+                    "socialMediaInfo": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "object"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "老師社群連結"
+                        }
+                      }
+                    },
+                    "order": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "number"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "老師排序 (數字越小越前面)"
+                        },
+                        "required": {
+                          "type": "boolean",
+                          "example": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Teachers-manage"
+        ],
+        "description": "刪除老師 (Manage)",
+        "parameters": [
+          {
+            "name": "teacherId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "deleteTeacherManage",
+            "in": "body",
+            "description": "使用管理員密碼刪除老師",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "adminPassword": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "管理員密碼"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/teachers/admin/{teacherId}": {
+      "get": {
+        "tags": [
+          "Teachers-back"
+        ],
+        "description": "取得單筆老師資料 (Back)",
+        "parameters": [
+          {
+            "name": "teacherId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "token",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/teachers/": {
+      "post": {
+        "tags": [
+          "Teachers-back"
+        ],
+        "description": "新增老師 (Back)",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "newTeacher",
+            "in": "body",
+            "description": "老師資訊",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "object"
+                },
+                "properties": {
+                  "type": "object",
+                  "properties": {
+                    "vendorId": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "供應商 ID"
+                        },
+                        "required": {
+                          "type": "boolean",
+                          "example": true
+                        }
+                      }
+                    },
+                    "name": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "老師名稱"
+                        },
+                        "required": {
+                          "type": "boolean",
+                          "example": true
+                        }
+                      }
+                    },
+                    "description": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "老師描述"
+                        }
+                      }
+                    },
+                    "photo": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "老師頭像"
+                        }
+                      }
+                    },
+                    "intro": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "老師簡述 (編輯器)"
+                        }
+                      }
+                    },
+                    "socialMediaInfo": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "object"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "老師社群連結"
+                        }
+                      }
+                    },
+                    "order": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "number"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "老師排序 (數字越小越前面)"
+                        },
+                        "required": {
+                          "type": "boolean",
+                          "example": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/teachers/admin/deactivate/{teacherId}": {
+      "patch": {
+        "tags": [
+          "Teachers-back"
+        ],
+        "description": "刪除老師 (偽刪除) (Back)",
+        "parameters": [
+          {
+            "name": "teacherId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "token",
+            "in": "header",
             "type": "string"
           }
         ],
