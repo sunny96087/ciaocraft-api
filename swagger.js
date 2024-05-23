@@ -18,8 +18,16 @@ const doc = {
     basePath: "/",
     tags: [ // by default: empty Array
       {
-        name: "Vendors",
-        description: "賣家 (廠商)"
+        name: "Vendors-front",
+        description: "賣家 (前台)"
+      },
+      {
+        name: "Vendors-back",
+        description: "賣家 (後台)"
+      },
+      {
+        name: "Vendors-manage",
+        description: "賣家 (平台管理員)"
       },
       {
         name: "HR",

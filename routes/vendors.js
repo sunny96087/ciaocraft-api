@@ -10,11 +10,11 @@ dotenv.config({ path: "./config.env" });
 const passport = require("passport");
 
 // * 審核後給予賣家密碼 (Manage)
-router.get(
+router.post(
   "/manage/:vendorId",
   handleErrorAsync(vendorsController.updateVendorManage)
   /* 	
-    #swagger.tags = ['Vendors']
+    #swagger.tags = ['Vendors-manage']
     #swagger.description = '審核後給予賣家密碼 (Manage)' 
 
     #swagger.parameters['body'] = {
@@ -39,10 +39,9 @@ router.get(
 // * 寄開通信給賣家 (Manage)
 router.post(
   "/sendEmail/:vendorId",
-  isAuth,
   handleErrorAsync(vendorsController.sendEmailToVendor)
   /*
-    #swagger.tags = ['Vendors']
+    #swagger.tags = ['Vendors-manage']
     #swagger.description = '寄開通信給賣家 (Manage)' 
 
     #swagger.parameters['body'] = {
@@ -72,26 +71,39 @@ router.post(
 // * 取得全部賣家資料 (Manage)
 router.get(
   "/manage",
-  handleErrorAsync(vendorsController.getAllVendors)
+  handleErrorAsync(vendorsController.getVendorsManage)
   /*
-    #swagger.tags = ['Vendors']
+    #swagger.tags = ['Vendors-manage']
     #swagger.description = '取得全部賣家資料 (Manage)' 
+
+    #swagger.parameters['body'] = {
+        in: 'body',
+        required: true,
+        schema: {
+            adminPassword: {
+                type: 'string',
+                description: '管理員密碼',
+                required: true
+            }
+        }
+    }
   */
 );
 
 // * 登入 (Back)
 router.post(
   "/login",
-  handleErrorAsync(vendorsController.signIn)
+  handleErrorAsync(vendorsController.vendorLogin)
   /*
-    #swagger.tags = ['Vendors']
+    #swagger.tags = ['Vendors-back']
     #swagger.description = '登入 (Back)' 
 
     #swagger.parameters['body'] = {
         in: 'body',
         required: true,
+        description: '會檢查帳號狀態(審核中或停權), 再檢查密碼',
         schema: {
-            email: {
+            account: {
                 type: 'string',
                 description: '帳號 (電子郵件)',
                 required: true
@@ -108,22 +120,22 @@ router.post(
 
 // * 取得登入賣家資料 (Back)
 router.get(
-  "/login",
+  "/admin",
   isAuth,
-  handleErrorAsync(vendorsController.getVendor)
+  handleErrorAsync(vendorsController.getVendorAdmin)
   /*
-    #swagger.tags = ['Vendors']
+    #swagger.tags = ['Vendors-back']
     #swagger.description = '取得登入賣家資料 (Back)' 
   */
 );
 
 // * 編輯賣家資料 (Back)
 router.patch(
-  "/",
+  "/admin",
   isAuth,
   handleErrorAsync(vendorsController.updateVendor)
   /*
-        #swagger.tags = ['Vendors']
+        #swagger.tags = ['Vendors-back']
         #swagger.description = '編輯賣家資料 (Back)' 
     
         #swagger.parameters['body'] = {
@@ -217,23 +229,28 @@ router.patch(
 router.patch(
   "/password",
   isAuth,
-  handleErrorAsync(vendorsController.updatePassword)
+  handleErrorAsync(vendorsController.updateVendorPassword)
   /*
-    #swagger.tags = ['Vendors']
+    #swagger.tags = ['Vendors-back']
     #swagger.description = '修改密碼 (Back)' 
 
     #swagger.parameters['body'] = {
         in: 'body',
         required: true,
         schema: {
-            oldPassword: {
+            currentPassword: {
                 type: 'string',
                 description: '舊密碼',
                 required: true
             },
-            newPassword: {
+            password: {
                 type: 'string',
                 description: '新密碼',
+                required: true
+            },
+            confirmPassword: {
+                type: 'string',
+                description: '新密碼確認',
                 required: true
             }
         }
@@ -246,7 +263,7 @@ router.post(
   "/",
   handleErrorAsync(vendorsController.newVendorReview)
   /*
-    #swagger.tags = ['Vendors']
+    #swagger.tags = ['Vendors-front']
     #swagger.description = '新增賣家申請 (Front)' 
 
     #swagger.parameters['body'] = {
@@ -302,7 +319,7 @@ router.get(
   "/checkAccount/:account",
   handleErrorAsync(vendorsController.checkVendorAccount)
   /*
-    #swagger.tags = ['Vendors']
+    #swagger.tags = ['Vendors-front']
     #swagger.description = '確認賣家帳號是否重複 (Front)' 
   */
 );
@@ -312,7 +329,7 @@ router.get(
   "/:vendorId",
   handleErrorAsync(vendorsController.getVendor)
   /*
-    #swagger.tags = ['Vendors']
+    #swagger.tags = ['Vendors-front']
     #swagger.description = '取得單筆賣家綜合資料 (需計算學員數、全部課程、師資) (Front)' 
   */
 );

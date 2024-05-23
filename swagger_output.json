@@ -9,8 +9,16 @@
   "basePath": "/",
   "tags": [
     {
-      "name": "Vendors",
-      "description": "賣家 (廠商)"
+      "name": "Vendors-front",
+      "description": "賣家 (前台)"
+    },
+    {
+      "name": "Vendors-back",
+      "description": "賣家 (後台)"
+    },
+    {
+      "name": "Vendors-manage",
+      "description": "賣家 (平台管理員)"
     },
     {
       "name": "HR",
@@ -1343,10 +1351,442 @@
         }
       }
     },
-    "/vendors/manage/{vendorId}": {
-      "get": {
+    "/auth/signup": {
+      "post": {
         "tags": [
-          "Vendors"
+          "Auth"
+        ],
+        "description": "註冊會員",
+        "parameters": [
+          {
+            "name": "member",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "account": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "用戶帳號"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                },
+                "password": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "用戶密碼"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                },
+                "confirmPassword": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "確認密碼"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/auth/signin": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "登入",
+        "parameters": [
+          {
+            "name": "user",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "account": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "用戶帳號"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                },
+                "password": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "用戶密碼"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/auth/checkAccountExist": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "檢查帳號是否已註冊",
+        "parameters": [
+          {
+            "name": "account",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "account": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "用戶帳號"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/auth/googleLogin": {
+      "post": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/auth/linkGoogleAccount": {
+      "post": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/auth/unlinkGoogleAccount": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/members/memberOne": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      },
+      "patch": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/members/collections": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/members/orders": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/members/password": {
+      "put": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/orders/{orderId}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "token",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      },
+      "patch": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "token",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/orders/": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/collections/": {
+      "post": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/collections/{collectionId}": {
+      "delete": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "collectionId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/feedbacks/": {
+      "post": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/platforms/": {
+      "get": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      },
+      "post": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      },
+      "patch": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/courses/": {
+      "get": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/vendors/manage/{vendorId}": {
+      "post": {
+        "tags": [
+          "Vendors-manage"
         ],
         "description": "審核後給予賣家密碼 (Manage)",
         "parameters": [
@@ -1411,7 +1851,7 @@
     "/vendors/sendEmail/{vendorId}": {
       "post": {
         "tags": [
-          "Vendors"
+          "Vendors-manage"
         ],
         "description": "寄開通信給賣家 (Manage)",
         "parameters": [
@@ -1419,11 +1859,6 @@
             "name": "vendorId",
             "in": "path",
             "required": true,
-            "type": "string"
-          },
-          {
-            "name": "token",
-            "in": "header",
             "type": "string"
           },
           {
@@ -1498,9 +1933,38 @@
     "/vendors/manage": {
       "get": {
         "tags": [
-          "Vendors"
+          "Vendors-manage"
         ],
         "description": "取得全部賣家資料 (Manage)",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "adminPassword": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "管理員密碼"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
         "responses": {
           "default": {
             "description": ""
@@ -1511,7 +1975,7 @@
     "/vendors/login": {
       "post": {
         "tags": [
-          "Vendors"
+          "Vendors-back"
         ],
         "description": "登入 (Back)",
         "parameters": [
@@ -1519,10 +1983,11 @@
             "name": "body",
             "in": "body",
             "required": true,
+            "description": "會檢查帳號狀態(審核中或停權), 再檢查密碼",
             "schema": {
               "type": "object",
               "properties": {
-                "email": {
+                "account": {
                   "type": "object",
                   "properties": {
                     "type": {
@@ -1565,10 +2030,12 @@
             "description": ""
           }
         }
-      },
+      }
+    },
+    "/vendors/admin": {
       "get": {
         "tags": [
-          "Vendors"
+          "Vendors-back"
         ],
         "description": "取得登入賣家資料 (Back)",
         "parameters": [
@@ -1583,12 +2050,10 @@
             "description": ""
           }
         }
-      }
-    },
-    "/vendors/": {
+      },
       "patch": {
         "tags": [
-          "Vendors"
+          "Vendors-back"
         ],
         "description": "編輯賣家資料 (Back)",
         "parameters": [
@@ -1874,152 +2339,12 @@
             "description": ""
           }
         }
-      },
-      "post": {
-        "tags": [
-          "Vendors"
-        ],
-        "description": "新增賣家申請 (Front)",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "representative": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "申請人名稱"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
-                },
-                "account": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "帳號(電子郵件)"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
-                },
-                "mobile": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "手機號碼"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
-                },
-                "brandName": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "品牌名稱"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
-                },
-                "reviewLinks": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "array"
-                    },
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "example": "string"
-                        }
-                      }
-                    }
-                  }
-                },
-                "reviewBrief": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "審核用簡介"
-                    }
-                  }
-                },
-                "reviewImages": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "array"
-                    },
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "example": "string"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
       }
     },
     "/vendors/password": {
       "patch": {
         "tags": [
-          "Vendors"
+          "Vendors-back"
         ],
         "description": "修改密碼 (Back)",
         "parameters": [
@@ -2035,7 +2360,7 @@
             "schema": {
               "type": "object",
               "properties": {
-                "oldPassword": {
+                "currentPassword": {
                   "type": "object",
                   "properties": {
                     "type": {
@@ -2052,7 +2377,7 @@
                     }
                   }
                 },
-                "newPassword": {
+                "password": {
                   "type": "object",
                   "properties": {
                     "type": {
@@ -2062,6 +2387,23 @@
                     "description": {
                       "type": "string",
                       "example": "新密碼"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                },
+                "confirmPassword": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "新密碼確認"
                     },
                     "required": {
                       "type": "boolean",
@@ -2080,10 +2422,23 @@
         }
       }
     },
+    "/vendors/": {
+      "post": {
+        "tags": [
+          "Vendors-front"
+        ],
+        "description": "新增賣家申請 (Front)",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/vendors/checkAccount/{account}": {
       "get": {
         "tags": [
-          "Vendors"
+          "Vendors-front"
         ],
         "description": "確認賣家帳號是否重複 (Front)",
         "parameters": [
@@ -2104,7 +2459,7 @@
     "/vendors/{vendorId}": {
       "get": {
         "tags": [
-          "Vendors"
+          "Vendors-front"
         ],
         "description": "取得單筆賣家綜合資料 (需計算學員數、全部課程、師資) (Front)",
         "parameters": [

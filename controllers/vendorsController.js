@@ -8,11 +8,13 @@ const jwt = require("jsonwebtoken");
 const { isAuth, generateSendJWT } = require("../utils/auth");
 const Vendor = require("../models/vendor");
 const { Course, CourseItem, CourseComment } = require("../models/course");
+const nodemailer = require("nodemailer");
+const { google } = require("googleapis");
+const OAuth2 = google.auth.OAuth2;
 
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
 const crypto = require("crypto");
-const nodemailer = require("nodemailer");
 
 const vendorController = {
   // todo : 分成 3 個使用方 ( Front 前台, Back 後台, Manage 平台管理 )
@@ -30,9 +32,14 @@ const vendorController = {
 
     let hashedPassword = await bcrypt.hash(password, 12);
 
-    const vendor = await Vendor.findByIdAndUpdate(vendorId, {
-      password: hashedPassword,
-    });
+    const vendor = await Vendor.findByIdAndUpdate(
+      vendorId,
+      {
+        password: hashedPassword,
+        status: 1, // 審核通過
+      },
+      { new: true }
+    );
 
     if (!vendor) {
       return next(appError("404", "用戶不存在！"));
@@ -58,6 +65,18 @@ const vendorController = {
     if (!vendor) {
       return next(appError(400, "找不到該賣家"));
     }
+
+    // 讓 Google 驗證專案
+    const oauth2Client = new OAuth2(
+      process.env.GOOGLE_AUTH_CLIENTID,
+      process.env.GOOGLE_AUTH_CLIENT_SECRET,
+      "https://developers.google.com/oauthplayground"
+    );
+
+    oauth2Client.setCredentials({
+      refresh_token: process.env.GOOGLE_AUTH_REFRESH_TOKEN,
+    });
+
     // 取得一次性的 access token
     const accessToken = oauth2Client.getAccessToken();
 
@@ -89,6 +108,15 @@ const vendorController = {
 
   // * 取得全部賣家資料 (Manage)
   getVendorsManage: async function (req, res, next) {
+    const { adminPassword } = req.body;
+
+    // 檢查管理員密碼是否正確
+    const correctAdminPassword = process.env.ADMIN_PASSWORD;
+
+    if (adminPassword !== correctAdminPassword) {
+      return next(appError("401", "管理員密碼錯誤！"));
+    }
+
     const data = await Vendor.find(); // 查詢所有資料
     handleSuccess(res, data, "取得所有資料成功");
   },
@@ -101,15 +129,9 @@ const vendorController = {
     }
 
     // 檢查 account 是否存在
-    const existingVendor = await Vendor.findOne({ account });
-    if (!existingVendor) {
-      return next(appError(400, "帳號不存在"));
-    }
-
     const vendor = await Vendor.findOne({ account }).select("+password");
-    const auth = await bcrypt.compare(password, vendor.password);
-    if (!auth) {
-      return next(appError(400, "您的密碼不正確"));
+    if (!vendor) {
+      return next(appError(400, "帳號不存在"));
     }
 
     // 檢查狀態
@@ -119,19 +141,28 @@ const vendorController = {
       case 2:
         return next(appError(400, "帳號被停權，若有疑問請聯絡平台管理員"));
       case 1:
+        break; // 如果 status 為 1，則不做任何事情並繼續執行後續的程式碼
       default:
-        // 更新登入時間
-        vendor.loginAt = Date.now();
-        await vendor.save();
-        generateSendJWT(vendor, 200, res);
+        return next(appError(400, "帳號狀態錯誤"));
     }
+
+    // 檢查密碼
+    const auth = await bcrypt.compare(password, vendor.password);
+    if (!auth) {
+      return next(appError(400, "您的密碼不正確"));
+    }
+
+    // 更新登入時間
+    vendor.loginAt = Date.now();
+    await vendor.save();
+    generateSendJWT(vendor, 200, res);
   },
 
   // * 取得登入賣家資料 (Back)
   getVendorAdmin: async function (req, res, next) {
-    const id = req.user.id;
+    const id = req.vendor.id;
     const vendor = await Vendor.findById(id);
-    // 還沒選要顯示哪些資料
+    // ? 還沒選要顯示哪些資料
 
     if (vendor) {
       handleSuccess(res, vendor, "取得賣家資料成功");
@@ -176,7 +207,6 @@ const vendorController = {
     );
 
     if (updateVendor) {
-      // 如果更新成功
       handleSuccess(res, updateVendor, "更新賣家資料成功");
     } else {
       return next(appError(400, "資料更新失敗"));
@@ -185,7 +215,22 @@ const vendorController = {
 
   // * 修改密碼 (Back)
   updateVendorPassword: async function (req, res, next) {
-    const { password, confirmPassword } = req.body;
+    const { currentPassword, password, confirmPassword } = req.body;
+
+    if(!currentPassword || !password || !confirmPassword) {
+      return next(appError(400, "請輸入所有必填欄位"));
+    }
+
+    // 首先，驗證現有的密碼
+    const vendor = await Vendor.findById(req.vendor.id).select("+password");
+    if (!vendor || !vendor.password) {
+      return next(appError("400", "無法驗證現有密碼"));
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, vendor.password);
+    if (!isMatch) {
+      return next(appError("400", "現有密碼不正確"));
+    }
 
     // 密碼必須為英數混合且至少 8 碼
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
@@ -198,7 +243,7 @@ const vendorController = {
     }
     let newPassword = await bcrypt.hash(password, 12);
 
-    const vendor = await Vendor.findByIdAndUpdate(req.vendor.id, {
+    await Vendor.findByIdAndUpdate(req.vendor.id, {
       password: newPassword,
     });
     generateSendJWT(vendor, 200, res, "更改密碼成功");
@@ -294,8 +339,9 @@ const vendorController = {
   getVendor: async function (req, res, next) {
     const vendorId = req.params.vendorId;
 
-    const vendor = await Vendor.findById(vendorId)
-    .select("-reviewLinks -reviewBrief -reviewImages -status -createdAt -updatedAt -__v");
+    const vendor = await Vendor.findById(vendorId).select(
+      "-reviewLinks -reviewBrief -reviewImages -status -createdAt -updatedAt -__v"
+    );
     if (!vendor) {
       return next(appError(400, "找不到該賣家"));
     }
