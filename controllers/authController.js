@@ -1,5 +1,6 @@
 const Member = require('../models/member');
 const bcrypt = require('bcryptjs');
+const validator = require('validator');
 const appError = require('../utils/appError');
 const handleSuccess = require('../utils/handleSuccess');
 const { generateSendJWT } = require('../utils/auth');
@@ -20,7 +21,7 @@ const authController = {
         }
 
         // 檢查帳號是否已存在
-        const isAccountExist = await Member.findOne({ account : account});
+        const isAccountExist = await Member.findOne({ account: account });
         if (isAccountExist) {
             return next(appError(400, '此 email 已註冊'));
         }
@@ -34,7 +35,7 @@ const authController = {
         if(!isValidPassword) {
             return next(appError(400, '密碼需包含英文及數字，且至少 8 碼'));
         }
-        
+
         password = await bcrypt.hash(password, 12);
 
         // 創建新會員
@@ -66,7 +67,7 @@ const authController = {
         }
 
         // 檢查帳號是否已存在
-        const isAccountExist = await Member.findOne({ account: account});
+        const isAccountExist = await Member.findOne({ account: account });
         if (isAccountExist) {
             return next(appError(400, '此 email 已註冊過會員'));
         }
@@ -97,7 +98,35 @@ const authController = {
 
         // 產生 token
         generateSendJWT(member, 200, res, '登入成功');
-    }
+    },
+
+    // google 登入
+    googleLogin: async (req, res, next) => {
+        // 處理 google 相關邏輯
+        // 創建會員資料
+        // 產生 token
+    },
+
+    // google 帳號綁定
+    linkGoogleAccount: async (req, res, next) => {
+        // 處理 google 相關邏輯
+        // 更新會員資料
+    },
+
+    // 取消連結 Google 帳號
+    unlinkGoogleAccount: async (req, res, next) => {
+        const memeberId = req.user.id;
+
+        // 清除 googleId
+        const member = await Member.findByIdAndUpdate(memeberId, { googleId: null, });
+
+        if (!member) {
+            return next(appError(500, '取消連結 Google 帳號失敗'));
+        }
+
+        handleSuccess(res, member, '取消連結 Google 帳號成功');
+    },
+
 };
 
 module.exports = authController;

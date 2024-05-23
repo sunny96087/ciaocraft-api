@@ -1,9 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const handleErrorAsync = require("../utils/handleErrorAsync");
-
 const authController = require("../controllers/authController");
-
 const { isAuth } = require("../utils/auth");
 
 router.post(
@@ -81,5 +79,9 @@ router.post(
       }
     */
 );
+
+router.post("/googleLogin", handleErrorAsync(authController.googleLogin));
+router.post('/linkGoogleAccount', handleErrorAsync(authController.linkGoogleAccount));
+router.post("/unlinkGoogleAccount", isAuth, handleErrorAsync(authController.unlinkGoogleAccount));
 
 module.exports = router;
