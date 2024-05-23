@@ -8,6 +8,8 @@
     "dev": "nodemon ./bin/www",
     "start:dev": "NODE_ENV=dev nodemon ./bin/www",
     "start:production": "NODE_ENV=production nodemon ./bin/www",
+    "win:dev": "set NODE_ENV=dev && nodemon ./bin/www",
+    "win:production": "set NODE_ENV=production && nodemon ./bin/www",
     "swagger": "node ./swagger.js"
   },
   "dependencies": {

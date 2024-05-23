@@ -7,6 +7,7 @@ const platformSchema = new mongoose.Schema({
     },
     platformNameEn:{
         type: String,
+        unique: true,   // 做為查詢唯一值
         required: [true, 'platformNameEn 為必填']
     },
     platformCompanyName:{
