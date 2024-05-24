@@ -20,7 +20,7 @@ const crypto = require("crypto");
 const teacherController = {
   // todo : 分成 3 個使用方 ( Front 前台, Back 後台, Manage 平台管理 )
 
-  // * 取得所有老師 (Back)
+  // * 取得所有老師 (query: sort, createdAt, 課程類型, keyword) (Back) 
   getAdminTeachers: async (req, res, next) => {
     const teachers = await Teacher.find({ status: { $in: [0, 1] } }).populate(
       "courseId"
