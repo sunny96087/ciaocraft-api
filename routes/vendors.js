@@ -306,7 +306,7 @@ router.post(
                 type: 'array',
                 items: {
                     type: 'string'
-                }
+                },
                 required: true
             },
         }
