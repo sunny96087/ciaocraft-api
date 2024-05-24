@@ -33,7 +33,7 @@ const memberSchema = new mongoose.Schema(
         },
         status: {
             type: Number,
-            default: 1,
+            default: 1,     // 0: : 停權 1: 啟用
         },
         point: {
             type: Number,
@@ -46,8 +46,7 @@ const memberSchema = new mongoose.Schema(
                     return v.every(interest => ['工藝手作', '烹飪烘烤', '藝術人文', '生活品味'].includes(interest));
                 },
                 message: props => `${props.value} 非有效 tags 值`
-            },
-            default: ['工藝手作']
+            }
         },
         collections: [{
             type: mongoose.Schema.Types.ObjectId,
