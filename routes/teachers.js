@@ -3,7 +3,7 @@ const router = express.Router(); // 創建一個路由器實例
 const handleErrorAsync = require("../utils/handleErrorAsync");
 
 const teacherController = require("../controllers/teacherController");
-const { isAuth } = require("../utils/vendorAuth");
+const { isVendorAuth } = require("../utils/vendorAuth");
 
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
@@ -35,7 +35,7 @@ router.get(
 // * 取得所有老師 (query: sort, createdAt, 課程類型, keyword) (Back)
 router.get(
   "/admin",
-  isAuth,
+  isVendorAuth,
   handleErrorAsync(teacherController.getAdminTeachers)
   /*
     #swagger.tags = ['Teachers-back']
@@ -81,7 +81,7 @@ router.get(
 // * 取得單筆老師資料 (Back)
 router.get(
   "/admin/:teacherId",
-  isAuth,
+  isVendorAuth,
   handleErrorAsync(teacherController.getAdminTeacher)
   /*
     #swagger.tags = ['Teachers-back']
@@ -92,7 +92,7 @@ router.get(
 // * 新增老師 (Back)
 router.post(
   "/",
-  isAuth,
+  isVendorAuth,
   handleErrorAsync(teacherController.newTeacher)
   /*
     #swagger.tags = ['Teachers-back']
@@ -145,7 +145,7 @@ router.post(
 // * 刪除老師 (偽刪除) (Back)
 router.patch(
   "/admin/deactivate/:teacherId",
-  isAuth,
+  isVendorAuth,
   handleErrorAsync(teacherController.deactivateTeacher)
   /*
     #swagger.tags = ['Teachers-back']
@@ -156,7 +156,7 @@ router.patch(
 // * 編輯老師 (Back)
 router.patch(
   "/:teacherId",
-  isAuth,
+  isVendorAuth,
   handleErrorAsync(teacherController.updateTeacher)
   /*
     #swagger.tags = ['Teachers-back']

@@ -14,7 +14,7 @@ const courseSchema = new mongoose.Schema(
       ref: "Teacher",
     },
     // * 關聯課程時間
-    CourseItemId: [
+    courseItemId: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "CourseItem",
@@ -23,11 +23,15 @@ const courseSchema = new mongoose.Schema(
     // * 關聯評論
     comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "CourseComment" }],
     // 課程類型
-    courseType: [String],
+    courseType: {
+      type: [String],
+      enum: ["工藝手作", "烹飪烘焙", "藝術人文", "生活品味"],
+      message: "課程類型只能是：工藝手作、烹飪烘焙、藝術人文、生活品味",
+    },
     // 課程時長類型
     courseTerm: {
       type: Number,
-      enum: [0, 1]  // 0: 單堂體驗 1:培訓課程
+      enum: [0, 1], // 0: 單堂體驗 1:培訓課程
     },
     // 課程名稱
     courseName: String,
@@ -35,8 +39,9 @@ const courseSchema = new mongoose.Schema(
     coursePrice: Number,
     // 課程狀態
     courseStatus: {
-      type: Boolean, // true: 啟用, false: 停用
-      default: true,
+      type: Number,
+      enum: [0, 1, 2], // 0: 下架, 1: 上架, 2: 刪除
+      default: 1,
     },
     // 課程名額
     courseCapacity: Number,
@@ -71,9 +76,11 @@ const courseItemSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Course",
     },
-    // 項目名額
+    // 人數
     capacity: Number,
-    // 項目價格
+    // 主課程名稱
+    mainCourseName: String,
+    // 日期
     courseDate: Date,
     // 項目名稱
     itemName: String,
@@ -161,14 +168,14 @@ const CourseComment = mongoose.model("CourseComment", courseCommentSchema);
 courseSchema.pre("find", function () {
   this.populate("vendorId")
     .populate("teacherId")
-    .populate("CourseItemId")
+    .populate("courseItemId")
     .populate("comments");
 });
 
 courseSchema.pre("findOne", function () {
   this.populate("vendorId")
     .populate("teacherId")
-    .populate("CourseItemId")
+    .populate("courseItemId")
     .populate("comments");
 });
 

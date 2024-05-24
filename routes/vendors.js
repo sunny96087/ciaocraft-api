@@ -3,7 +3,7 @@ const router = express.Router(); // 創建一個路由器實例
 const handleErrorAsync = require("../utils/handleErrorAsync");
 
 const vendorsController = require("../controllers/vendorsController");
-const { isAuth } = require("../utils/vendorAuth");
+const { isVendorAuth } = require("../utils/vendorAuth");
 
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
@@ -121,7 +121,7 @@ router.post(
 // * 取得登入賣家資料 (Back)
 router.get(
   "/admin",
-  isAuth,
+  isVendorAuth,
   handleErrorAsync(vendorsController.getVendorAdmin)
   /*
     #swagger.tags = ['Vendors-back']
@@ -132,7 +132,7 @@ router.get(
 // * 編輯賣家資料 (Back)
 router.patch(
   "/admin",
-  isAuth,
+  isVendorAuth,
   handleErrorAsync(vendorsController.updateVendor)
   /*
         #swagger.tags = ['Vendors-back']
@@ -228,7 +228,7 @@ router.patch(
 // * 修改密碼 (Back)
 router.patch(
   "/password",
-  isAuth,
+  isVendorAuth,
   handleErrorAsync(vendorsController.updateVendorPassword)
   /*
     #swagger.tags = ['Vendors-back']

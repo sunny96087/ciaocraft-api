@@ -43,6 +43,18 @@ const doc = {
       description: "老師 (平台管理員)",
     },
     {
+      name: "Courses-front",
+      description: "課程 (前台)",
+    },
+    {
+      name: "Courses-back",
+      description: "課程 (後台)",
+    },
+    {
+      name: "Courses-manage",
+      description: "課程 (平台管理員)",
+    },
+    {
       name: "HR",
       description: "--- 分隔線 - 以下是參考的 ---",
     },

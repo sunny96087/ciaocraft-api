@@ -5,7 +5,7 @@ const Vendor = require("../models/vendor");
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
 
-const isAuth = handleErrorAsync(async (req, res, next) => {
+const isVendorAuth = handleErrorAsync(async (req, res, next) => {
   // 確認 token 是否存在
   let token;
   //   if (
@@ -66,6 +66,6 @@ const generateSendJWT = (vendor, statusCode, res, message) => {
 };
 
 module.exports = {
-  isAuth,
+  isVendorAuth,
   generateSendJWT,
 };

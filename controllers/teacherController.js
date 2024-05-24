@@ -146,7 +146,6 @@ const teacherController = {
       return next(appError(400, errorMessage));
     }
 
-    console.log("Before creating new teacher:", data);
     const newTeacher = await Teacher.create({
       vendorId: data.vendorId,
       name: data.name,
@@ -156,7 +155,6 @@ const teacherController = {
       socialMediaInfo: data.socialMediaInfo,
       order: data.order,
     });
-    console.log("After creating new teacher:", newTeacher);
 
     handleSuccess(res, newTeacher, "新增老師成功");
   },
