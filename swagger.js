@@ -31,7 +31,7 @@ const doc = {
       description: "賣家 (平台管理員)",
     },
     {
-      name: "VTeachers-front",
+      name: "Teachers-front",
       description: "老師 (前台)",
     },
     {

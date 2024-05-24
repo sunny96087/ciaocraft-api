@@ -21,7 +21,7 @@
       "description": "賣家 (平台管理員)"
     },
     {
-      "name": "VTeachers-front",
+      "name": "Teachers-front",
       "description": "老師 (前台)"
     },
     {
@@ -2060,11 +2060,42 @@
     },
     "/courses/admin": {
       "get": {
-        "description": "",
+        "tags": [
+          "Courses-back"
+        ],
+        "description": "取得全部課程 (Back)",
         "parameters": [
           {
             "name": "token",
             "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "courseTerm",
+            "in": "query",
+            "description": "課程時長類型, 0: 單堂體驗 1:培訓課程",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "courseStatus",
+            "in": "query",
+            "description": "課程狀態, 0: 下架, 1: 上架, 2: 刪除",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "description": "搜尋關鍵字, 查詢老師姓名或課程名稱",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "createdAt",
+            "in": "query",
+            "description": "創建日期的排序方式，日期新到舊(預設)、舊到新: CREATED_AT_ASC",
+            "required": false,
             "type": "string"
           }
         ],
@@ -2077,13 +2108,17 @@
     },
     "/courses/admin/{courseId}": {
       "get": {
-        "description": "",
+        "tags": [
+          "Courses-back"
+        ],
+        "description": "取得單筆課程資料 + 項目資料 (Back)",
         "parameters": [
           {
             "name": "courseId",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "description": "要取得的課程 ID"
           },
           {
             "name": "token",
@@ -2108,7 +2143,10 @@
         }
       },
       "post": {
-        "description": "",
+        "tags": [
+          "Courses-back"
+        ],
+        "description": "新增課程 + 項目資料 (Back)",
         "parameters": [
           {
             "name": "token",
@@ -2125,18 +2163,353 @@
     },
     "/courses/{courseId}": {
       "patch": {
-        "description": "",
+        "tags": [
+          "Courses-back"
+        ],
+        "description": "編輯課程 + 項目資料 (Back)",
         "parameters": [
           {
             "name": "courseId",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "description": "要編輯的課程ID"
           },
           {
             "name": "token",
             "in": "header",
             "type": "string"
+          },
+          {
+            "name": "updateCourse",
+            "in": "body",
+            "description": "課程和項目資料的更新資訊",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "teacherId": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "老師 ID"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                },
+                "courseType": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "array"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "課程類型"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "enum": {
+                          "type": "array",
+                          "example": [
+                            "工藝手作",
+                            "烹飪烘焙",
+                            "藝術人文",
+                            "生活品味"
+                          ],
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "courseTerm": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "課程時長類型, 0: 單堂體驗 1:培訓課程"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "enum": {
+                      "type": "array",
+                      "example": [
+                        0,
+                        1
+                      ],
+                      "items": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                },
+                "courseName": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "課程名稱"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                },
+                "coursePrice": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "number"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "課程價格"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                },
+                "courseStatus": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "number"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "課程狀態, 0: 下架, 1: 上架, 2: 刪除"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "enum": {
+                      "type": "array",
+                      "example": [
+                        0,
+                        1,
+                        2
+                      ],
+                      "items": {
+                        "type": "number"
+                      }
+                    },
+                    "default": {
+                      "type": "number",
+                      "example": 1
+                    }
+                  }
+                },
+                "courseCapacity": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "number"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "課程名額"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                },
+                "courseSummary": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "課程摘要"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                },
+                "courseAddress": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "課程地址 (詳細活動地址)"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                },
+                "courseRemark": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "備註 (報名的注意事項)"
+                    }
+                  }
+                },
+                "courseImage": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "array"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "課程圖片 (最多 5 張)"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                },
+                "courseContent": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "課程內容 (編輯器)"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                },
+                "courseItems": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "array"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "課程項目 (時間), 帶入 id 表示更新, 不帶入 id 表示新增, 若資料庫有的 id, 但資料內沒出現, 則刪除該筆資料"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "object"
+                        },
+                        "properties": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "type": "string",
+                                  "example": "string"
+                                },
+                                "description": {
+                                  "type": "string",
+                                  "example": "課程項目 ID"
+                                }
+                              }
+                            },
+                            "courseDate": {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "type": "string",
+                                  "example": "string"
+                                },
+                                "format": {
+                                  "type": "string",
+                                  "example": "date-time"
+                                },
+                                "description": {
+                                  "type": "string",
+                                  "example": "開課日期"
+                                }
+                              }
+                            },
+                            "itemName": {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "type": "string",
+                                  "example": "string"
+                                },
+                                "description": {
+                                  "type": "string",
+                                  "example": "項目名稱"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         ],
         "responses": {
@@ -2148,13 +2521,17 @@
     },
     "/courses/admin/deactivate/{courseId}": {
       "patch": {
-        "description": "",
+        "tags": [
+          "Courses-back"
+        ],
+        "description": "刪除課程 (偽刪除) (Back)",
         "parameters": [
           {
             "name": "courseId",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "description": "要刪除的課程 ID"
           },
           {
             "name": "token",

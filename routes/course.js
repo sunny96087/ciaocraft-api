@@ -5,7 +5,11 @@ const { isVendorAuth } = require("../utils/vendorAuth");
 const courseController = require("../controllers/courseController");
 
 // ? 取得全部課程 (query: createdAt, courseTerm, courseStatus, keyword(teacherId > name || courseName)) (Back)
-/*
+router.get(
+  "/admin",
+  isVendorAuth,
+  handleErrorAsync(courseController.getAdminCourses)
+  /*
     #swagger.tags = ['Courses-back']
     #swagger.description = '取得全部課程 (Back)'
     #swagger.parameters['courseTerm'] = {
@@ -33,14 +37,14 @@ const courseController = require("../controllers/courseController");
         type: 'string'
     }
 */
-router.get(
-  "/admin",
-  isVendorAuth,
-  handleErrorAsync(courseController.getAdminCourses)
 );
 
 // ? 取得單筆課程資料 + 項目資料 (Back)
-/*
+router.get(
+  "/admin/:courseId",
+  isVendorAuth,
+  handleErrorAsync(courseController.getAdminCourse)
+  /*
   #swagger.tags = ['Courses-back']
   #swagger.description = '取得單筆課程資料 + 項目資料 (Back)'
   #swagger.parameters['courseId'] = {
@@ -50,23 +54,23 @@ router.get(
       type: 'string'
   }
   */
-router.get(
-  "/admin/:courseId",
-  isVendorAuth,
-  handleErrorAsync(courseController.getAdminCourse)
 );
 
 // * 取得課程列表 (Front)
 router.get("/", handleErrorAsync(courseController.getCourses));
 
 // ? 新增課程 + 項目資料 (Back)
-/*
+router.post(
+  "/",
+  isVendorAuth,
+  handleErrorAsync(courseController.newCourse)
+  /*
     #swagger.tags = ['Courses-back']
     #swagger.description = '新增課程 + 項目資料 (Back)'
 
     #swagger.parameters['newCourse'] = {
         in: 'body',
-        description: '新增課程 + 項目資料',
+        description: '新增課程 + 項目資料 (Back)',
         required: true,
         schema: {
             teacherId: {
@@ -156,10 +160,15 @@ router.get("/", handleErrorAsync(courseController.getCourses));
         }
     }
    */
-router.post("/", isVendorAuth, handleErrorAsync(courseController.newCourse));
+);
 
 // ? 編輯課程 + 項目資料 (Back)
-/*
+
+router.patch(
+  "/:courseId",
+  isVendorAuth,
+  handleErrorAsync(courseController.updateCourse)
+  /*
   #swagger.tags = ['Courses-back']
   #swagger.description = '編輯課程 + 項目資料 (Back)'
   #swagger.parameters['courseId'] = {
@@ -265,14 +274,15 @@ router.post("/", isVendorAuth, handleErrorAsync(courseController.newCourse));
     }
   }
 */
-router.patch(
-  "/:courseId",
-  isVendorAuth,
-  handleErrorAsync(courseController.updateCourse)
 );
 
 // ? 刪除課程 (偽刪除) (Back)
-/*
+
+router.patch(
+  "/admin/deactivate/:courseId",
+  isVendorAuth,
+  handleErrorAsync(courseController.deactivateCourse)
+  /*
   #swagger.tags = ['Courses-back']
   #swagger.description = '刪除課程 (偽刪除) (Back)'
   #swagger.parameters['courseId'] = {
@@ -282,9 +292,6 @@ router.patch(
       type: 'string'
   }
   */
-router.patch(
-  "/admin/deactivate/:courseId",
-  isVendorAuth,
-  handleErrorAsync(courseController.deactivateCourse)
 );
+
 module.exports = router;
