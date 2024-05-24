@@ -62,7 +62,7 @@ const orderSchema = new mongoose.Schema(
         },
         paidStatus: {
             type: Number,
-            enum: [0, 1, 2], // 0:待付款, 1: 已付款, 2: 已取消
+            enum: [0, 1, 2, 3, 4, 5, 6], // 0:待付款, 1: 已付款, 2: 已確認收到款, 3:已完課, 4:訂單取消(已過期), 5:訂單取消(待退款), 6:已退款
             default: 0,
         },
         // 使用者送出後 5 碼後的時間

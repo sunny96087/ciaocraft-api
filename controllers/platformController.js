@@ -1,4 +1,4 @@
-const Platform = require('../models/Platform');
+const Platform = require('../models/platform');
 const validator = require('validator');
 const appError = require('../utils/appError');
 const handleSuccess = require('../utils/handleSuccess');

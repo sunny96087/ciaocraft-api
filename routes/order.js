@@ -3,6 +3,7 @@ const router = express.Router();
 const handleErrorAsync = require("../utils/handleErrorAsync");
 const orderController = require("../controllers/orderController");
 const { isAuth } = require("../utils/auth");
+const { isVendorAuth } = require("../utils/vendorAuth");
 
 // 取得單一訂單資料
 router.get(
