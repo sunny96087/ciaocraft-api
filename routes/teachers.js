@@ -9,7 +9,30 @@ const dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
 const passport = require("passport");
 
-// * 取得所有老師 (Back)
+// * 取得所有老師 (Manage)
+router.get(
+  "/manage",
+  handleErrorAsync(teacherController.getAdminTeachers)
+  /*
+    #swagger.tags = ['Teachers-manage']
+    #swagger.description = '取得所有老師 (Manage)'
+
+    #swagger.parameters['getManageTeachers'] = {
+        in: 'body',
+        description: '使用管理員密碼取得所有老師',
+        required: true,
+        schema: {
+            adminPassword: {
+                type: 'string',
+                description: '管理員密碼',
+                required: true
+            },
+        }
+    }
+    */
+);
+
+// * 取得所有老師 (query: sort, createdAt, 課程類型, keyword) (Back)
 router.get(
   "/admin",
   isAuth,
@@ -17,7 +40,32 @@ router.get(
   /*
     #swagger.tags = ['Teachers-back']
     #swagger.description = '取得所有老師 (Back)'
-    */
+
+    #swagger.parameters['sort'] = {
+        in: 'query',
+        description: '排序方式，數字小到大(預設)、大到小: ORDER_DESC',
+        required: false,
+        type: 'string'
+    }
+    #swagger.parameters['createdAt'] = {
+        in: 'query',
+        description: '創建日期的排序方式，日期新到舊(預設)、舊到新: CREATED_AT_ASC',
+        required: false,
+        type: 'string'
+    }
+    #swagger.parameters['keyword'] = {
+        in: 'query',
+        description: '搜尋關鍵字, 查詢姓名欄位',
+        required: false,
+        type: 'string'
+    }
+    #swagger.parameters['courseTerm'] = {
+        in: 'query',
+        description: '課程時長類型, 0: 單堂體驗 1:培訓課程',
+        required: false,
+        type: 'string'
+    }
+  */
 );
 
 // * 取得單筆老師資料 (Front)

@@ -20,11 +20,68 @@ const crypto = require("crypto");
 const teacherController = {
   // todo : 分成 3 個使用方 ( Front 前台, Back 後台, Manage 平台管理 )
 
-  // * 取得所有老師 (query: sort, createdAt, 課程類型, keyword) (Back) 
+  // >> 取得所有老師 (Manage)
+  getManageTeachers: async (req, res, next) => {
+    const id = req.params.teacherId;
+
+    const { adminPassword } = req.body;
+
+    // 檢查管理員密碼是否正確
+    const correctAdminPassword = process.env.ADMIN_PASSWORD;
+
+    if (adminPassword !== correctAdminPassword) {
+      return next(appError("401", "管理員密碼錯誤！"));
+    }
+
+    const teachers = await Teacher.find().populate("courseId");
+    handleSuccess(res, teachers);
+  },
+
+  // ? 取得所有老師 (query: sort, createdAt, 課程類型, keyword) (Back)
   getAdminTeachers: async (req, res, next) => {
-    const teachers = await Teacher.find({ status: { $in: [0, 1] } }).populate(
-      "courseId"
-    );
+    const { order, createdAt, keyword, courseTerm } = req.query;
+
+    // 建立查詢條件
+    let query = { status: { $in: [0, 1] } };
+
+    // 如果有提供關鍵字，則添加到查詢條件中
+    if (keyword) {
+      query.name = new RegExp(keyword, "i"); // 'i' 代表不區分大小寫
+    }
+
+    // 建立排序條件
+    let sort = {};
+    if (order === "ORDER_DESC") {
+      sort.order = -1; // 數字大到小
+    } else {
+      sort.order = 1; // 數字小到大（預設）
+    }
+    if (createdAt === "CREATED_AT_ASC") {
+      sort.createdAt = 1; // 日期舊到新
+    } else {
+      sort.createdAt = -1; // 日期新到舊（預設）
+    }
+
+    // 查詢老師
+    let teachersQuery = Teacher.find(query).sort(sort);
+    if (courseTerm !== "") {
+      // 建立關聯查詢條件
+      let populateQuery = {
+        path: "courseId",
+        match: { courseTerm: Number(courseTerm) },
+      };
+      teachersQuery = teachersQuery.populate(populateQuery);
+    }
+
+    let teachers = await teachersQuery;
+    if (courseTerm !== "") {
+      teachers = teachers.filter((teacher) =>
+        teacher.courseId.some(
+          (course) => course.courseTerm === Number(courseTerm)
+        )
+      );
+    }
+
     handleSuccess(res, teachers);
   },
 
@@ -155,7 +212,7 @@ const teacherController = {
     handleSuccess(res, teacher, "編輯老師成功");
   },
 
-  // > 刪除老師 (Manage)
+  // >> 刪除老師 (Manage)
   deleteTeacherManage: async (req, res, next) => {
     const id = req.params.teacherId;
 
