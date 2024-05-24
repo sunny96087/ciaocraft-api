@@ -24,6 +24,11 @@ const courseSchema = new mongoose.Schema(
     comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "CourseComment" }],
     // 課程類型
     courseType: [String],
+    // 課程時長類型
+    courseTerm: {
+      type: Number,
+      enum: [0, 1]  // 0: 單堂體驗 1:培訓課程
+    },
     // 課程名稱
     courseName: String,
     // 課程價格
