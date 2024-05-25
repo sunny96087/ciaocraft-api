@@ -57,6 +57,18 @@
       "description": "訂單 (平台管理員)"
     },
     {
+      "name": "Upload-front",
+      "description": "上傳圖片 (前台)"
+    },
+    {
+      "name": "Upload-back",
+      "description": "上傳圖片 (後台)"
+    },
+    {
+      "name": "Upload-manage",
+      "description": "上傳圖片 (平台管理員)"
+    },
+    {
       "name": "HR",
       "description": "--- 分隔線 - 以下是參考的 ---"
     },
@@ -1188,6 +1200,84 @@
         }
       }
     },
+    "/upload/singleImage/admin": {
+      "post": {
+        "tags": [
+          "Upload-back"
+        ],
+        "description": "上傳單張圖片 (back)",
+        "parameters": [
+          {
+            "name": "file",
+            "in": "formData",
+            "required": true,
+            "type": "file",
+            "description": "圖片檔案",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "file"
+                },
+                "format": {
+                  "type": "string",
+                  "example": "binary"
+                },
+                "required": {
+                  "type": "boolean",
+                  "example": true
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/upload/multipleImage/admin": {
+      "post": {
+        "tags": [
+          "Upload-back"
+        ],
+        "description": "上傳多張圖片 (不超過 5 張) (back)",
+        "parameters": [
+          {
+            "name": "file",
+            "in": "formData",
+            "required": true,
+            "type": "file",
+            "description": "圖片檔案",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "file"
+                },
+                "format": {
+                  "type": "string",
+                  "example": "binary"
+                },
+                "required": {
+                  "type": "boolean",
+                  "example": true
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/upload/image": {
       "post": {
         "tags": [
@@ -1912,7 +2002,10 @@
     },
     "/orders/admin/payment/summary": {
       "get": {
-        "description": "",
+        "tags": [
+          "Orders-back"
+        ],
+        "description": "取得進帳總覽 (今日、近 7 天、30 天、12個月) (Back)",
         "parameters": [
           {
             "name": "token",

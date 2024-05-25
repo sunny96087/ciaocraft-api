@@ -67,6 +67,18 @@ const doc = {
       description: "訂單 (平台管理員)",
     },
     {
+      name: "Upload-front",
+      description: "上傳圖片 (前台)",
+    },
+    {
+      name: "Upload-back",
+      description: "上傳圖片 (後台)",
+    },
+    {
+      name: "Upload-manage",
+      description: "上傳圖片 (平台管理員)",
+    },
+    {
       name: "HR",
       description: "--- 分隔線 - 以下是參考的 ---",
     },
