@@ -5,7 +5,6 @@ const handleSuccess = require("../utils/handleSuccess"); // 引入自訂的成�
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { isAuth, generateSendJWT } = require("../utils/auth");
 const Teacher = require("../models/teacher");
 const Vendor = require("../models/vendor");
 const { Course, CourseItem, CourseComment } = require("../models/course");
@@ -39,10 +38,16 @@ const teacherController = {
 
   // ? 取得所有老師 (query: sort, createdAt, 課程類型, keyword) (Back)
   getAdminTeachers: async (req, res, next) => {
+    // 取得登入賣家的 ID
+    const vendorId = req.vendor.id;
+
     const { order, createdAt, keyword, courseTerm } = req.query;
 
     // 建立查詢條件
     let query = { status: { $in: [0, 1] } };
+
+    // 只取的該賣家的老師
+    query.vendorId = vendorId;
 
     // 如果有提供關鍵字，則添加到查詢條件中
     if (keyword) {

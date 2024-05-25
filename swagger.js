@@ -55,6 +55,18 @@ const doc = {
       description: "課程 (平台管理員)",
     },
     {
+      name: "Orders-front",
+      description: "訂單 (前台)",
+    },
+    {
+      name: "Orders-back",
+      description: "訂單 (後台)",
+    },
+    {
+      name: "Orders-manage",
+      description: "訂單 (平台管理員)",
+    },
+    {
       name: "HR",
       description: "--- 分隔線 - 以下是參考的 ---",
     },
