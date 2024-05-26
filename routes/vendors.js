@@ -118,6 +118,12 @@ router.post(
   */
 );
 
+// * 確認賣家帳號是否存在 (Back)
+router.get(
+  "/admin/checkAccount/:account",
+  handleErrorAsync(vendorsController.checkAdminVendorAccount)
+);
+
 // * 取得登入賣家資料 (Back)
 router.get(
   "/admin",

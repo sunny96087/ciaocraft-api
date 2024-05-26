@@ -5,7 +5,7 @@ const handleSuccess = require("../utils/handleSuccess"); // 引入自訂的成�
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { isVendorAuth, generateSendJWT } = require("../utils/auth");
+const { isVendorAuth, generateSendJWT } = require("../utils/vendorAuth");
 const Vendor = require("../models/vendor");
 const { Course, CourseItem, CourseComment } = require("../models/course");
 const nodemailer = require("nodemailer");
@@ -19,7 +19,7 @@ const crypto = require("crypto");
 const vendorController = {
   // todo : 分成 3 個使用方 ( Front 前台, Back 後台, Manage 平台管理 )
 
-  // * 審核後給予賣家密碼 (Manage)
+  // >> 審核後給予賣家密碼 (Manage)
   updateVendorManage: async function (req, res, next) {
     const vendorId = req.params.vendorId;
     const { adminPassword, password } = req.body;
@@ -48,7 +48,7 @@ const vendorController = {
     handleSuccess(res, vendor, "更新賣家資料成功");
   },
 
-  // * 寄開通信給賣家 (Manage)
+  // >> 寄開通信給賣家 (Manage)
   sendEmailToVendor: async function (req, res, next) {
     const vendorId = req.params.vendorId;
     const { adminPassword, subject, text } = req.body;
@@ -106,7 +106,7 @@ const vendorController = {
     handleSuccess(res, mailOptions, "審核通過郵件已成功發送給賣家");
   },
 
-  // * 取得全部賣家資料 (Manage)
+  // >> 取得全部賣家資料 (Manage)
   getVendorsManage: async function (req, res, next) {
     const { adminPassword } = req.body;
 
@@ -121,7 +121,7 @@ const vendorController = {
     handleSuccess(res, data, "取得所有資料成功");
   },
 
-  // * 登入 (Back)
+  // ? 登入 (Back)
   vendorLogin: async function (req, res, next) {
     const { account, password } = req.body;
     if (!account || !password) {
@@ -158,7 +158,19 @@ const vendorController = {
     generateSendJWT(vendor, 200, res);
   },
 
-  // * 取得登入賣家資料 (Back)
+  // ? 確認賣家帳號是否存在 (Back)
+  checkAdminVendorAccount: async function (req, res, next) {
+    const account = req.params.account;
+
+    const data = await Vendor.findOne({ account });
+    if (data) {
+      handleSuccess(res, null, "該帳號存在");
+    } else {
+      return next(appError(400, "該帳號不存在"));
+    }
+  },
+
+  // ? 取得登入賣家資料 (Back)
   getVendorAdmin: async function (req, res, next) {
     const id = req.vendor.id;
     const vendor = await Vendor.findById(id);
@@ -171,7 +183,7 @@ const vendorController = {
     }
   },
 
-  // * 編輯賣家資料 (Back)
+  // ? 編輯賣家資料 (Back)
   updateVendor: async function (req, res, next) {
     const id = req.vendor.id;
     let data = req.body;
@@ -189,6 +201,7 @@ const vendorController = {
       // 更新指定 ID 的資料
       id,
       {
+        representative: data.representative,
         mobile: data.mobile,
         brandName: data.brandName,
         avatar: data.avatar,
@@ -213,11 +226,11 @@ const vendorController = {
     }
   },
 
-  // * 修改密碼 (Back)
+  // ? 修改密碼 (Back)
   updateVendorPassword: async function (req, res, next) {
     const { currentPassword, password, confirmPassword } = req.body;
 
-    if(!currentPassword || !password || !confirmPassword) {
+    if (!currentPassword || !password || !confirmPassword) {
       return next(appError(400, "請輸入所有必填欄位"));
     }
 
