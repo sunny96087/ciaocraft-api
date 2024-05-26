@@ -16,7 +16,7 @@ const authController = {
         }
 
         // 驗證 email 格式
-        if(!validator.isEmail(account)) {
+        if (!validator.isEmail(account)) {
             return next(appError(400, '請輸入有效 email 格式'));
         }
 
@@ -32,7 +32,7 @@ const authController = {
         }
 
         const isValidPassword = /^(?=.*[a-zA-Z])(?=.*[0-9]).{8,}$/.test(password);
-        if(!isValidPassword) {
+        if (!isValidPassword) {
             return next(appError(400, '密碼需包含英文及數字，且至少 8 碼'));
         }
 
@@ -54,7 +54,6 @@ const authController = {
     // 檢查帳號是否存在
     checkAccountExist: async (req, res, next) => {
         let { account } = req.body;
-        console.log(account);
 
         // 驗證必填欄位
         if (!account) {
@@ -83,11 +82,15 @@ const authController = {
             return next(appError(400, 'account, password 為必填'));
         }
 
-        // 檢查帳號是否存在
-        const member = await Member.findOne({ account });
+        // 檢查帳號是否存在且未被停權
+        const member = await Member.findOne({account:account});
 
         if (!member) {
             return next(appError(400, '帳號錯誤'));
+        }
+        
+        if(member.status === 0){
+            return next(appError(400, '此帳號已被停權'));
         }
 
         // 檢查密碼是否正確

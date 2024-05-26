@@ -1,10 +1,17 @@
 const Member = require("../models/member");
 const Collection = require("../models/collection");
 const Order = require("../models/order");
+const validator = require("validator");
 const appError = require("../utils/appError");
 const handleSuccess = require("../utils/handleSuccess");
 
 const memberController = {
+    // 取得所有會員資料 (開發方便查詢用)
+    getAllMembers: async (req, res, next) => {
+        const members = await Member.find();
+        handleSuccess(res, members, "取得所有會員資料成功");
+    },
+
     // 取得單筆會員資料
     getMember: async (req, res, next) => {
         const memberId = req.user.id;
@@ -12,13 +19,13 @@ const memberController = {
         // 取得會員資料
         const member = await Member.findById(memberId)
             .select("nickname name gender birthday phone interests point");
-      
+
         // 取得 收藏 總數
         const collections = await Collection.find({ memberId: memberId });
         member.totalCollections = collections.length;
 
         // 取得 上過的課程 總數 (不重複)
-        const courses = await Order.find({ memberId: memberId }).distinct("courseId");
+        const courses = await Order.find({ memberId: memberId, status:1 }).distinct("courseId");
         member.totalCourses = courses.length;
 
         handleSuccess(res, member, "取得會員資料成功");
@@ -37,16 +44,25 @@ const memberController = {
     // 取得會員訂單
     getMemberOrders: async (req, res, next) => {
         const memberId = req.user.id;
+        const { status } = req.query;
+
+        // 查詢條件
+        const queryField = { memberId: memberId };
+        if (status) {
+            queryField.status = status;
+        }
 
         // 取得會員訂單
-        const orders = await Order.find({ memberId: memberId }).populate("courseId").sort({ createdAt: -1 });
+        const orders = await Order.find(queryField)
+            .populate("courseId")
+            .sort({ createdAt: -1 });
         handleSuccess(res, orders, "取得會員訂單成功");
     },
 
     // 修改會員資料
     updateMember: async (req, res, next) => {
         const memberId = req.user.id;
-        const { nickname, interests, name, gender, birthday, phone } = req.body;
+        const { nickname, interests, name, gender, birthday, phone, photo, point } = req.body;
 
         // 更新物件
         const updateFields = {};
@@ -55,6 +71,13 @@ const memberController = {
         if (interests) { updateFields.interests = interests; }
         if (name) { updateFields.name = name; }
         if (phone) { updateFields.phone = phone; }
+        if (photo) { updateFields.photo = photo; }
+        if (Number.isInteger(point) && point >= 0) {
+            updateFields.point = point;
+        }
+        else{
+            return next(appError(400, 'point 須為正整數'));
+        }
 
         // 驗證 gender 值
         if (gender) {
@@ -79,7 +102,7 @@ const memberController = {
             memberId,
             updateFields,
             { new: true, runValidators: true }
-        ).select("nickname name gender birthday phone interests ");
+        ).select("nickname name gender birthday phone interests point photo");
 
         if (!updateMember) {
             return next(appError(404, "找不到會員資料，更新失敗"));
