@@ -80,8 +80,10 @@ const courseItemSchema = new mongoose.Schema(
     capacity: Number,
     // 主課程名稱
     mainCourseName: String,
-    // 日期
-    courseDate: Date,
+    // 上課時間
+    startTime: Date,
+    // 結束時間
+    endTime: Date,
     // 項目名稱
     itemName: String,
     // 項目狀態

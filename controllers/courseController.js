@@ -152,7 +152,8 @@ const courseController = {
         // ...item,
         capacity: data.courseCapacity,
         mainCourseName: data.courseName,
-        courseDate: item.courseDate,
+        startTime: item.startTime,
+        endTime: item.endTime,
         itemName: item.itemName,
       });
       courseItemIds.push(newCourseItem._id);
@@ -257,7 +258,8 @@ const courseController = {
           // ...item,
           capacity: data.courseCapacity,
           mainCourseName: data.courseName,
-          courseDate: item.courseDate,
+          startTime: item.startTime,
+          endTime: item.endTime,
           itemName: item.itemName,
         });
         course.courseItemId.push(newCourseItem._id); // 將新的課程項目的 _id 加入到 course.courseItemId
