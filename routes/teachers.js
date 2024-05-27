@@ -12,7 +12,7 @@ const passport = require("passport");
 // * 取得所有老師 (Manage)
 router.get(
   "/manage",
-  handleErrorAsync(teacherController.getAdminTeachers)
+  handleErrorAsync(teacherController.getManageTeachers)
   /*
     #swagger.tags = ['Teachers-manage']
     #swagger.description = '取得所有老師 (Manage)'

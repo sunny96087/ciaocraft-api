@@ -21,7 +21,7 @@ const teacherController = {
 
   // >> 取得所有老師 (Manage)
   getManageTeachers: async (req, res, next) => {
-    const id = req.params.teacherId;
+    // const id = req.params.teacherId;
 
     const { adminPassword } = req.body;
 
