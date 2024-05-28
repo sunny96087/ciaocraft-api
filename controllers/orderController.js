@@ -378,7 +378,7 @@ const orderController = {
     const memberId = req.user.id;
     const { vendorId, courseId, courseItemId, vendorName, courseName, courseItemName, count, price, totalPrice, startTime, endTime, note, courseLocation } = req.body;
 
-    if (!vendorId || !courseId || !courseItemId || !vendorName || !courseItemName || !count || !price || !totalPrice || !courseTime || !courseLocation) {
+    if (!vendorId || !courseId || !courseItemId || !vendorName || !courseItemName || !count || !price || !totalPrice || !startTime || !endTime || !courseLocation) {
       return next(appError(400, '請輸入所有必填欄位'));
     }
 
@@ -456,6 +456,12 @@ const orderController = {
 
     if (!newOrder) {
       return next(appError(500, '新增訂單失敗'));
+    }
+
+    // 課程項目人數減少
+    const updateCourseItem = await CourseItem.findByIdAndUpdate(courseItemId, { $inc: { capacity: -count } });
+    if (!updateCourseItem) {
+      return next(appError(500, '更新課程項目人數失敗'));
     }
 
     handleSuccess(res, newOrder, '新增訂單成功');

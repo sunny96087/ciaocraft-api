@@ -7,18 +7,18 @@ const { isAuth } = require("../utils/auth");
 router.post(
     '/signup',
     handleErrorAsync(authController.signUp)
-    /** 
+    /*
       #swagger.tags = ['Auth-front']
+      #swagger.summary = '註冊'
       #swagger.description = '註冊會員'
-    
-      #swagger.parameters['member'] = {
+      #swagger.parameters['body'] = {
           in: 'body',
           description: '登入資訊',
           required: true,
           schema: {
               $account: "tht@gmail.com",
-              $password: "Aa123456",
-              $confirmPassword: "Aa123456"
+              $password: "Aa123456@",
+              $confirmPassword: "Aa123456@"
             }
         }
     */
@@ -30,23 +30,13 @@ router.post(
       #swagger.tags = ['Auth-front']
       #swagger.summary = '登入'
       #swagger.description = '登入會員，填入帳號密碼'
-      #swagger.parameters['user'] = {
+      #swagger.parameters['body'] = {
           in: 'body',
           description: '登入資訊',
           required: ["account", "password"],
-          schema : {
-            type: 'object',
-            properties: {
-              account: {
-                type: 'string',
-                description: '帳號',
-                example: 'tht@gmail.com'
-              },
-              password: {
-                    type: 'string',
-                    description: '密碼',
-                    example: 'Aa123456'
-               } 
+          schema: {
+              $account: "tht@gmail.com",
+              $password: "Aa123456@",
             }
           }
         }
@@ -55,19 +45,22 @@ router.post(
 router.post(
     '/checkAccountExist',
     handleErrorAsync(authController.checkAccountExist)
-    /** 
+    /*
       #swagger.tags = ['Auth-front']
+      #swagger.summary = '檢查帳號是否已註冊'
       #swagger.description = '檢查帳號是否已註冊'
-    
-      #swagger.parameters['account'] = {
+      #swagger.parameters['body'] = {
           in: 'body',
           required: true,
-          schema: {
+          schema : {
+            type: 'object',
+            properties: {
               account: {
-                  type: 'string',
-                  description: '用戶帳號',
-                  required: true
+                type: 'string',
+                description: '帳號',
+                example: 'tht@gmail.com'
               }
+            }
           }
       }
     */
@@ -78,9 +71,10 @@ router.post(
     handleErrorAsync(authController.googleLogin)
     /** 
       #swagger.tags = ['Auth-front']
+      #swagger.summary = 'Google 登入'
       #swagger.description = 'Google 登入'
     
-      #swagger.parameters['googleToken'] = {
+      #swagger.parameters['body'] = {
           in: 'body',
           required: true,
           schema: {
@@ -98,9 +92,10 @@ router.post(
     handleErrorAsync(authController.linkGoogleAccount)
     /** 
       #swagger.tags = ['Auth-front']
+      #swagger.summary = 'Google 帳號綁定'
       #swagger.description = 'Google 帳號綁定'
     
-      #swagger.parameters['googleToken'] = {
+      #swagger.parameters['body'] = {
           in: 'body',
           required: true,
           schema: {
@@ -119,6 +114,7 @@ router.post(
     handleErrorAsync(authController.unlinkGoogleAccount)
     /** 
       #swagger.tags = ['Auth-front']
+      #swagger.summary = 'Google 帳號解除綁定'
       #swagger.description = 'Google 帳號解除綁定'
     */
 );
