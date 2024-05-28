@@ -68,7 +68,7 @@ const teacherController = {
     }
 
     // 查詢老師
-    let teachersQuery = Teacher.find(query).sort(sort);
+    let teachersQuery = Teacher.find(query).populate("courseId").sort(sort);
     if (courseTerm !== "") {
       // 建立關聯查詢條件
       let populateQuery = {
@@ -130,29 +130,20 @@ const teacherController = {
   // ? 新增老師 (Back)
   newTeacher: async (req, res, next) => {
     let data = req.body;
+    let vendorId = req.vendor.id;
 
     // 使用 trimObjectValues 函數來去掉資料中所有值的空格
     data = tools.trimObjectAllValues(data);
 
-    // 檢查 ID 格式及是否存在
-    const isIdExist = await tools.findModelByIdNext(
-      Vendor,
-      data.vendorId,
-      next
-    );
-    if (!isIdExist) {
-      return;
-    }
-
     // 定義及檢查欄位內容不得為空
-    const fieldsToCheck = ["vendorId", "name", "order"];
+    const fieldsToCheck = ["name", "order"];
     const errorMessage = tools.checkFieldsNotEmpty(data, fieldsToCheck);
     if (errorMessage) {
       return next(appError(400, errorMessage));
     }
 
     const newTeacher = await Teacher.create({
-      vendorId: data.vendorId,
+      vendorId: vendorId,
       name: data.name,
       description: data.description,
       photo: data.photo,
