@@ -239,7 +239,7 @@ const courseController = {
               }
             },
             commentCount: {
-              $sum: { comments : 1 }
+              $sum: { comments: 1 }
             },
             createdAt: { $first: "$createdAt" },
           }
@@ -263,7 +263,7 @@ const courseController = {
         }
       ]);
     }
-    else{
+    else {
 
     }
 
@@ -447,6 +447,177 @@ const courseController = {
 
   // ? 取得所有訂單 (關聯課程 + 項目) (Back)
   // ? 取得單筆訂單資料 (關聯課程 + 項目) (Back)
+
+  // 取得單一課程資料 (Front)
+  getCourse: async (req, res, next) => {
+    const { courseId } = req.params;
+
+    // 驗證 courseId 格式和是否存在
+    const isValidCourseId = await tools.findModelByIdNext(Course, courseId, next);
+    if (!isValidCourseId) {
+      return;
+    }
+
+    // 查詢課程
+    const course = await Course.findById(courseId)
+      .populate({
+        path: "teacherId",
+        select: "name photo"
+      })
+      .populate({
+        path: "vendorId",
+        match: { status: 1 },
+        select: "brandName intro"
+      })
+      .populate({
+        path: "courseItemId",
+        match: { status: 1 },
+        select: "capacity startTime endTime itemName"
+      })
+      .select("courseName courseType courseTerm coursePrice courseSummary courseLocation courseAddress courseRemark courseImage courseContent courseStatus createdAt updatedAt")
+      .lean();
+
+    // 如果課程不存在，則返回錯誤
+    if (!course) {
+      return next(appError(404, "課程不存在 或 已下架"))
+    };
+
+    // 計算 賣家 評價分數：取得該賣家所有課程的評價，計算評價總數和平均值
+    let allComments = [];
+    
+    // 取得該賣家的所有 courseId
+    const allVendorCourses = await Course.find({ vendorId: course.vendorId }).select("courseId");
+
+    // 取得所有課程的評價
+    const allCoursesRatingsPromise = allVendorCourses.map(async (course) => {
+      const courseComments = await CourseComment.find({ courseId: course._id }).select("rating").lean();
+      return courseComments.map((comment) => comment.rating);
+    });
+    const allVendorCommentsRatings = await Promise.all(allCoursesRatingsPromise).then((values) => values.flat());
+
+    // 計算賣家 評價總數 和 平均值
+    const totalVendorComments = allVendorCommentsRatings.reduce((acc, cur) => acc + cur, 0);
+    const vendorRating = totalVendorComments / allVendorCourses.length;
+
+    // 計算 課程 評價總數 和 平均值
+    const courseComments = await CourseComment.find({ courseId: courseId }).select("rating");
+    const totalComments = courseComments.length;
+    const courseRating = courseComments.reduce((acc, cur) => acc + cur.rating, 0);
+
+    // 更新 course 物件
+    course.totalVendorComments = totalVendorComments;
+    course.vendorRating = vendorRating;
+    course.totalComments = totalComments;
+    course.courseRating = courseRating;
+
+    handleSuccess(res, course, "取得單一課程資料成功");
+  },
+
+  // 取得單一課程全部評價 (Front)
+  getCourseAllComments: async (req, res, next) => {
+    const { courseId } = req.params;
+
+    // 驗證 courseId 格式和是否存在
+    const isValidCourseId = await tools.findModelByIdNext(Course, courseId, next);
+    if (!isValidCourseId) {
+      return;
+    }
+
+    const isCourseExist = await Course.find({ courseId: courseId, courseStatus: 1 });
+    if (!isCourseExist) {
+      return next(appError(404, "課程不存在 或 已下架"));
+    }
+
+    // 查詢課程全部評價
+    const comments = await CourseComment.findById(courseId)
+      .populate({
+        path: "memberId",
+        select: "name"
+      })
+      .select("content images tags rating likes createAt");
+
+    handleSuccess(res, comments, "取得單一課程全部評價成功");
+  },
+
+  // 取得單一評價 (Front)
+  getComment: async (req, res, next) => {
+    const memberId = req.user.id;
+    const { commentId } = req.params;
+
+    // 驗證 commentId 格式和是否存在
+    const isValidCommentId = await tools.findModelByIdNext(CourseComment, commentId, next);
+    if (!isValidCommentId) {
+      return;
+    }
+
+    const isMeberComment = await CourseComment.findOne({ _id: commentId, memberId: memberId });
+    if (!isMeberComment) {
+      return next(appError(403, "無權限查看該評價"));
+    }
+
+    // 查詢評價
+    const comment = await Course.findById(commentId)
+      .populate({
+        path: "courseId",
+        select: "courseName"
+      })
+      .select("content images tags rating createAt");
+
+    // 如果評價不存在，則返回錯誤
+    if (!comment) {
+      return next(appError(404, "評價不存在"));
+    }
+
+    handleSuccess(res, comment, "取得單一評價成功");
+  },
+
+  // 新增課程評價 (Front)
+  newComment: async (req, res, next) => {
+    const memberId = req.user.id;
+    const { courseId } = req.params;
+    let { content, images, tags, rating } = req.body;
+
+    // 驗證必填欄位
+    if (!content || !rating || !tags) {
+      return next(appError(400, "content, rating, tags 為必填欄位"));
+    }
+
+    // 驗證 courseId 格式和是否存在 
+    const isValidCourseId = await tools.findModelByIdNext(Course, courseId, next);
+    if (!isValidCourseId) {
+      return;
+    }
+
+    if (content.length > 500) {
+      return next(appError(400, "content 長度不得超過 500 字元"));
+    }
+
+    // 驗證 rating 格式
+    if (validator.isInteger(rating) && rating >= 1 && rating <= 5) {
+      return next(appError(400, "rating 應介於 1 到 5 之正整數"));
+    }
+
+    // 驗證 tags 格式
+    if (!Array.isArray(tags) || tags.length === 0) {
+      return next(appError(400, "tags 應為不為空的陣列"));
+    }
+
+    // 新增評價
+    const newComment = await CourseComment.create({
+      memberId: memberId,
+      courseId: courseId,
+      content: content,
+      images: images,
+      tags: tags,
+      rating: rating
+    });
+
+    if (!newComment) {
+      return next(appError(500, "新增課程評價失敗"));
+    }
+
+    handleSuccess(res, newComment, "新增課程評價成功");
+  },
 };
 
 module.exports = courseController;

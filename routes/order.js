@@ -152,6 +152,7 @@ router.post(
     /*  #swagger.tags = ['Orders-front']
         #swagger.summary = '新增訂單'
         #swagger.description = '新增訂單'
+        #swagger.parameters['body'] = {}
     */
 );
 
@@ -163,6 +164,20 @@ router.patch(
     /*  #swagger.tags = ['Orders-front']
         #swagger.summary = '更新訂單資料'
         #swagger.description = '更新訂單資料，前台會員僅可更新後5碼'
+        #swagger.parameters['body'] = {
+          in: 'body',
+          required: true,
+          schema : {
+            type: 'object',
+            properties: {
+              lastFiveDigits: {
+                type: 'string',
+                description: '銀行帳號後五碼',
+                example: '12345'
+              }
+            }
+          }
+      }
     */  
 );
 
