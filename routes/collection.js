@@ -7,7 +7,7 @@ const collectionController = require("../controllers/collectionsController");
 router.post(
     "/",
     handleErrorAsync(collectionController.newCollection)
-    /* #swagger.tags = ['Collection']
+    /* #swagger.tags = ['Collection-front']
        #swagger.description = '新增收藏'
        #swagger.parameters['collection'] = {
            in: 'body',
@@ -28,7 +28,7 @@ router.post(
 router.delete(
     "/:collectionId",
     handleErrorAsync(collectionController.deleteCollection)
-    /* #swagger.tags = ['Collection']
+    /* #swagger.tags = ['Collection-front']
        #swagger.description = '刪除收藏'
        #swagger.parameters['collectionId'] = {
            in: 'path',

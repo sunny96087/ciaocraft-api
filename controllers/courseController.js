@@ -93,7 +93,180 @@ const courseController = {
 
   // * 取得課程列表 (Front)
   getCourses: async (req, res, next) => {
-    const courses = await Course.find();
+    console.log('取得課程列表 (Front)')
+    let { keyword, courseTerm, courseType, sortBy, pageNo, pageSize } = req.query;
+
+    // 建立查詢條件；預設只顯示上架課程
+    let queryField = { courseStatus: 1 };
+
+    // 關鍵字查詢
+    if (keyword) { queryField.courseName = { $regex: keyword, $options: "i" }; }
+
+    // 課程類型(Array)查詢
+    if (courseType) { queryField.courseType = { $in: courseType.split(",") }; }
+
+    // 選擇課程時長類型 (0:單堂體驗 1:培訓課程)
+    if (courseTerm) {
+      courseTerm = parseInt(courseTerm);
+      queryField.courseTerm = courseTerm;
+    }
+
+    // 分頁查詢 (預設第 1 頁，每頁 100 筆)
+    pageNo = parseInt(pageNo) || 1;
+    pageSize = parseInt(pageSize) || 100;
+    let skip = (pageNo - 1) * pageSize;
+    let limit = pageSize;
+
+    // 課程 
+    let courses = [];
+
+    // 排序查詢 (預設依照最新時間排序)
+    sortBy = sortBy || "newest";
+    if (sortBy === "newest") {
+      // 依照最新時間排序
+      courses = await Course
+        .find(queryField)
+        .sort({ createdAt: -1 })
+        .skip(skip).limit(limit)
+        .select("brandName courseName courseType courseTerm coursePrice createdAt");
+    }
+    else if (sortBy === "mostPopular") {
+      // 依照訂單被預訂數量 status=3(已完課) -> 收藏數量 -> 最新時間
+      courses = await Course.aggregate([
+        {
+          $match: queryField
+        },
+        {
+          $lookup: {
+            from: "vendors",
+            localField: "vendorId",
+            foreignField: "_id",
+            as: "vendor"
+          }
+        },
+        {
+          $unwind: "$vendor"
+        },
+        {
+          $lookup: {
+            from: "orders",
+            localField: "_id",
+            foreignField: "courseId",
+            as: "orders"
+          }
+        },
+        {
+          $lookup: {
+            from: "collections",
+            localField: "_id",
+            foreignField: "courseId",
+            as: "collections"
+          }
+        },
+        {
+          $project: {
+            courseName: 1,
+            brandName: "$vendor.brandName",
+            courseType: 1,
+            courseTerm: 1,
+            coursePrice: 1,
+            orderCount: {
+              $size: {
+                $filter: {
+                  input: "$orders",
+                  as: "order",
+                  cond: { $eq: ["$$order.status", 3] } // order=3(已完課)
+                }
+              }
+            },
+            collectionCount: { $size: "$collections" },
+            createdAt: 1
+          }
+        },
+        {
+          $sort: { orderCount: -1, collectionCount: -1, createdAt: -1 }
+        },
+        { $skip: skip },
+        { $limit: limit }
+      ]);
+    }
+    else if (sortBy === "highestRate") {
+      // 依照評價高低 -> 評論數最多 -> 最新上架時間
+      courses = await Course.aggregate([
+        {
+          $match: queryField
+        },
+        {
+          $lookup: {
+            from: "vendors",
+            localField: "vendorId",
+            foreignField: "_id",
+            as: "vendor"
+          }
+        },
+        {
+          $unwind: "$vendor"
+        },
+        {
+          $lookup: {
+            from: "coursecomments",
+            localField: "_id",
+            foreignField: "courseId",
+            as: "comments"
+          }
+        },
+        {
+          $unwind: {
+            path: "$comments",
+            preserveNullAndEmptyArrays: true
+          }
+        },
+        {
+          $group: {
+            _id: "$_id",
+            courseName: { $first: "$courseName" },
+            brandName: { $first: "$vendor.brandName" },
+            courseType: { $first: "$courseType" },
+            courseTerm: { $first: "$courseTerm" },
+            coursePrice: { $first: "$coursePrice" },
+            averageRate: {
+              $avg: {
+                $cond: {
+                  if: { $ne: ["$comments.rating", null] },
+                  then: "$comments.rating",
+                  else: null                            // 不存在 rate 欄位，則返回 null
+                }
+              }
+            },
+            commentCount: {
+              $sum: { comments : 1 }
+            },
+            createdAt: { $first: "$createdAt" },
+          }
+        },
+        {
+          $sort: { averageRate: -1, commentCount: -1, createdAt: -1 }
+        },
+        { $skip: skip },
+        { $limit: limit },
+        {
+          $project: {
+            courseName: 1,
+            brandName: 1,
+            courseType: 1,
+            courseTerm: 1,
+            coursePrice: 1,
+            averageRate: 1,
+            commentCount: 1,
+            createdAt: 1
+          }
+        }
+      ]);
+    }
+    else{
+
+    }
+
     handleSuccess(res, courses, "取得課程列表成功");
   },
 

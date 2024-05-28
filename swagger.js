@@ -9,11 +9,11 @@ const doc = {
     description: "六角課程團體專題用 api",
   },
   // * 開發
-  // host: 'localhost:3666',
-  // schemes: ['http', 'https'],
+  host: 'localhost:3666',
+  schemes: ['http', 'https'],
   // * 部署
-  host: "ciaocraft-api.onrender.com",
-  schemes: ["https"],
+  // host: "ciaocraft-api.onrender.com",
+  // schemes: ["https"],
 
   basePath: "/",
   tags: [
@@ -65,6 +65,30 @@ const doc = {
     {
       name: "Orders-manage",
       description: "訂單 (平台管理員)",
+    },
+    {
+      name: "Auth-front",
+      description: "登入/註冊 (前台)"
+    },
+    {
+      name: "Members-front",
+      description: "會員 (前台)",
+    },
+    {
+      name: "Collections-front",
+      description: "收藏 (前台)",
+    },
+    {
+      name: "Platforms-front",
+      description: "平台資料"
+    },
+    {
+      name: "Platforms-manage",
+      description: "平台資料 (平台管理員)"
+    },
+    {
+      name: "Feedback-front",
+      description: "回饋 (前台)",
     },
     {
       name: "Upload-front",

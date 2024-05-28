@@ -57,7 +57,52 @@ router.get(
 );
 
 // * 取得課程列表 (Front)
-router.get("/", handleErrorAsync(courseController.getCourses));
+router.get(
+    "/", 
+    handleErrorAsync(courseController.getCourses)
+    /*  #swagger.tags = ['Courses-front']
+        #swagger.summary = '取得課程列表'
+        #swagger.description = '搜尋條件：可帶入「課程時長類型 (courseTerm)、課程類型 (courseType)、課程名稱關鍵字 (keyword)」篩選課程。 <br>
+        排序條件：sortBy 可帶入「newest (最近日期), mostPopular (最熱門), highestRate (評分最高)」；未選擇則預設 newest 方式排序。 <br>
+        分頁功能：可帶入頁碼 (pageNo)、筆數 (pageSize) 以使用分頁功能。未帶入則預設 pageNo = 1, pageSize = 20。'
+        #swagger.parameters['courseTerm'] = {
+            in: 'query',
+            description: '課程時長類型；0: 單堂體驗 1:培訓課程',
+            required: false,
+            type: 'string'
+        }
+        #swagger.parameters['courseType'] = {
+            in: 'query',
+            description: '課程類型；多選以逗號分隔，可帶入類型：工藝手作, 烹飪烘焙, 藝術人文, 生活品味',
+            required: false,
+            type: 'string'
+        }
+        #swagger.parameters['keyword'] = {
+            in: 'query',
+            description: '課程名稱關鍵字',
+            required: false,
+            type: 'string'
+        }
+        #swagger.parameters['sortBy'] = {
+            in: 'query',
+            description: '預設依照日期排序：可填 newest(最近日期), mostPopular(最熱門), highestRate(評分最高)',
+            required: false,
+            type: 'string'
+        }
+        #swagger.parameters['pageNo'] = {
+            in: 'query',
+            description: '當前頁碼，預設 1',
+            required: false,
+            type: 'number'
+        }
+        #swagger.parameters['pageSize'] = {
+            in: 'query',
+            description: '每頁筆數，預設 20 筆，上限 100 筆',
+            required: false,
+            type: 'number'
+        }
+     */
+);
 
 // ? 新增課程 + 項目資料 (Back)
 router.post(
@@ -150,6 +195,7 @@ router.post(
                             type: 'string',
                             format: 'date-time',
                             description: '日期'
+                        }
                     },
                     itemName: {
                         type: 'string',
