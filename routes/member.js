@@ -4,12 +4,35 @@ const { isAuth } = require("../utils/auth");
 const memberController = require('../controllers/memberController');
 const handleErrorAsync = require('../utils/handleErrorAsync');
 
+// 取得所有會員資料 (開發方便查詢用)
+router.get(
+    "/",
+    handleErrorAsync(memberController.getAllMembers)
+    /*  #swagger.tags = ['Members-front']
+        #swagger.summary = '取得所有會員 (開發查詢用)'
+        #swagger.description = '取得所有會員 (方便開發查詢用)'
+        #swagger.parameters['adminPasswird'] = {
+            in: 'body',
+            description: '管理者密碼',
+            required: true,
+            schema: {
+                adminPassword: {
+                    type: 'string',
+                    description: '管理者密碼',
+                    required: true
+                }
+            }
+        }
+     */
+)
+
 // 取得登入會員資料
 router.get(
     "/memberOne",
     isAuth,
     handleErrorAsync(memberController.getMember)
-    /* #swagger.tags = ['Member']
+    /*  #swagger.tags = ['Members-front']
+        #swagger.summary = '取得登入會員資料'
         #swagger.description = '取得登入會員資料'
      */
 );
@@ -19,7 +42,8 @@ router.patch(
     "/memberOne",
     isAuth,
     handleErrorAsync(memberController.updateMember)
-    /* #swagger.tags = ['Member']
+    /*  #swagger.tags = ['Members-front']
+        #swagger.summary = '修改會員資料'
         #swagger.description = '修改登入會員資料，欄位只需填寫要修改的部分'
         #swagger.parameters['member'] = {
             in: 'body',
@@ -61,8 +85,14 @@ router.get(
     "/memberOne/collections",
     isAuth,
     handleErrorAsync(memberController.getMemberCollections)
-    /* #swagger.tags = ['Member']
+    /*  #swagger.tags = ['Members-front']
+        #swagger.summary = '取得登入會員收藏'
         #swagger.description = '取得登入會員收藏'
+        #swagger.parameters['courseTerm'] = {
+            in: 'query',
+            description: '課程期別',
+            type: 'string'
+        }
      */
 );
 
@@ -70,9 +100,10 @@ router.get(
 router.post(
     "/memberOne/collections",
     isAuth,
-    handleErrorAsync(memberController.newCollection)
-    /* #swagger.tags = ['Member']
-        #swagger.description = '新增收藏'
+    handleErrorAsync(memberController.newMemberCollections)
+    /*  #swagger.tags = ['Members-front']
+        #swagger.summary = '會員新增收藏'
+        #swagger.description = '會員新增收藏'
         #swagger.parameters['collection'] = {
             in: 'body',
             required: true,
@@ -91,9 +122,10 @@ router.post(
 router.delete(
     "/memberOne/collections/:collectionId",
     isAuth,
-    handleErrorAsync(memberController.deleteCollection)
-    /* #swagger.tags = ['Member']
-        #swagger.description = '刪除收藏'
+    handleErrorAsync(memberController.deleteMemberCollection)
+    /*  #swagger.tags = ['Members-front']
+        #swagger.summary = '會員刪除收藏'
+        #swagger.description = '會員刪除收藏'
         #swagger.parameters['collectionId'] = {
             in: 'path',
             required: true,
@@ -107,8 +139,14 @@ router.get(
     "/memberOne/orders",
     isAuth,
     handleErrorAsync(memberController.getMemberOrders)
-    /* #swagger.tags = ['Member']
-        #swagger.description = '取得登入會員訂單'
+    /*  #swagger.tags = ['Members-front']
+        #swagger.summary = '取得登入會員全部訂單'
+        #swagger.description = '取得登入會員全部訂單'
+        #swagger.parameters['status'] = {
+            in: 'query',
+            description: '訂單狀態；0:未付款, 1:已付款, 2:已確認收款, 3:已完成, 4:已取消, 5:訂單取消(不需退款), 6:訂單取消(待退款), 7:訂單取消(已退款)',
+            type: 'string'
+        }
      */
 );
 
@@ -117,7 +155,8 @@ router.put(
     "/memberOne/password",
     isAuth,
     handleErrorAsync(memberController.updatePassword)
-    /* #swagger.tags = ['Member']
+    /*  #swagger.tags = ['Members-front']
+        #swagger.summary = '修改會員密碼'
         #swagger.description = '修改會員密碼'
         #swagger.parameters['password'] = {
             in: 'body',

@@ -134,16 +134,36 @@ router.patch(
 );
 
 // 取得單一訂單資料
-router.get("/:orderId", isAuth, handleErrorAsync(orderController.getOrder));
+router.get(
+    "/:orderId", 
+    isAuth, 
+    handleErrorAsync(orderController.getOrder)
+    /*  #swagger.tags = ['Orders-front']
+        #swagger.summary = '取得單一訂單資料'
+        #swagger.description = '取得單一訂單資料'
+    */
+);
 
 // 新增訂單
-router.post("/", isAuth, handleErrorAsync(orderController.newOrder));
+router.post(
+    "/", 
+    isAuth, 
+    handleErrorAsync(orderController.newOrder)
+    /*  #swagger.tags = ['Orders-front']
+        #swagger.summary = '新增訂單'
+        #swagger.description = '新增訂單'
+    */
+);
 
 // 更新訂單資料 (前台會員僅可更新後5碼)
 router.patch(
   "/:orderId",
   isAuth,
   handleErrorAsync(orderController.updateOrder)
+    /*  #swagger.tags = ['Orders-front']
+        #swagger.summary = '更新訂單資料'
+        #swagger.description = '更新訂單資料，前台會員僅可更新後5碼'
+    */  
 );
 
 module.exports = router;
