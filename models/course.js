@@ -55,8 +55,16 @@ const courseSchema = new mongoose.Schema(
     courseRemark: String,
     // 課程圖片
     courseImage: [String],
-    // 課程內容 (編輯器)
+    // 課程內容 (編輯器) // 又改成要四個欄位了..
     courseContent: String,
+    // 注意事項
+    courseNotice: String,
+    // 適合對象
+    courseSuitableFor: String,
+    // 你可以學到
+    courseSkillsLearned: String,
+    // 課程總時數 (時長)
+    courseTotalHours: Number,
   },
   {
     versionKey: false,

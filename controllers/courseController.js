@@ -137,8 +137,8 @@ const courseController = {
     let { keyword, courseTerm, courseType, sortBy, pageNo, pageSize } =
       req.query;
 
-    // 建立查詢條件；預設只顯示上架課程
-    let queryField = { courseStatus: 1 };
+    // 建立查詢條件；預設顯示狀態為 0 或 1 的課程
+    let queryField = { courseStatus: { $in: [0, 1] } };
 
     // 關鍵字查詢
     if (keyword) {
@@ -359,6 +359,14 @@ const courseController = {
       ...data,
     });
 
+    // 找到相對應的老師並將新課程 _id 添加到 courseId 陣列中
+    const teacher = await Teacher.findById(data.teacherId);
+    if (!teacher) {
+      return next(appError(400, "找不到相對應的老師"));
+    }
+    teacher.courseId.push(newCourse._id);
+    await teacher.save();
+
     // 建立課程項目並儲存課程項目的 ID
     const courseItems = data.courseItems;
     const courseItemIds = [];
@@ -396,6 +404,16 @@ const courseController = {
     // 將課程狀態設為 2 來表示假刪除
     course.courseStatus = 2;
     await course.save();
+
+    // 找到相對應的老師並從 courseId 陣列中移除該課程 _id
+    const teacher = await Teacher.findById(course.teacherId);
+    if (teacher) {
+      const index = teacher.courseId.indexOf(courseId);
+      if (index > -1) {
+        teacher.courseId.splice(index, 1);
+        await teacher.save();
+      }
+    }
 
     handleSuccess(res, null, "刪除課程成功");
   },
@@ -437,6 +455,14 @@ const courseController = {
     // 更新課程資料
     Object.assign(course, data);
     await course.save();
+
+    // 找到相對應的老師並將課程 _id 添加到 courseId 陣列中
+    const teacher = await Teacher.findById(data.teacherId);
+    if (!teacher) {
+      return next(appError(400, "找不到相對應的老師"));
+    }
+    teacher.courseId.push(course._id);
+    await teacher.save();
 
     // 對取回來的 item.id 進行比對, 若資料庫有的 id, 但資料內沒出現, 則刪除該筆資料
     const courseItemIds = data.courseItems.map((item) => item.id);
