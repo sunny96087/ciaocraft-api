@@ -22,7 +22,7 @@ const orderSchema = new mongoose.Schema(
             required: [true, "courseItemId 為必填"]
         },
         // 顯示廠商名稱，避免廠商名稱更動後，訂單顯示不同名稱
-        vendorName: {
+        brandName: {
             type: String,
             required: [true, "vendorName 為必填"]
         },
@@ -52,13 +52,21 @@ const orderSchema = new mongoose.Schema(
             required: [true, "totalPrice 為必填"]
         },
         // 上課日期，格式須為 Datetime 格式，用來確認是否已完課
-        courseTime: {
+        startTime:{
             type: Date,
-            required: [true, "courseTime 為必填"]
+            required: [true, "courseEndTime 為必填"]
+        },
+        endTime: {
+            type: Date,
+            required: [true, "courseStartTime 為必填"]
         },
         // 教室地址
-        location: {
+        courseLocation: {
             type: String,
+        },
+        orderPoint:{
+            type: Number,
+            default: 0,
         },
         paymentType: {
             type: Number,

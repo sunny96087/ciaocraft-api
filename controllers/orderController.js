@@ -334,7 +334,38 @@ const orderController = {
     const orderId = req.params.orderId;
 
     // 檢查訂單是否存在
-    const order = await Order.findOne({ _id: orderId, memberId: memberId }).populate('courseId');
+    const order = await Order
+      .findOne({ _id: orderId, memberId: memberId })
+      .populate({
+        path: 'vendorId',
+        select: 'bankName bankCode bankBranch bankAccountName bankAccount'
+      })
+      .select(`_id 
+                memberId
+                vendorId
+                courseId
+                courseItemId 
+                vendorName
+                courseLocation 
+                paymentType 
+                paidStatus 
+                count 
+                price 
+                totalPrice 
+                startTime 
+                note 
+                createdAt 
+                confirmTime 
+                refundTime 
+                cancelTime 
+                cancelReason 
+                lastFiveDigits
+                bankName
+                bankCode 
+                bankBranch
+                bankAccountName
+                bankAccount `)
+
     if (!order) {
       return next(appError(400, '會員無此訂單資料'));
     }
@@ -345,9 +376,9 @@ const orderController = {
   // 新增訂單
   newOrder: async (req, res, next) => {
     const memberId = req.user.id;
-    const { vendorId, courseId, courseItemId, vendorName, courseItemName, count, price, totalPrice, courseTime, note, location } = req.body;
+    const { vendorId, courseId, courseItemId, vendorName, courseName, courseItemName, count, price, totalPrice, startTime, endTime, note, courseLocation } = req.body;
 
-    if (!vendorId || !courseId || !courseItemId || !vendorName || !courseItemName || !count || !price || !totalPrice || !courseTime || !location) {
+    if (!vendorId || !courseId || !courseItemId || !vendorName || !courseItemName || !count || !price || !totalPrice || !courseTime || !courseLocation) {
       return next(appError(400, '請輸入所有必填欄位'));
     }
 
@@ -392,12 +423,19 @@ const orderController = {
       return next(appError(400, 'totalPrice 須為大於 0 之正整數'));
     }
 
-    // 驗證 courseTime 和轉換 Date 物件
-    const isValidDateStr = Date.parse(courseTime);
-    if (!isValidDateStr) {
-      return next(appError(400, 'courseTime 格式錯誤'));
+    // 驗證 startTime 和轉換 Date 物件
+    const isValidStartTimeStr = Date.parse(startTime);
+    if (!isValidStartTimeStr) {
+      return next(appError(400, 'startTime 格式錯誤'));
     }
-    const courseTimeDateObj = new Date(courseTime);
+    const startTimeDateObj = new Date(startTime);
+
+    // 驗證 endTime 和轉換 Date 物件
+    const isValidEndTimeStr = Date.parse(endTime);
+    if (!isValidEndTimeStr) {
+      return next(appError(400, 'endTime 格式錯誤'));
+    }
+    const endTimeDateObj = new Date(endTime);
 
     // 新增訂單
     const newOrder = await Order.create({
@@ -406,11 +444,13 @@ const orderController = {
       courseId,
       courseItemId,
       vendorName,
+      courseName,
       courseItemName,
       count,
       price,
       totalPrice,
-      courseTimeDateObj,
+      startTimeDateObj,
+      endTimeDateObj,
       note
     });
 
@@ -427,14 +467,31 @@ const orderController = {
     const orderId = req.params.orderId;
     const lastFiveDigits = req.body.lastFiveDigits;
 
-    // 檢查訂單是否存在
+    // 檢查 orderId 格式
+    const isOrderExist = await tools.findModelByIdNext(Order, orderId, next);
+    if (!isOrderExist) {
+      return;
+    }
+
+    // 檢查 lastFiveDigits 格式
+    if (!lastFiveDigits || lastFiveDigits.length !== 5) {
+      return next(appError(400, 'lastFiveDigits 錯誤'));
+    }
+
+    // 檢查會員是否有此訂單
     const order = await Order.findOne({ _id: orderId, memberId: memberId });
     if (!order) {
       return next(appError(400, '會員無此訂單資料'));
     }
 
+    // 0: 待付款, 1: 已付款, 2: 已確認收到款, 3:已完課, 4:訂單取消(已過期), 5:訂單取消(不需退款), 6:訂單取消(待退款), 7:訂單取消(已退款)
+    const status = 1;
+
     // 更新後五碼
-    const updateOrder = await Order.findOneAndUpdate({ _id: orderId, memberId: memberId }, { lastFiveDigits: lastFiveDigits }, { new: true });
+    const updateOrder = await Order.findOneAndUpdate(
+      { _id: orderId, memberId: memberId },
+      { lastFiveDigits: lastFiveDigits, status: status },
+      { new: true });
     handleSuccess(res, updateOrder, '更新訂單資料成功');
   },
 }
