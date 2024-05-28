@@ -16,7 +16,7 @@ const courseController = {
     console.log("req.query", req.query);
 
     // 從請求中取得查詢參數
-    const { createdAt, courseTerm, courseStatus, keyword } = req.query;
+    const { startDate, courseTerm, courseStatus, keyword } = req.query;
 
     // 建立查詢條件
     const query = { vendorId };
@@ -43,18 +43,58 @@ const courseController = {
     }
 
     // 根據 createdAt 排序課程
-    const sort = {};
-    if (createdAt === "asc") {
-      sort.createdAt = 1;
-    } else {
-      sort.createdAt = -1; // 預設為降序
-    }
+    // const sort = {};
+    // if (createdAt === "asc") {
+    //   sort.createdAt = 1;
+    // } else {
+    //   sort.createdAt = -1; // 預設為降序
+    // }
 
     // 查詢賣家的所有課程
-    const courses = await Course.find(query)
-      .sort(sort)
+    let courses = await Course.find(query)
       .populate("teacherId")
       .populate("courseItemId");
+    // .sort(sort)
+
+    // 對每個課程查詢相關的 courseItemId 並找出最早的 startTime 和最晚的 endTime
+    courses = await Promise.all(
+      courses.map(async (course) => {
+        const courseItems = await CourseItem.find({
+          _id: { $in: course.courseItemId },
+        });
+
+        if (courseItems.length === 0) {
+          return course;
+        }
+
+        const startTimes = courseItems
+          .filter((item) => item.startTime)
+          .map((item) => new Date(item.startTime).getTime());
+        const endTimes = courseItems
+          .filter((item) => item.endTime)
+          .map((item) => new Date(item.endTime).getTime());
+
+        if (startTimes.length === 0 || endTimes.length === 0) {
+          return course;
+        }
+
+        const earliestStartTime = new Date(Math.min(...startTimes));
+        const latestEndTime = new Date(Math.max(...endTimes));
+
+        return {
+          ...course._doc,
+          earliestStartTime,
+          latestEndTime,
+        };
+      })
+    );
+
+    // 根據 earliestStartTime 排序課程
+    if (startDate === "asc") {
+      courses.sort((a, b) => a.earliestStartTime - b.earliestStartTime);
+    } else {
+      courses.sort((a, b) => b.earliestStartTime - a.earliestStartTime); // 預設為降序
+    }
 
     // 返回查詢結果
     handleSuccess(res, courses, "取得全部課程成功");
@@ -93,17 +133,22 @@ const courseController = {
 
   // * 取得課程列表 (Front)
   getCourses: async (req, res, next) => {
-    console.log('取得課程列表 (Front)')
-    let { keyword, courseTerm, courseType, sortBy, pageNo, pageSize } = req.query;
+    console.log("取得課程列表 (Front)");
+    let { keyword, courseTerm, courseType, sortBy, pageNo, pageSize } =
+      req.query;
 
     // 建立查詢條件；預設只顯示上架課程
     let queryField = { courseStatus: 1 };
 
     // 關鍵字查詢
-    if (keyword) { queryField.courseName = { $regex: keyword, $options: "i" }; }
+    if (keyword) {
+      queryField.courseName = { $regex: keyword, $options: "i" };
+    }
 
     // 課程類型(Array)查詢
-    if (courseType) { queryField.courseType = { $in: courseType.split(",") }; }
+    if (courseType) {
+      queryField.courseType = { $in: courseType.split(",") };
+    }
 
     // 選擇課程時長類型 (0:單堂體驗 1:培訓課程)
     if (courseTerm) {
@@ -117,51 +162,52 @@ const courseController = {
     let skip = (pageNo - 1) * pageSize;
     let limit = pageSize;
 
-    // 課程 
+    // 課程
     let courses = [];
 
     // 排序查詢 (預設依照最新時間排序)
     sortBy = sortBy || "newest";
     if (sortBy === "newest") {
       // 依照最新時間排序
-      courses = await Course
-        .find(queryField)
+      courses = await Course.find(queryField)
         .sort({ createdAt: -1 })
-        .skip(skip).limit(limit)
-        .select("brandName courseName courseType courseTerm coursePrice createdAt");
-    }
-    else if (sortBy === "mostPopular") {
+        .skip(skip)
+        .limit(limit)
+        .select(
+          "brandName courseName courseType courseTerm coursePrice createdAt"
+        );
+    } else if (sortBy === "mostPopular") {
       // 依照訂單被預訂數量 status=3(已完課) -> 收藏數量 -> 最新時間
       courses = await Course.aggregate([
         {
-          $match: queryField
+          $match: queryField,
         },
         {
           $lookup: {
             from: "vendors",
             localField: "vendorId",
             foreignField: "_id",
-            as: "vendor"
-          }
+            as: "vendor",
+          },
         },
         {
-          $unwind: "$vendor"
+          $unwind: "$vendor",
         },
         {
           $lookup: {
             from: "orders",
             localField: "_id",
             foreignField: "courseId",
-            as: "orders"
-          }
+            as: "orders",
+          },
         },
         {
           $lookup: {
             from: "collections",
             localField: "_id",
             foreignField: "courseId",
-            as: "collections"
-          }
+            as: "collections",
+          },
         },
         {
           $project: {
@@ -175,51 +221,50 @@ const courseController = {
                 $filter: {
                   input: "$orders",
                   as: "order",
-                  cond: { $eq: ["$$order.status", 3] } // order=3(已完課)
-                }
-              }
+                  cond: { $eq: ["$$order.status", 3] }, // order=3(已完課)
+                },
+              },
             },
             collectionCount: { $size: "$collections" },
-            createdAt: 1
-          }
+            createdAt: 1,
+          },
         },
         {
-          $sort: { orderCount: -1, collectionCount: -1, createdAt: -1 }
+          $sort: { orderCount: -1, collectionCount: -1, createdAt: -1 },
         },
         { $skip: skip },
-        { $limit: limit }
+        { $limit: limit },
       ]);
-    }
-    else if (sortBy === "highestRate") {
+    } else if (sortBy === "highestRate") {
       // 依照評價高低 -> 評論數最多 -> 最新上架時間
       courses = await Course.aggregate([
         {
-          $match: queryField
+          $match: queryField,
         },
         {
           $lookup: {
             from: "vendors",
             localField: "vendorId",
             foreignField: "_id",
-            as: "vendor"
-          }
+            as: "vendor",
+          },
         },
         {
-          $unwind: "$vendor"
+          $unwind: "$vendor",
         },
         {
           $lookup: {
             from: "coursecomments",
             localField: "_id",
             foreignField: "courseId",
-            as: "comments"
-          }
+            as: "comments",
+          },
         },
         {
           $unwind: {
             path: "$comments",
-            preserveNullAndEmptyArrays: true
-          }
+            preserveNullAndEmptyArrays: true,
+          },
         },
         {
           $group: {
@@ -234,18 +279,18 @@ const courseController = {
                 $cond: {
                   if: { $ne: ["$comments.rating", null] },
                   then: "$comments.rating",
-                  else: null                            // 不存在 rate 欄位，則返回 null
-                }
-              }
+                  else: null, // 不存在 rate 欄位，則返回 null
+                },
+              },
             },
             commentCount: {
-              $sum: { comments : 1 }
+              $sum: { comments: 1 },
             },
             createdAt: { $first: "$createdAt" },
-          }
+          },
         },
         {
-          $sort: { averageRate: -1, commentCount: -1, createdAt: -1 }
+          $sort: { averageRate: -1, commentCount: -1, createdAt: -1 },
         },
         { $skip: skip },
         { $limit: limit },
@@ -258,13 +303,11 @@ const courseController = {
             coursePrice: 1,
             averageRate: 1,
             commentCount: 1,
-            createdAt: 1
-          }
-        }
+            createdAt: 1,
+          },
+        },
       ]);
-    }
-    else{
-
+    } else {
     }
 
     handleSuccess(res, courses, "取得課程列表成功");

@@ -30,9 +30,9 @@ router.get(
         required: false,
         type: 'string'
     }
-    #swagger.parameters['createdAt'] = {
+    #swagger.parameters['startDate'] = {
         in: 'query',
-        description: '創建日期的排序方式，日期新到舊(預設)、舊到新: CREATED_AT_ASC',
+        description: '開課日期的排序方式，日期新到舊(預設)、舊到新: asc',
         required: false,
         type: 'string'
     }
