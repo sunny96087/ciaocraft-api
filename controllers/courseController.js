@@ -166,7 +166,7 @@ const courseController = {
     let courses = [];
 
     // 排序查詢 (預設依照最新時間排序)
-    sortBy = sortBy || "newest";
+    sortBy = sortBy.trim() || "newest";
     if (sortBy === "newest") {
       // 依照最新時間排序
       courses = await Course.find(queryField)
@@ -176,6 +176,7 @@ const courseController = {
         .select(
           "brandName courseName courseType courseTerm coursePrice createdAt"
         );
+      console.log("time");
     } else if (sortBy === "mostPopular") {
       // 依照訂單被預訂數量 status=3(已完課) -> 收藏數量 -> 最新時間
       courses = await Course.aggregate([
@@ -517,7 +518,9 @@ const courseController = {
         match: { status: 1 },
         select: "capacity startTime endTime itemName"
       })
-      .select("courseName courseType courseTerm coursePrice courseSummary courseLocation courseAddress courseRemark courseImage courseContent courseStatus createdAt updatedAt")
+      .select(`courseName courseType courseTerm coursePrice courseSummary 
+               courseLocation courseAddress courseRemark courseImage courseContent courseStatus 
+               createdAt updatedAt`)
       .lean();
 
     // 如果課程不存在，則返回錯誤
@@ -526,32 +529,31 @@ const courseController = {
     };
 
     // 計算 賣家 評價分數：取得該賣家所有課程的評價，計算評價總數和平均值
-    let allComments = [];
-    
     // 取得該賣家的所有 courseId
     const allVendorCourses = await Course.find({ vendorId: course.vendorId }).select("courseId");
 
-    // 取得所有課程的評價
-    const allCoursesRatingsPromise = allVendorCourses.map(async (course) => {
-      const courseComments = await CourseComment.find({ courseId: course._id }).select("rating").lean();
-      return courseComments.map((comment) => comment.rating);
-    });
-    const allVendorCommentsRatings = await Promise.all(allCoursesRatingsPromise).then((values) => values.flat());
+    // 取得所有課程的評價數值
+    let allVendorCommentsRatings = [];
+    for (const course of allVendorCourses) {
+      const courseComments = await CourseComment.find({ courseId: course.courseId }).select("rating");
+      allRatingsValue = courseComments.map(comment => comment.rating);
+      allVendorCommentsRatings.push(...allRatingsValue);
+    }
 
     // 計算賣家 評價總數 和 平均值
     const totalVendorComments = allVendorCommentsRatings.reduce((acc, cur) => acc + cur, 0);
-    const vendorRating = totalVendorComments / allVendorCourses.length;
+    const vendorAvgRating = totalVendorComments / allVendorCourses.length;
 
     // 計算 課程 評價總數 和 平均值
     const courseComments = await CourseComment.find({ courseId: courseId }).select("rating");
-    const totalComments = courseComments.length;
-    const courseRating = courseComments.reduce((acc, cur) => acc + cur.rating, 0);
+    const totalCourseComments = courseComments.length;
+    const courseAvgRating = courseComments.reduce((acc, cur) => acc + cur.rating, 0);
 
     // 更新 course 物件
     course.totalVendorComments = totalVendorComments;
-    course.vendorRating = vendorRating;
-    course.totalComments = totalComments;
-    course.courseRating = courseRating;
+    course.vendorAvgRating = vendorAvgRating;
+    course.totalCourseComments = totalCourseComments;
+    course.courseAvgRating = courseAvgRating;
 
     handleSuccess(res, course, "取得單一課程資料成功");
   },
