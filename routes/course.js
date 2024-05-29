@@ -94,13 +94,13 @@ router.get(
             in: 'query',
             description: '當前頁碼，預設 1',
             required: false,
-            type: 'number'
+            type: 'string'
         }
         #swagger.parameters['pageSize'] = {
             in: 'query',
             description: '每頁筆數，預設 20 筆，上限 100 筆',
             required: false,
-            type: 'number'
+            type: 'string'
         }
      */
 );
@@ -242,15 +242,15 @@ router.get(
     "/:courseId",
     handleErrorAsync(courseController.getCourse)
     /* 
-    #swagger.tags = ['Courses-front']
-    #swagger.summary = '取得單筆課程資料'
-    #swagger.description = '取得單筆課程資料，不含評論'
-    #swagger.parameters['courseId'] = {
-        in: 'path',
-        description: '要取得的課程 ID',
-        required: true,
-        type: 'string'
-    }
+        #swagger.tags = ['Courses-front']
+        #swagger.summary = '取得單筆課程資料'
+        #swagger.description = '取得單筆課程資料，不含評論'
+        #swagger.parameters['courseId'] = {
+            in: 'path',
+            description: '要取得的課程 ID',
+            required: true,
+            type: 'string'
+        }
     */
 )
 
@@ -259,15 +259,15 @@ router.get(
     "/:courseId/comments",
     handleErrorAsync(courseController.getCourseAllComments)
     /* 
-    #swagger.tags = ['Courses-front']
-    #swagger.summary = '取得單筆課程全部評論'
-    #swagger.description = '取得單筆課程全部評論'
-    #swagger.parameters['courseId'] = {
-        in: 'path',
-        description: '要取得的課程 ID',
-        required: true,
-        type: 'string'
-    }
+        #swagger.tags = ['Courses-front']
+        #swagger.summary = '取得單筆課程全部評論'
+        #swagger.description = '取得單筆課程全部評論'
+        #swagger.parameters['courseId'] = {
+            in: 'path',
+            description: '要取得的課程 ID',
+            required: true,
+            type: 'string'
+        }
     */
 )
 
@@ -276,15 +276,15 @@ router.get(
     "/comments/:commentId",
     handleErrorAsync(courseController.getComment)
     /* 
-    #swagger.tags = ['Courses-front']
-    #swagger.summary = '取得單筆評論'
-    #swagger.description = '取得單筆評論' 
-    #swagger.parameters['commentId'] = {
-        in: 'path',
-        description: '要取得的評論 ID',
-        required: true,
-        type: 'string'
-    }
+        #swagger.tags = ['Courses-front']
+        #swagger.summary = '取得單筆評論'
+        #swagger.description = '取得單筆評論' 
+        #swagger.parameters['commentId'] = {
+            in: 'path',
+            description: '要取得的評論 ID',
+            required: true,
+            type: 'string'
+        }
     */
 
 )
@@ -294,53 +294,53 @@ router.post(
     "/comments",
     handleErrorAsync(courseController.newComment)
     /* 
-    #swagger.tags = ['Courses-front']
-    #swagger.summary = '新增評論'
-    #swagger.description = '新增評論'
-    #swagger.parameters['newComment'] = {
-        in: 'body',
-        description: '新增評論',
-        required: true,
-        schema: {
-            memberId: {
-                type: 'string',
-                description: '會員 ID',
-                required: true
-            },
-            courseId: {
-                type: 'string',
-                description: '課程 ID',
-                required: true
-            },
-            content: {
-                type: 'string',
-                description: '評論內容',
-                required: true
-            },
-            images: {
-                type: 'array',
-                description: '評論圖片 (最多 5 張)',
-            },
-            tags: {
-                type: 'array',
-                description: '評論標籤',
-                required: true,
-                items: {
+        #swagger.tags = ['Courses-front']
+        #swagger.summary = '新增評論'
+        #swagger.description = '新增評論'
+        #swagger.parameters['newComment'] = {
+            in: 'body',
+            description: '新增評論',
+            required: true,
+            schema: {
+                memberId: {
                     type: 'string',
-                    enum: ["師生互動", "教學環境", "專業度", "其他"]
+                    description: '會員 ID',
+                    required: true
+                },
+                courseId: {
+                    type: 'string',
+                    description: '課程 ID',
+                    required: true
+                },
+                content: {
+                    type: 'string',
+                    description: '評論內容',
+                    required: true
+                },
+                images: {
+                    type: 'array',
+                    description: '評論圖片 (最多 5 張)',
+                },
+                tags: {
+                    type: 'array',
+                    description: '評論標籤',
+                    required: true,
+                    items: {
+                        type: 'string',
+                        enum: ["師生互動", "教學環境", "專業度", "其他"]
+                    }
+                },
+                rating: {
+                    type: 'number',
+                    description: '評分',
+                    required: true
+                },
+                likes: {
+                    type: 'number',
+                    description: '按讚數',
                 }
-            },
-            rating: {
-                type: 'number',
-                description: '評分',
-                required: true
-            },
-            likes: {
-                type: 'number',
-                description: '按讚數',
             }
         }
-    }
     */
 )
 

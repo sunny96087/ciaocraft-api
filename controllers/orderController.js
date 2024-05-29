@@ -376,9 +376,10 @@ const orderController = {
   // 新增訂單
   newOrder: async (req, res, next) => {
     const memberId = req.user.id;
-    const { vendorId, courseId, courseItemId, vendorName, courseName, courseItemName, count, price, totalPrice, startTime, endTime, note, courseLocation } = req.body;
-
-    if (!vendorId || !courseId || !courseItemId || !vendorName || !courseItemName || !count || !price || !totalPrice || !startTime || !endTime || !courseLocation) {
+    const { vendorId, courseId, courseItemId, brandName, courseName, courseItemName, count, price, totalPrice, startTime, endTime, note, courseLocation } = req.body;
+    
+    // 驗證必填欄位
+    if (!vendorId || !courseId || !courseItemId || !brandName || !courseItemName || !count || !price || !totalPrice || !startTime || !endTime || !courseLocation) {
       return next(appError(400, '請輸入所有必填欄位'));
     }
 
@@ -387,6 +388,7 @@ const orderController = {
     if (!isVendorExist) {
       return;
     }
+
     const vendorStatus = await Vendor.findById({ _id: vendorId }).select('status');
     if (vendorStatus.status !== 1) {
       return next(appError(400, '此廠商已停用'));
@@ -397,8 +399,9 @@ const orderController = {
     if (!isCourseExist) {
       return;
     }
-    const courseStatus = await Course.findById({ _id: courseId }).select('status');
-    if (courseStatus.status !== 1) {
+    const course = await Course.findById({ _id: courseId }).select('courseStatus');
+
+    if (course.courseStatus !== 1) {
       return next(appError(400, '非上架課程'));
     }
 
@@ -439,19 +442,20 @@ const orderController = {
 
     // 新增訂單
     const newOrder = await Order.create({
-      memberId,
-      vendorId,
-      courseId,
-      courseItemId,
-      vendorName,
-      courseName,
-      courseItemName,
-      count,
-      price,
-      totalPrice,
-      startTimeDateObj,
-      endTimeDateObj,
-      note
+      memberId: memberId,
+      vendorId: vendorId,
+      courseId: courseId,
+      courseItemId:courseItemId,
+      brandName: brandName,
+      courseName: courseName,
+      courseItemName: courseItemName,
+      count: count,
+      price: price,
+      totalPrice: totalPrice,
+      courseLocation: courseLocation,
+      startTime: startTimeDateObj,
+      endTime: endTimeDateObj,
+      note: note
     });
 
     if (!newOrder) {
