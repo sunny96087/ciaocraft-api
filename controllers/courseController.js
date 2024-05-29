@@ -166,7 +166,7 @@ const courseController = {
     let courses = [];
 
     // 排序查詢 (預設依照最新時間排序)
-    sortBy = sortBy.trim() || "newest";
+    sortBy = sortBy || "newest";
     if (sortBy === "newest") {
       // 依照最新時間排序
       courses = await Course.find(queryField)
