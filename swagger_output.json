@@ -3165,6 +3165,11 @@
             "required": true,
             "type": "string",
             "description": "要取得的評論 ID"
+          },
+          {
+            "name": "token",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
@@ -3180,149 +3185,104 @@
           "Courses-front"
         ],
         "summary": "新增評論",
-        "description": "新增評論",
+        "description": "新增評論 <br>\r  memberId: 會員 ID <br>\r  courseId: 課程 ID <br>\r  content: 評論內容 <br>\r  images: 圖片連結 (Array<string>)，最多 5 張 <br>\r  tags: 評論標籤 (Array<string>)，可帶入值包含 \"師生互動\", \"教學環境\", \"專業度\", \"其他\" <br>\r  rating: 評分 <br>\r  likes: 按讚數 <br>",
         "parameters": [
           {
-            "name": "newComment",
+            "name": "token",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
             "in": "body",
             "description": "新增評論",
             "required": true,
             "schema": {
               "type": "object",
               "properties": {
-                "memberId": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "會員 ID"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
-                },
                 "courseId": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "課程 ID"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "課程 ID"
                 },
                 "content": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "評論內容"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "評論內容"
                 },
                 "images": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "array"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "評論圖片 (最多 5 張)"
-                    }
+                  "type": "array",
+                  "example": [
+                    "圖片1",
+                    "圖片2",
+                    "圖片3",
+                    "圖片4",
+                    "圖片"
+                  ],
+                  "items": {
+                    "type": "string"
                   }
                 },
                 "tags": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "array"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "評論標籤"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "example": "string"
-                        },
-                        "enum": {
-                          "type": "array",
-                          "example": [
-                            "師生互動",
-                            "教學環境",
-                            "專業度",
-                            "其他"
-                          ],
-                          "items": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
+                  "type": "array",
+                  "example": [
+                    "師生互動",
+                    "教學環境",
+                    "專業度",
+                    "其他"
+                  ],
+                  "items": {
+                    "type": "string"
                   }
                 },
                 "rating": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "number"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "評分"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
-                },
-                "likes": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "number"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "按讚數"
-                    }
-                  }
+                  "type": "number",
+                  "example": 5
                 }
-              }
+              },
+              "required": [
+                "courseId",
+                "content",
+                "tags",
+                "rating"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/courses/comments/like": {
+      "post": {
+        "tags": [
+          "Courses-front"
+        ],
+        "summary": "課程評論按讚",
+        "description": "課程評論按讚",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "按讚評論",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "commentId": {
+                  "type": "string",
+                  "example": "評論 ID"
+                }
+              },
+              "required": [
+                "commentId"
+              ]
             }
           }
         ],

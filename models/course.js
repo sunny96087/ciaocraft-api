@@ -159,10 +159,10 @@ const courseCommentSchema = new mongoose.Schema(
       type: Number,
       default: 1,
     },
-    likes: {
-      type: Number,
-      default: 0,
-    },
+    // 評論讚數會員Id
+    likes: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "Member" }
+    ],
   },
   {
     timestamps: true,

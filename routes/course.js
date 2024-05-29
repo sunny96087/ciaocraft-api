@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const handleErrorAsync = require("../utils/handleErrorAsync");
 const { isVendorAuth } = require("../utils/vendorAuth");
+const { isAuth } = require("../utils/auth");
 const courseController = require("../controllers/courseController");
 
 // ? 取得全部課程 (query: createdAt, courseTerm, courseStatus, keyword(teacherId > name || courseName)) (Back)
@@ -274,6 +275,7 @@ router.get(
 // 取得單筆評論 (Front)
 router.get(
     "/comments/:commentId",
+    isAuth,
     handleErrorAsync(courseController.getComment)
     /* 
         #swagger.tags = ['Courses-front']
@@ -286,59 +288,54 @@ router.get(
             type: 'string'
         }
     */
-
 )
 
 // 新增評論 (Front)
 router.post(
     "/comments",
+    isAuth,
     handleErrorAsync(courseController.newComment)
     /* 
         #swagger.tags = ['Courses-front']
         #swagger.summary = '新增評論'
-        #swagger.description = '新增評論'
-        #swagger.parameters['newComment'] = {
+        #swagger.description = `新增評論 <br>
+                                memberId: 會員 ID <br>
+                                courseId: 課程 ID <br>
+                                content: 評論內容 <br>
+                                images: 圖片連結 (Array<string>)，最多 5 張 <br>
+                                tags: 評論標籤 (Array<string>)，可帶入值包含 "師生互動", "教學環境", "專業度", "其他" <br>
+                                rating: 評分 <br>
+                                likes: 按讚數 <br>`
+        #swagger.parameters['body'] = {
             in: 'body',
             description: '新增評論',
             required: true,
             schema: {
-                memberId: {
-                    type: 'string',
-                    description: '會員 ID',
-                    required: true
-                },
-                courseId: {
-                    type: 'string',
-                    description: '課程 ID',
-                    required: true
-                },
-                content: {
-                    type: 'string',
-                    description: '評論內容',
-                    required: true
-                },
-                images: {
-                    type: 'array',
-                    description: '評論圖片 (最多 5 張)',
-                },
-                tags: {
-                    type: 'array',
-                    description: '評論標籤',
-                    required: true,
-                    items: {
-                        type: 'string',
-                        enum: ["師生互動", "教學環境", "專業度", "其他"]
-                    }
-                },
-                rating: {
-                    type: 'number',
-                    description: '評分',
-                    required: true
-                },
-                likes: {
-                    type: 'number',
-                    description: '按讚數',
-                }
+                $courseId:'課程 ID',
+                $content: '評論內容',
+                images: ['圖片1', '圖片2', '圖片3', '圖片4', '圖片'],
+                $tags: ['師生互動', '教學環境', '專業度', '其他'],
+                $rating: 5
+            }
+        }
+    */
+)
+
+// 課程評論按讚 (Front)
+router.post(
+    "/comments/like",
+    isAuth,
+    handleErrorAsync(courseController.likeComment)
+    /* 
+        #swagger.tags = ['Courses-front']
+        #swagger.summary = '課程評論按讚'
+        #swagger.description = '課程評論按讚'
+        #swagger.parameters['body'] = {
+            in: 'body',
+            description: '按讚評論',
+            required: true,
+            schema: {
+                $commentId: '評論 ID'
             }
         }
     */

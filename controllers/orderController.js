@@ -340,34 +340,28 @@ const orderController = {
         path: 'vendorId',
         select: 'bankName bankCode bankBranch bankAccountName bankAccount'
       })
-      .select(`_id 
-                memberId
-                vendorId
-                courseId
-                courseItemId 
-                vendorName
-                courseLocation 
-                paymentType 
-                paidStatus 
-                count 
-                price 
-                totalPrice 
-                startTime 
-                note 
-                createdAt 
-                confirmTime 
-                refundTime 
-                cancelTime 
-                cancelReason 
-                lastFiveDigits
-                bankName
-                bankCode 
-                bankBranch
-                bankAccountName
-                bankAccount `)
+      .select(`_id memberId vendorId courseId courseItemId 
+                brandName courseLocation 
+                paymentType paidStatus 
+                count price totalPrice 
+                startTime endTime note 
+                confirmTime refundTime
+                cancelTime cancelReason 
+                bankName bankCode bankBranch bankAccountName bankAccount 
+                createdAt`)
+      .lean();
 
     if (!order) {
       return next(appError(400, '會員無此訂單資料'));
+    }
+
+    const isCommentExist = await CourseComment.findOne({ memberId: memberId, courseId: order.courseId });
+
+    if (isCommentExist) {
+      order.isCommented = true;
+    }
+    else {
+      order.isCommented = false;
     }
 
     handleSuccess(res, order, '取得訂單資料成功');
@@ -377,7 +371,7 @@ const orderController = {
   newOrder: async (req, res, next) => {
     const memberId = req.user.id;
     const { vendorId, courseId, courseItemId, brandName, courseName, courseItemName, count, price, totalPrice, startTime, endTime, note, courseLocation } = req.body;
-    
+
     // 驗證必填欄位
     if (!vendorId || !courseId || !courseItemId || !brandName || !courseItemName || !count || !price || !totalPrice || !startTime || !endTime || !courseLocation) {
       return next(appError(400, '請輸入所有必填欄位'));
@@ -445,7 +439,7 @@ const orderController = {
       memberId: memberId,
       vendorId: vendorId,
       courseId: courseId,
-      courseItemId:courseItemId,
+      courseItemId: courseItemId,
       brandName: brandName,
       courseName: courseName,
       courseItemName: courseItemName,

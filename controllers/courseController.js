@@ -5,6 +5,7 @@ const appError = require("../utils/appError");
 const handleSuccess = require("../utils/handleSuccess");
 const { isVendorAuth, generateSendJWT } = require("../utils/vendorAuth");
 const tools = require("../utils/tools");
+const validator = require("validator");
 
 const courseController = {
   // ? 取得全部課程 (query: createdAt, courseTerm, courseStatus, keyword(teacherId > name || courseName)) (Back)
@@ -674,8 +675,7 @@ const courseController = {
   // 新增課程評價 (Front)
   newComment: async (req, res, next) => {
     const memberId = req.user.id;
-    const { courseId } = req.params;
-    let { content, images, tags, rating } = req.body;
+    let { courseId, content, images, tags, rating } = req.body;
 
     // 驗證必填欄位
     if (!content || !rating || !tags) {
@@ -693,7 +693,7 @@ const courseController = {
     }
 
     // 驗證 rating 格式
-    if (validator.isInteger(rating) && rating >= 1 && rating <= 5) {
+    if ( !Number.isInteger(rating) && rating >= 1 && rating <= 5) {
       return next(appError(400, "rating 應介於 1 到 5 之正整數"));
     }
 
@@ -716,7 +716,41 @@ const courseController = {
       return next(appError(500, "新增課程評價失敗"));
     }
 
+    const newCommentToCourse = await Course.findByIdAndUpdate(courseId, { $push: { comments: newComment._id } });
+    if (!newCommentToCourse) {
+      return next(appError(500, "新增課程評價失敗"));
+    }
+  
     handleSuccess(res, newComment, "新增課程評價成功");
+  },
+
+  // 課程評價按讚 (Front): 如果已按讚，則取消按讚；如果未按讚，則按讚
+  likeComment: async (req, res, next) => {
+    const memberId = req.user.id;
+    const { commentId } = req.body;
+
+    // 驗證 commentId 格式和是否存在
+    const isValidCommentId = await tools.findModelByIdNext(CourseComment, commentId, next);
+    if (!isValidCommentId) {
+      return;
+    }
+
+    // 驗證 memberId 是否按讚過，
+    const isLike = await CourseComment.findOne({ _id: commentId, likes: { $in: memberId } });
+    if (isLike) {
+      const disLike = await CourseComment.findByIdAndDelete(commentId, );
+      if (!disLike) {
+        return next(appError(400, "取消按讚失敗"));
+      }
+    }
+
+    // 按讚
+    const comment = await CourseComment.findByIdAndUpdate(commentId, { $push: { likes: memberId } }, { new: true });
+    if(!comment) {
+      return next(appError(400, "按讚失敗"));
+    }
+
+    handleSuccess(res, null, "按讚/取消按讚成功");
   },
 };
 
