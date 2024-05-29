@@ -5,7 +5,7 @@
     "title": "ciaocraft api",
     "description": "六角課程團體專題用 api"
   },
-  "host": "localhost:3666",
+  "host": "ciaocraft-api.onrender.com",
   "basePath": "/",
   "tags": [
     {
@@ -118,7 +118,6 @@
     }
   ],
   "schemes": [
-    "http",
     "https"
   ],
   "paths": {
