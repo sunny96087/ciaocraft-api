@@ -165,7 +165,13 @@ const teacherController = {
       return;
     }
 
-    const teacher = await Teacher.findByIdAndUpdate(
+    // 檢查老師是否有相關的課程
+    const teacher = await Teacher.findById(id);
+    if (teacher.courseId && teacher.courseId.length > 0) {
+      return next(appError(400, "老師有相關的課程，無法刪除"));
+    }
+
+    const updatedTeacher = await Teacher.findByIdAndUpdate(
       id,
       { status: 2 },
       {
@@ -174,7 +180,7 @@ const teacherController = {
       }
     );
 
-    handleSuccess(res, teacher, "刪除老師成功");
+    handleSuccess(res, null, "刪除老師成功");
   },
 
   // ? 編輯老師 (Back)
