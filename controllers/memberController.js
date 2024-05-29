@@ -175,11 +175,13 @@ const memberController = {
         if (photo) { updateFields.photo = photo; }
         
         // 驗證 point 值需為正整數
-        if (Number.isInteger(point) && point >= 0) {
-            updateFields.point = point;
-        }
-        else {
-            return next(appError(400, 'point 須為正整數'));
+        if(point){
+            if (Number.isInteger(point) && point >= 0) {
+                updateFields.point = point;
+            }
+            else {
+                return next(appError(400, 'point 須為正整數'));
+            }
         }
 
         // 驗證 gender 值

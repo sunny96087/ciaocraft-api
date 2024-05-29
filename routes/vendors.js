@@ -11,221 +11,143 @@ const passport = require("passport");
 
 // * 審核後給予賣家密碼 (Manage)
 router.post(
-  "/manage/:vendorId",
-  handleErrorAsync(vendorsController.updateVendorManage)
-  /* 	
-    #swagger.tags = ['Vendors-manage']
-    #swagger.description = '審核後給予賣家密碼 (Manage)' 
-
-    #swagger.parameters['body'] = {
-        in: 'body',
-        required: true,
-        schema: {
-            adminPassword: {
-                type: 'string',
-                description: '管理員密碼',
-                required: true
-            },
-            password: {
-                type: 'string',
-                description: '新密碼',
-                required: true
-            },
+    "/manage/:vendorId",
+    handleErrorAsync(vendorsController.updateVendorManage)
+    /* 	
+      #swagger.tags = ['Vendors-manage']
+      #swagger.summary = '審核後給予賳戶密碼 (Manage)'
+      #swagger.description = '審核後給予賣家密碼 (Manage)' 
+  
+      #swagger.parameters['body'] = {
+          in: 'body',
+          required: true,
+          schema: {
+              $adminPassword: '管理員密碼',
+              $password:'新密碼',
+            }
         }
-    }
-  */
+    */
 );
 
 // * 寄開通信給賣家 (Manage)
 router.post(
-  "/sendEmail/:vendorId",
-  handleErrorAsync(vendorsController.sendEmailToVendor)
-  /*
-    #swagger.tags = ['Vendors-manage']
-    #swagger.description = '寄開通信給賣家 (Manage)' 
-
-    #swagger.parameters['body'] = {
-        in: 'body',
-        required: true,
-        schema: {
-            adminPassword: {
-                type: 'string',
-                description: '管理員密碼',
-                required: true
-            },
-            subject: {
-                type: 'string',
-                description: '主旨',
-                required: true
-            },
-            text: {
-                type: 'string',
-                description: '內文',
-                required: true
-            },
+    "/sendEmail/:vendorId",
+    handleErrorAsync(vendorsController.sendEmailToVendor)
+    /*
+      #swagger.tags = ['Vendors-manage']
+      #swagger.summary = '寄開通信給賣家 (Manage)'
+      #swagger.description = '寄開通信給賣家 (Manage)' 
+  
+      #swagger.parameters['body'] = {
+          in: 'body',
+          required: true,
+          schema: {
+              $adminPassword: '管理員密碼',
+              $subject:  '主旨',
+              $text: '內文',
+            }
         }
-    }
-  */
+    */
 );
 
 // * 取得全部賣家資料 (Manage)
 router.get(
-  "/manage",
-  handleErrorAsync(vendorsController.getVendorsManage)
-  /*
-    #swagger.tags = ['Vendors-manage']
-    #swagger.description = '取得全部賣家資料 (Manage)' 
-
-    #swagger.parameters['body'] = {
-        in: 'body',
-        required: true,
-        schema: {
-            adminPassword: {
-                type: 'string',
-                description: '管理員密碼',
-                required: true
+    "/manage",
+    handleErrorAsync(vendorsController.getVendorsManage)
+    /*
+      #swagger.tags = ['Vendors-manage']
+      #swagger.summary = '取得全部賣家資料 (Manage)'
+      #swagger.description = '取得全部賣家資料 (Manage)' 
+  
+      #swagger.parameters['body'] = {
+          in: 'body',
+          required: true,
+          schema: {
+              $adminPassword:"管理員密碼"
             }
         }
-    }
-  */
+    */
 );
 
 // * 登入 (Back)
 router.post(
-  "/login",
-  handleErrorAsync(vendorsController.vendorLogin)
-  /*
-    #swagger.tags = ['Vendors-back']
-    #swagger.description = '登入 (Back)' 
-
-    #swagger.parameters['body'] = {
-        in: 'body',
-        required: true,
-        description: '會檢查帳號狀態(審核中或停權), 再檢查密碼',
-        schema: {
-            account: {
-                type: 'string',
-                description: '帳號 (電子郵件)',
-                required: true
-            },
-            password: {
-                type: 'string',
-                description: '密碼',
-                required: true
-            },
+    "/login",
+    handleErrorAsync(vendorsController.vendorLogin)
+    /*
+      #swagger.tags = ['Vendors-back']
+      #swagger.summary = '登入 (Back)'
+      #swagger.description = '登入 (Back)' 
+      #swagger.parameters['body'] = {
+          in: 'body',
+          required: true,
+          description: '會檢查帳號狀態(審核中或停權), 再檢查密碼',
+          schema: {
+                $account: "帳號 (電子郵件)",
+                $password: '密碼'
+            }
         }
-    }
-  */
+    */
 );
 
 // * 確認賣家帳號是否存在 (Back)
 router.get(
-  "/admin/checkAccount/:account",
-  handleErrorAsync(vendorsController.checkAdminVendorAccount)
+    "/admin/checkAccount/:account",
+    handleErrorAsync(vendorsController.checkAdminVendorAccount)
+    /*
+      #swagger.tags = ['Vendors-back']
+      #swagger.summary = '確認賣家帳號是否存在 (Back)'
+      #swagger.description = '確認賣家帳號是否存在 (Back)' 
+    */
 );
 
 // * 取得登入賣家資料 (Back)
 router.get(
-  "/admin",
-  isVendorAuth,
-  handleErrorAsync(vendorsController.getVendorAdmin)
-  /*
-    #swagger.tags = ['Vendors-back']
-    #swagger.description = '取得登入賣家資料 (Back)' 
-  */
+    "/admin",
+    isVendorAuth,
+    handleErrorAsync(vendorsController.getVendorAdmin)
+    /*
+      #swagger.tags = ['Vendors-back']
+      #swagger.summary = '取得登入賣家資料 (Back)'
+      #swagger.description = '取得登入賣家資料 (Back)' 
+    */
 );
 
 // * 編輯賣家資料 (Back)
 router.patch(
-  "/admin",
-  isVendorAuth,
-  handleErrorAsync(vendorsController.updateVendor)
-  /*
+    "/admin",
+    isVendorAuth,
+    handleErrorAsync(vendorsController.updateVendor)
+    /*
         #swagger.tags = ['Vendors-back']
+        #swagger.summary = '編輯賣家資料 (Back)'
         #swagger.description = '編輯賣家資料 (Back)' 
     
         #swagger.parameters['body'] = {
             in: 'body',
             required: true,
             schema: {
-                mobile: {
-                    type: 'string',
-                    description: '手機號碼',
-                    required: true
-                },
-                brandName: {
-                    type: 'string',
-                    description: '品牌名稱',
-                    required: true
-                },
-                avatar: {
-                    type: 'string',
-                    description: '品牌頭像',
-                    required: true
-                },
-                bannerImage: {
-                    type: 'string',
-                    description: '品牌封面',
-                    required: true
-                },
-                intro: {
-                    type: 'string',
-                    description: '品牌介紹',
-                    required: true
-                },
-                socialMedias: {
-                    type: 'array',
-                    items: {
-                        type: 'object',
-                        properties: {
-                            name: {
-                                type: 'string',
-                                description: '社群名稱',
-                                required: true
-                            },
-                            link: {
-                                type: 'string',
-                                description: '連結',
-                                required: true
-                            }
-                        }
+                $mobile:'手機號碼',
+                $brandName: '品牌名稱',
+                $avatar: '品牌頭像連結',
+                $bannerImage: '品牌封面連結',
+                $intro: '品牌介紹',
+                $socialMedias: [
+                    {
+                        name: 'facebook',
+                        link: '連結'
+                    },
+                    {
+                        name: 'instagram',
+                        link: '連結'
                     }
-                },
-                bankName: {
-                    type: 'string',
-                    description: '銀行名稱',
-                    required: true
-                },
-                bankCode: {
-                    type: 'string',
-                    description: '銀行代碼',
-                    required: true
-                },
-                bankBranch: {
-                    type: 'string',
-                    description: '分行名稱',
-                    required: true
-                },
-                bankAccountName: {
-                    type: 'string',
-                    description: '銀行戶名',
-                    required: true
-                },
-                bankAccount: {
-                    type: 'string',
-                    description: '銀行帳號',
-                    required: true
-                },
-                address: {
-                    type: 'string',
-                    description: '地址',
-                    required: true
-                },
-                notice: {
-                    type: 'string',
-                    description: '公告',
-                    required: true
-                }
+                ],
+                $bankName:'銀行名稱',
+                $bankCode:'銀行代碼',
+                $bankBranch: '分行名稱',
+                $bankAccountName:'銀行戶名',
+                $bankAccount: '銀行帳號',
+                $address: '銀行帳號',
+                $notice: '公告'
             }
         }
     */
@@ -233,111 +155,71 @@ router.patch(
 
 // * 修改密碼 (Back)
 router.patch(
-  "/password",
-  isVendorAuth,
-  handleErrorAsync(vendorsController.updateVendorPassword)
-  /*
-    #swagger.tags = ['Vendors-back']
-    #swagger.description = '修改密碼 (Back)' 
-
-    #swagger.parameters['body'] = {
-        in: 'body',
-        required: true,
-        schema: {
-            currentPassword: {
-                type: 'string',
-                description: '舊密碼',
-                required: true
-            },
-            password: {
-                type: 'string',
-                description: '新密碼',
-                required: true
-            },
-            confirmPassword: {
-                type: 'string',
-                description: '新密碼確認',
-                required: true
+    "/password",
+    isVendorAuth,
+    handleErrorAsync(vendorsController.updateVendorPassword)
+    /*
+      #swagger.tags = ['Vendors-back']
+      #swagger.summary = '修改密碼 (Back)'
+      #swagger.description = '修改密碼 (Back)' 
+  
+      #swagger.parameters['body'] = {
+          in: 'body',
+          required: true,
+          schema: {
+              $currentPassword: '舊密碼',
+              $password: '新密碼',
+              $confirmPassword: '新密碼確認'
             }
         }
-    }
-  */
+    */
 );
 
 // * 新增賣家申請 (Front)
 router.post(
-  "/",
-  handleErrorAsync(vendorsController.newVendorReview)
-  /*
-    #swagger.tags = ['Vendors-front']
-    #swagger.description = '新增賣家申請 (Front)' 
-
-    #swagger.parameters['body'] = {
-        in: 'body',
-        required: true,
-        schema: {
-            representative: {
-                type: 'string',
-                description: '申請人名稱',
-                required: true
-            },
-            account: {
-                type: 'string',
-                description: '帳號(電子郵件)',
-                required: true
-            },
-            mobile: {
-                type: 'string',
-                description: '手機號碼',
-                required: true
-            },
-            brandName: {
-                type: 'string',
-                description: '品牌名稱',
-                required: true
-            },
-            reviewLinks: {
-                type: 'array',
-                items: {
-                    type: 'string'
-                },
-                required: true
-            },
-            reviewBrief: {
-                type: 'string',
-                description: '審核用簡介',
-                required: true
-            },
-            reviewImages: {
-                type: 'array',
-                items: {
-                    type: 'string'
-                },
-                required: true
-            },
+    "/",
+    handleErrorAsync(vendorsController.newVendorReview)
+    /*
+      #swagger.tags = ['Vendors-front']
+      #swagger.summary = '新增賣家申請 (Front)'
+      #swagger.description = '新增賣家申請 (Front)' 
+  
+      #swagger.parameters['body'] = {
+          in: 'body',
+          required: true,
+          schema: {
+                $representative: '申請人名稱',
+                $account: '帳號(電子郵件)',
+                $mobile: '手機號碼',
+                $brandName: '品牌名稱',
+                $reviewLinks: ['網站1', '網站2', '網站3', '網站4', '網站5'],
+                $reviewBrief:'審核用簡介',
+                $reviewImages: ['圖片1', '圖片2', '圖片3', '圖片4', '圖片5']
+            }
         }
-    }
     */
 );
 
 // * 確認賣家帳號是否重複 (Front)
 router.get(
-  "/checkAccount/:account",
-  handleErrorAsync(vendorsController.checkVendorAccount)
-  /*
-    #swagger.tags = ['Vendors-front']
-    #swagger.description = '確認賣家帳號是否重複 (Front)' 
-  */
+    "/checkAccount/:account",
+    handleErrorAsync(vendorsController.checkVendorAccount)
+    /*
+      #swagger.tags = ['Vendors-front']
+      #swagger.summary = '確認賣家帳號是否重複 (Front)'
+      #swagger.description = '確認賣家帳號是否重複 (Front)' 
+    */
 );
 
 // * 取得單筆賣家綜合資料 (需計算學員數、全部課程、師資) (Front)
 router.get(
-  "/:vendorId",
-  handleErrorAsync(vendorsController.getVendor)
-  /*
-    #swagger.tags = ['Vendors-front']
-    #swagger.description = '取得單筆賣家綜合資料 (需計算學員數、全部課程、師資) (Front)' 
-  */
+    "/:vendorId",
+    handleErrorAsync(vendorsController.getVendor)
+    /*
+      #swagger.tags = ['Vendors-front']
+      #swagger.summary = '取得單筆賣家綜合資料 (需計算學員數、全部課程、師資) (Front)'
+      #swagger.description = '取得單筆賣家綜合資料 (需計算學員數、全部課程、師資) (Front)' 
+    */
 );
 
 module.exports = router;

@@ -5,7 +5,7 @@
     "title": "ciaocraft api",
     "description": "六角課程團體專題用 api"
   },
-  "host": "ciaocraft-api.onrender.com",
+  "host": "localhost:3666",
   "basePath": "/",
   "tags": [
     {
@@ -118,6 +118,7 @@
     }
   ],
   "schemes": [
+    "http",
     "https"
   ],
   "paths": {
@@ -1229,6 +1230,7 @@
         "tags": [
           "Upload-back"
         ],
+        "summary": "上傳單張圖片 (back)",
         "description": "上傳單張圖片 (back)",
         "parameters": [
           {
@@ -1268,6 +1270,7 @@
         "tags": [
           "Upload-back"
         ],
+        "summary": "上傳多張圖片 (不超過 5 張) (back)",
         "description": "上傳多張圖片 (不超過 5 張) (back)",
         "parameters": [
           {
@@ -1310,7 +1313,7 @@
         "description": "上傳圖片",
         "parameters": [
           {
-            "name": "upload",
+            "name": "body",
             "in": "body",
             "required": true,
             "schema": {
@@ -1351,6 +1354,7 @@
         "tags": [
           "Upload"
         ],
+        "summary": "刪除圖片",
         "description": "刪除圖片",
         "parameters": [
           {
@@ -1386,6 +1390,7 @@
         "tags": [
           "Upload"
         ],
+        "summary": "獲取所有圖片列表",
         "description": "獲取所有圖片列表",
         "responses": {
           "default": {
@@ -1399,6 +1404,7 @@
         "tags": [
           "Upload"
         ],
+        "summary": "上傳圖片 -> 要登入才能用的版本",
         "description": "上傳圖片 -> 要登入才能用的版本",
         "parameters": [
           {
@@ -1407,7 +1413,7 @@
             "type": "string"
           },
           {
-            "name": "upload",
+            "name": "body",
             "in": "body",
             "required": true,
             "schema": {
@@ -1450,6 +1456,7 @@
         "tags": [
           "Email"
         ],
+        "summary": "發送信件測試",
         "description": "發送信件測試",
         "parameters": [
           {
@@ -1483,6 +1490,7 @@
         "tags": [
           "Email"
         ],
+        "summary": "處理註冊電子郵件驗證用的路由",
         "description": "處理註冊電子郵件驗證用的路由",
         "parameters": [
           {
@@ -1506,10 +1514,11 @@
         "tags": [
           "Auth-front"
         ],
+        "summary": "註冊",
         "description": "註冊會員",
         "parameters": [
           {
-            "name": "member",
+            "name": "body",
             "in": "body",
             "description": "登入資訊",
             "required": true,
@@ -1522,11 +1531,11 @@
                 },
                 "password": {
                   "type": "string",
-                  "example": "Aa123456"
+                  "example": "Aa123456@"
                 },
                 "confirmPassword": {
                   "type": "string",
-                  "example": "Aa123456"
+                  "example": "Aa123456@"
                 }
               },
               "required": [
@@ -1553,60 +1562,25 @@
         "description": "登入會員，填入帳號密碼",
         "parameters": [
           {
-            "name": "user",
+            "name": "body",
             "in": "body",
             "description": "登入資訊",
-            "required": [
-              "account",
-              "password"
-            ],
             "schema": {
               "type": "object",
               "properties": {
-                "type": {
+                "account": {
                   "type": "string",
-                  "example": "object"
+                  "example": "tht@gmail.com"
                 },
-                "properties": {
-                  "type": "object",
-                  "properties": {
-                    "account": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "example": "string"
-                        },
-                        "description": {
-                          "type": "string",
-                          "example": "帳號"
-                        },
-                        "example": {
-                          "type": "string",
-                          "example": "tht@gmail.com"
-                        }
-                      }
-                    },
-                    "password": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "example": "string"
-                        },
-                        "description": {
-                          "type": "string",
-                          "example": "密碼"
-                        },
-                        "example": {
-                          "type": "string",
-                          "example": "Aa123456"
-                        }
-                      }
-                    }
-                  }
+                "password": {
+                  "type": "string",
+                  "example": "Aa123456@"
                 }
-              }
+              },
+              "required": [
+                "account",
+                "password"
+              ]
             }
           }
         ],
@@ -1622,33 +1596,24 @@
         "tags": [
           "Auth-front"
         ],
+        "summary": "檢查帳號是否已註冊",
         "description": "檢查帳號是否已註冊",
         "parameters": [
           {
-            "name": "account",
+            "name": "body",
             "in": "body",
             "required": true,
             "schema": {
               "type": "object",
               "properties": {
                 "account": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "用戶帳號"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "tht@gmail.com"
                 }
-              }
+              },
+              "required": [
+                "account"
+              ]
             }
           }
         ],
@@ -1664,31 +1629,19 @@
         "tags": [
           "Auth-front"
         ],
+        "summary": "Google 登入",
         "description": "Google 登入",
         "parameters": [
           {
-            "name": "googleToken",
+            "name": "body",
             "in": "body",
             "required": true,
             "schema": {
               "type": "object",
               "properties": {
                 "googleToken": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "Google 登入 token"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": ""
                 }
               }
             }
@@ -1706,31 +1659,19 @@
         "tags": [
           "Auth-front"
         ],
+        "summary": "Google 帳號綁定",
         "description": "Google 帳號綁定",
         "parameters": [
           {
-            "name": "googleToken",
+            "name": "body",
             "in": "body",
             "required": true,
             "schema": {
               "type": "object",
               "properties": {
                 "googleToken": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "Google 登入 token"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "Google 登入 token"
                 }
               }
             }
@@ -1748,6 +1689,7 @@
         "tags": [
           "Auth-front"
         ],
+        "summary": "Google 帳號解除綁定",
         "description": "Google 帳號解除綁定",
         "parameters": [
           {
@@ -1763,16 +1705,16 @@
         }
       }
     },
-    "/members/": {
-      "get": {
+    "/members/manage": {
+      "post": {
         "tags": [
           "Members-front"
         ],
         "summary": "取得所有會員 (開發查詢用)",
-        "description": "取得所有會員 (方便開發查詢用)",
+        "description": "取得所有會員資料 (方便開發查詢用) <br>\r  body 需帶入管理員密碼",
         "parameters": [
           {
-            "name": "adminPasswird",
+            "name": "body",
             "in": "body",
             "description": "管理者密碼",
             "required": true,
@@ -1780,23 +1722,13 @@
               "type": "object",
               "properties": {
                 "adminPassword": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "管理者密碼"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "管理員密碼"
                 }
-              }
+              },
+              "required": [
+                "adminPassword"
+              ]
             }
           }
         ],
@@ -1832,7 +1764,7 @@
           "Members-front"
         ],
         "summary": "修改會員資料",
-        "description": "修改登入會員資料，欄位只需填寫要修改的部分",
+        "description": "修改登入會員資料，只需帶入欲修改欄位 <br>\r  interests 陣列中可帶入值為: ['工藝手作','烹飪烘烤','藝術人文','生活品味'] <br>\r  gender 可帶入值為: male, female, other <br>\r  birthday 格式需為 Date 物件格式: YYYY-MM-DD、YYYY-MM-DD HH:mm:ss.SSS 等 <br>",
         "parameters": [
           {
             "name": "token",
@@ -1840,97 +1772,44 @@
             "type": "string"
           },
           {
-            "name": "member",
+            "name": "body",
             "in": "body",
             "schema": {
               "type": "object",
               "properties": {
                 "nickname": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "暱稱"
-                    }
-                  }
+                  "type": "string",
+                  "example": "瑄瑄仔"
                 },
                 "interests": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "array"
-                    },
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "example": "string"
-                        }
-                      }
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "興趣；目前僅可帶入: 工藝手作,烹飪烘烤,藝術人文, 生活品味"
-                    }
+                  "type": "array",
+                  "example": [
+                    "工藝手作",
+                    "烹飪烘烤"
+                  ],
+                  "items": {
+                    "type": "string"
                   }
                 },
                 "name": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "姓名"
-                    }
-                  }
+                  "type": "string",
+                  "example": ""
                 },
                 "gender": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "性別；僅可帶入 male, female, other"
-                    }
-                  }
+                  "type": "string",
+                  "example": "female"
                 },
                 "birthday": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "生日；請帶入DateTime格式，例如: 2024-01-01 或 2024-01-01T00:00:00.000Z"
-                    }
-                  }
+                  "type": "string",
+                  "example": "2000-01-01 12:00:00.000"
                 },
                 "phone": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "電話"
-                    }
-                  }
+                  "type": "string",
+                  "example": "886912345678"
+                },
+                "point": {
+                  "type": "number",
+                  "example": 10000
                 }
               }
             }
@@ -1959,7 +1838,7 @@
           {
             "name": "courseTerm",
             "in": "query",
-            "description": "課程期別",
+            "description": "課程時長；0:體驗課程 1:培訓課程",
             "type": "string"
           }
         ],
@@ -1989,23 +1868,13 @@
               "type": "object",
               "properties": {
                 "courseId": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "課程 ID"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "帶入有效課程 Id"
                 }
-              }
+              },
+              "required": [
+                "courseId"
+              ]
             }
           }
         ],
@@ -2076,7 +1945,7 @@
           "Members-front"
         ],
         "summary": "修改會員密碼",
-        "description": "修改會員密碼",
+        "description": "修改會員密碼 <br>\r  newPassword: 新密碼需包含英文及數字，且至少 8 碼 <br>\r  confirmPassword: 確認新密碼 <br>",
         "parameters": [
           {
             "name": "token",
@@ -2084,47 +1953,25 @@
             "type": "string"
           },
           {
-            "name": "password",
+            "name": "body",
             "in": "body",
             "required": true,
             "schema": {
               "type": "object",
               "properties": {
                 "newPassword": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "新密碼; 密碼需包含英文及數字，且至少 8 碼"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "Abc123456"
                 },
                 "confirmPassword": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "確認新密碼"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "Abc123456"
                 }
-              }
+              },
+              "required": [
+                "newPassword",
+                "confirmPassword"
+              ]
             }
           }
         ],
@@ -2140,6 +1987,7 @@
         "tags": [
           "Orders-back"
         ],
+        "summary": "取得進帳總覽 (Back)",
         "description": "取得進帳總覽 (今日、近 7 天、30 天、12個月) (Back)",
         "parameters": [
           {
@@ -2160,6 +2008,7 @@
         "tags": [
           "Orders-back"
         ],
+        "summary": "取得進帳詳情 (Back)",
         "description": "取得進帳詳情 (Back)",
         "parameters": [
           {
@@ -2224,6 +2073,7 @@
         "tags": [
           "Orders-back"
         ],
+        "summary": "取得所有訂單 (Back)",
         "description": "取得所有訂單 (query: 訂單狀態、日期區間、keyword (_id || member.name)) (Back)",
         "parameters": [
           {
@@ -2319,6 +2169,7 @@
         "tags": [
           "Orders-back"
         ],
+        "summary": "取得單筆訂單資料 (Back)",
         "description": "取得單筆訂單資料 (Back)",
         "parameters": [
           {
@@ -2344,7 +2195,8 @@
         "tags": [
           "Orders-back"
         ],
-        "description": "修改訂單 (賣家確認收到款項) (Back)",
+        "summary": "修改訂單 (賣家確認收到款項) (Back)",
+        "description": "修改訂單 (賣家確認收到款項) (Back) <br>\r  paidStatus: 課程狀態 (int)；2: 已確認收到款, 5:訂單取消(不需退款), 6:訂單取消(待退款), 7:訂單取消(已退款) <br>\r  cancelReason: 5 || 6 要備註取消訂單原因",
         "parameters": [
           {
             "name": "orderId",
@@ -2367,36 +2219,17 @@
               "type": "object",
               "properties": {
                 "paidStatus": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "number"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "課程狀態：(2: 已確認收到款, 5:訂單取消(不需退款), 6:訂單取消(待退款), 7:訂單取消(已退款)"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "number",
+                  "example": 2
                 },
                 "cancelReason": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "5 || 6 要備註取消訂單原因"
-                    }
-                  }
+                  "type": "string",
+                  "example": "5 || 6 要備註取消訂單原因"
                 }
-              }
+              },
+              "required": [
+                "paidStatus"
+              ]
             }
           }
         ],
@@ -2450,6 +2283,23 @@
             "name": "token",
             "in": "header",
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "lastFiveDigits": {
+                  "type": "string",
+                  "example": "銀行帳號後五碼"
+                }
+              },
+              "required": [
+                "lastFiveDigits"
+              ]
+            }
           }
         ],
         "responses": {
@@ -2471,6 +2321,11 @@
             "name": "token",
             "in": "header",
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "query",
+            "type": "string"
           }
         ],
         "responses": {
@@ -2483,33 +2338,21 @@
     "/collections/": {
       "post": {
         "tags": [
-          "Collection-front"
+          "Collections-front"
         ],
+        "summary": "新增收藏",
         "description": "新增收藏",
         "parameters": [
           {
-            "name": "collection",
+            "name": "body",
             "in": "body",
             "required": true,
             "schema": {
               "type": "object",
               "properties": {
                 "courseId": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "課程 ID"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "課程 ID"
                 }
               }
             }
@@ -2525,8 +2368,9 @@
     "/collections/{collectionId}": {
       "delete": {
         "tags": [
-          "Collection-front"
+          "Collections-front"
         ],
+        "summary": "刪除收藏",
         "description": "刪除收藏",
         "parameters": [
           {
@@ -2552,79 +2396,146 @@
         "description": "新增回饋",
         "parameters": [
           {
-            "name": "feedback",
+            "name": "body",
             "in": "body",
             "required": true,
             "schema": {
               "type": "object",
               "properties": {
                 "contactPerson": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "姓名"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "姓名"
                 },
                 "phone": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "電話"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "電話"
                 },
                 "email": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "信箱"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "信箱"
                 },
                 "feedback": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "內容"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "內容"
+                }
+              },
+              "required": [
+                "contactPerson",
+                "phone",
+                "email",
+                "feedback"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/platforms/manage": {
+      "post": {
+        "tags": [
+          "Platforms-manage"
+        ],
+        "summary": "取得全部平台資訊",
+        "description": "取得全部平台資訊",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "adminPassword": {
+                  "type": "string",
+                  "example": "管理員密碼"
+                }
+              },
+              "required": [
+                "adminPassword"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/platforms/{platformId}": {
+      "get": {
+        "tags": [
+          "Platforms-front"
+        ],
+        "summary": "取得平台資訊",
+        "description": "取得平台資訊；",
+        "parameters": [
+          {
+            "name": "platformId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Platforms-manage"
+        ],
+        "summary": "修改平台資訊",
+        "description": "修改平台資訊，只需要帶入要修改的欄位， <br>\r  此資料將用於網頁顯示，不可為空值 <br>",
+        "parameters": [
+          {
+            "name": "platformId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "平台資訊",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "platformNameCn": {
+                  "type": "string",
+                  "example": "巧手玩藝"
+                },
+                "platformNameEn": {
+                  "type": "string",
+                  "example": "Ciao! Craft"
+                },
+                "platformCompanyName": {
+                  "type": "string",
+                  "example": "巧手玩藝股份有限公司"
+                },
+                "platformLogo": {
+                  "type": "string",
+                  "example": "https://www.ciaocraft.com/logo.png"
+                },
+                "platformEmail": {
+                  "type": "string",
+                  "example": "ciao@ciaocraft.com"
+                },
+                "platformInfo": {
+                  "type": "string",
+                  "example": "巧手玩藝是一個提供手作課程的平台，我們提供各種手作課程，讓您可以在家輕鬆學習手作技巧。"
+                },
+                "copyright": {
+                  "type": "string",
+                  "example": "Copyright © 2021 Ciao! Craft"
                 }
               }
             }
@@ -2638,36 +2549,62 @@
       }
     },
     "/platforms/": {
-      "get": {
-        "tags": [
-          "Platforms-front"
-        ],
-        "summary": "取得平台資訊",
-        "description": "取得平台資訊",
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      },
       "post": {
         "tags": [
           "Platforms-manage"
         ],
         "summary": "新增平台資訊",
-        "description": "新增平台資訊",
-        "responses": {
-          "default": {
-            "description": ""
+        "description": "新增平台資訊 <br>",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "此資料將用於網頁顯示，全為必填欄位",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "platformNameCn": {
+                  "type": "string",
+                  "example": "巧手玩藝"
+                },
+                "platformNameEn": {
+                  "type": "string",
+                  "example": "Ciao! Craft"
+                },
+                "platformCompanyName": {
+                  "type": "string",
+                  "example": "巧手玩藝股份有限公司"
+                },
+                "platformLogo": {
+                  "type": "string",
+                  "example": "https://www.ciaocraft.com/logo.png"
+                },
+                "platformEmail": {
+                  "type": "string",
+                  "example": "ciao@ciaocraft.com"
+                },
+                "platformInfo": {
+                  "type": "string",
+                  "example": "巧手玩藝是一個提供手作課程的平台，我們提供各種手作課程，讓您可以在家輕鬆學習手作技巧。"
+                },
+                "copyright": {
+                  "type": "string",
+                  "example": "Copyright © 2021 Ciao! Craft"
+                }
+              },
+              "required": [
+                "platformNameCn",
+                "platformNameEn",
+                "platformCompanyName",
+                "platformLogo",
+                "platformEmail",
+                "platformInfo",
+                "copyright"
+              ]
+            }
           }
-        }
-      },
-      "patch": {
-        "tags": [
-          "Platforms-manage"
         ],
-        "summary": "修改平台資訊",
-        "description": "修改平台資訊，欄位只需填寫要修改的部分",
         "responses": {
           "default": {
             "description": ""
@@ -2680,6 +2617,7 @@
         "tags": [
           "Courses-back"
         ],
+        "summary": "取得全部課程 (Back)",
         "description": "取得全部課程 (Back)",
         "parameters": [
           {
@@ -2709,9 +2647,9 @@
             "type": "string"
           },
           {
-            "name": "createdAt",
+            "name": "startDate",
             "in": "query",
-            "description": "創建日期的排序方式，日期新到舊(預設)、舊到新: CREATED_AT_ASC",
+            "description": "開課日期的排序方式，日期新到舊(預設)、舊到新: asc",
             "required": false,
             "type": "string"
           }
@@ -2728,6 +2666,7 @@
         "tags": [
           "Courses-back"
         ],
+        "summary": "取得單筆課程資料 + 項目資料 (Back)",
         "description": "取得單筆課程資料 + 項目資料 (Back)",
         "parameters": [
           {
@@ -2811,7 +2750,8 @@
         "tags": [
           "Courses-back"
         ],
-        "description": "新增課程 + 項目資料 (Back)",
+        "summary": "新增課程 + 項目資料 (Back)",
+        "description": "新增課程 + 項目資料 (Back) <br>\r  teacherId: 老師 ID (string) <br>\r  courseType: 課程類型 (array<string>)；可帶入值包含 \"工藝手作\", \"烹飪烘焙\", \"藝術人文\", \"生活品味\" <br>\r  courseTerm: 課程時長類型 (int)；0: 單堂體驗 1:培訓課程 <br>\r  courseName: 課程名稱 (string) <br>\r  coursePrice: 課程價格 (int) <br>\r  courseStatus: 課程狀態 (int)，預設為 1；0: 下架, 1: 上架, 2: 刪除 <br>\r  courseCapacity: 課程名額 (int) <br>\r  courseSummary: 課程摘要 (string) <br>\r  courseAddress: 課程地址 (string)；詳細活動地址 <br>\r  courseRemark: 備註 (string)；報名的注意事項 <br>\r  courseImage: 課程圖片 (array<string>)；圖片連結，最多 5 張 <br>\r  courseContent: 課程內容 (string)；帶入編輯器內容 <br>\r  courseItems: 課程項目 (array<object>)；courseDate 為 Date 物件格式<br>",
         "parameters": [
           {
             "name": "token",
@@ -2819,7 +2759,7 @@
             "type": "string"
           },
           {
-            "name": "newCourse",
+            "name": "body",
             "in": "body",
             "description": "新增課程 + 項目資料 (Back)",
             "required": true,
@@ -2827,313 +2767,102 @@
               "type": "object",
               "properties": {
                 "teacherId": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "老師 ID"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "老師 ID"
                 },
                 "courseType": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "array"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "課程類型"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "example": "string"
-                        },
-                        "enum": {
-                          "type": "array",
-                          "example": [
-                            "工藝手作",
-                            "烹飪烘焙",
-                            "藝術人文",
-                            "生活品味"
-                          ],
-                          "items": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
+                  "type": "array",
+                  "example": [
+                    "工藝手作",
+                    "烹飪烘焙",
+                    "藝術人文",
+                    "生活品味"
+                  ],
+                  "items": {
+                    "type": "string"
                   }
                 },
                 "courseTerm": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "課程時長類型, 0: 單堂體驗 1:培訓課程"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "enum": {
-                      "type": "array",
-                      "example": [
-                        0,
-                        1
-                      ],
-                      "items": {
-                        "type": "number"
-                      }
-                    }
-                  }
+                  "type": "number",
+                  "example": 0
                 },
                 "courseName": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "課程名稱"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "課程名稱"
                 },
                 "coursePrice": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "number"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "課程價格"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "number",
+                  "example": 9999
                 },
                 "courseStatus": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "number"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "課程狀態, 0: 下架, 1: 上架, 2: 刪除"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "enum": {
-                      "type": "array",
-                      "example": [
-                        0,
-                        1,
-                        2
-                      ],
-                      "items": {
-                        "type": "number"
-                      }
-                    },
-                    "default": {
-                      "type": "number",
-                      "example": 1
-                    }
-                  }
+                  "type": "number",
+                  "example": 1
                 },
                 "courseCapacity": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "number"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "課程名額"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "number",
+                  "example": 30
                 },
                 "courseSummary": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "課程摘要"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "課程摘要"
                 },
                 "courseAddress": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "課程地址 (詳細活動地址)"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "課程地址 (詳細活動地址)"
                 },
                 "courseRemark": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "備註 (報名的注意事項)"
-                    }
-                  }
+                  "type": "string",
+                  "example": "備註 (報名的注意事項)"
                 },
                 "courseImage": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "array"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "課程圖片 (最多 5 張)"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
+                  "type": "array",
+                  "example": [
+                    "圖片1",
+                    "圖片2",
+                    "圖片3",
+                    "圖片4",
+                    "圖片5"
+                  ],
+                  "items": {
+                    "type": "string"
                   }
                 },
                 "courseContent": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "課程內容 (編輯器)"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "課程內容 (編輯器)"
                 },
                 "courseItems": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "array"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "課程項目 (時間)"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "example": "object"
-                        },
-                        "properties": {
-                          "type": "object",
-                          "properties": {
-                            "courseDate": {
-                              "type": "object",
-                              "properties": {
-                                "type": {
-                                  "type": "string",
-                                  "example": "string"
-                                },
-                                "format": {
-                                  "type": "string",
-                                  "example": "date-time"
-                                },
-                                "description": {
-                                  "type": "string",
-                                  "example": "日期"
-                                }
-                              }
-                            }
-                          }
-                        },
-                        "itemName": {
-                          "type": "object",
-                          "properties": {
-                            "type": {
-                              "type": "string",
-                              "example": "string"
-                            },
-                            "escription": {
-                              "type": "string",
-                              "example": "項目名稱"
-                            }
-                          }
-                        }
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "courseDate": {
+                        "type": "string",
+                        "example": "2024-06-01 12:00:00"
+                      },
+                      "itemName": {
+                        "type": "string",
+                        "example": "項目名稱2"
                       }
                     }
                   }
                 }
-              }
+              },
+              "required": [
+                "teacherId",
+                "courseType",
+                "courseTerm",
+                "courseName",
+                "coursePrice",
+                "courseStatus",
+                "courseCapacity",
+                "courseSummary",
+                "courseAddress",
+                "courseRemark",
+                "courseImage",
+                "courseContent",
+                "courseItems"
+              ]
             }
           }
         ],
@@ -3149,7 +2878,8 @@
         "tags": [
           "Courses-back"
         ],
-        "description": "編輯課程 + 項目資料 (Back)",
+        "summary": "編輯課程 + 項目資料 (Back)",
+        "description": "編輯課程 + 項目資料 (Back) <br>\r  teacherId: 老師 ID (string) <br>\r  courseType: 課程類型 (array<string>)；可帶入值包含 \"工藝手作\", \"烹飪烘焙\", \"藝術人文\", \"生活品味\" <br>\r  courseTerm: 課程時長類型 (int)；0: 單堂體驗 1:培訓課程 <br>\r  courseName: 課程名稱 (string) <br>\r  coursePrice: 課程價格 (int) <br>\r  courseStatus: 課程狀態 (int)，預設為 1；0: 下架, 1: 上架, 2: 刪除 <br>\r  courseCapacity: 課程名額 (int) <br>\r  courseSummary: 課程摘要 (string) <br>\r  courseAddress: 課程地址 (string)；詳細活動地址 <br>\r  courseRemark: 備註 (string)；報名的注意事項 <br>\r  courseImage: 課程圖片 (array<string>)；圖片連結，最多 5 張 <br>\r  courseContent: 課程內容 (string)；帶入編輯器內容 <br>\r  courseItems: 課程項目 (array<object>)；courseDate 為 Date 物件格式。課程項目 (時間), 帶入 id 表示更新, 不帶入 id 表示新增, 若資料庫有的 id, 但資料內沒出現, 則刪除該筆資料 <br>",
         "parameters": [
           {
             "name": "courseId",
@@ -3164,7 +2894,7 @@
             "type": "string"
           },
           {
-            "name": "updateCourse",
+            "name": "body",
             "in": "body",
             "description": "課程和項目資料的更新資訊",
             "required": true,
@@ -3172,327 +2902,120 @@
               "type": "object",
               "properties": {
                 "teacherId": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "老師 ID"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "老師 ID"
                 },
                 "courseType": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "array"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "課程類型"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "example": "string"
-                        },
-                        "enum": {
-                          "type": "array",
-                          "example": [
-                            "工藝手作",
-                            "烹飪烘焙",
-                            "藝術人文",
-                            "生活品味"
-                          ],
-                          "items": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  }
+                  "type": "string",
+                  "example": "課程類型"
                 },
                 "courseTerm": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "課程時長類型, 0: 單堂體驗 1:培訓課程"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "enum": {
-                      "type": "array",
-                      "example": [
-                        0,
-                        1
-                      ],
-                      "items": {
-                        "type": "number"
-                      }
-                    }
-                  }
+                  "type": "string",
+                  "example": "課程時長類型, 0: 單堂體驗 1:培訓課程"
                 },
                 "courseName": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "課程名稱"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "課程名稱"
                 },
                 "coursePrice": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "number"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "課程價格"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "number",
+                  "example": 9999
                 },
                 "courseStatus": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "number"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "課程狀態, 0: 下架, 1: 上架, 2: 刪除"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "enum": {
-                      "type": "array",
-                      "example": [
-                        0,
-                        1,
-                        2
-                      ],
-                      "items": {
-                        "type": "number"
-                      }
-                    },
-                    "default": {
-                      "type": "number",
-                      "example": 1
-                    }
-                  }
+                  "type": "number",
+                  "example": 1
                 },
                 "courseCapacity": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "number"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "課程名額"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "number",
+                  "example": 30
                 },
                 "courseSummary": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "課程摘要"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "課程摘要"
                 },
                 "courseAddress": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "課程地址 (詳細活動地址)"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "課程地址 (詳細活動地址)"
                 },
                 "courseRemark": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "備註 (報名的注意事項)"
-                    }
-                  }
+                  "type": "string",
+                  "example": "備註 (報名的注意事項)"
                 },
                 "courseImage": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "array"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "課程圖片 (最多 5 張)"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
+                  "type": "array",
+                  "example": [
+                    "圖片1",
+                    "圖片2",
+                    "圖片3",
+                    "圖片4",
+                    "圖片5"
+                  ],
+                  "items": {
+                    "type": "string"
                   }
                 },
                 "courseContent": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "課程內容 (編輯器)"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "課程內容 (編輯器)"
                 },
                 "courseItems": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "array"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "課程項目 (時間), 帶入 id 表示更新, 不帶入 id 表示新增, 若資料庫有的 id, 但資料內沒出現, 則刪除該筆資料"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "example": "object"
-                        },
-                        "properties": {
-                          "type": "object",
-                          "properties": {
-                            "id": {
-                              "type": "object",
-                              "properties": {
-                                "type": {
-                                  "type": "string",
-                                  "example": "string"
-                                },
-                                "description": {
-                                  "type": "string",
-                                  "example": "課程項目 ID"
-                                }
-                              }
-                            },
-                            "courseDate": {
-                              "type": "object",
-                              "properties": {
-                                "type": {
-                                  "type": "string",
-                                  "example": "string"
-                                },
-                                "format": {
-                                  "type": "string",
-                                  "example": "date-time"
-                                },
-                                "description": {
-                                  "type": "string",
-                                  "example": "開課日期"
-                                }
-                              }
-                            },
-                            "itemName": {
-                              "type": "object",
-                              "properties": {
-                                "type": {
-                                  "type": "string",
-                                  "example": "string"
-                                },
-                                "description": {
-                                  "type": "string",
-                                  "example": "項目名稱"
-                                }
-                              }
-                            }
-                          }
-                        }
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "courseItemId"
+                      },
+                      "courseDate": {
+                        "type": "string",
+                        "example": "2024-06-01 10:00:00"
+                      },
+                      "itemName": {
+                        "type": "string",
+                        "example": "項目名稱1"
                       }
                     }
                   }
                 }
-              }
+              },
+              "required": [
+                "teacherId",
+                "courseType",
+                "courseTerm",
+                "courseName",
+                "coursePrice",
+                "courseStatus",
+                "courseCapacity",
+                "courseSummary",
+                "courseAddress",
+                "courseRemark",
+                "courseImage",
+                "courseContent",
+                "courseItems"
+              ]
             }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Courses-front"
+        ],
+        "summary": "取得單筆課程資料",
+        "description": "取得單筆課程資料，不含評論",
+        "parameters": [
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "要取得的課程 ID"
           }
         ],
         "responses": {
@@ -3507,6 +3030,7 @@
         "tags": [
           "Courses-back"
         ],
+        "summary": "刪除課程 (偽刪除) (Back)",
         "description": "刪除課程 (偽刪除) (Back)",
         "parameters": [
           {
@@ -3529,11 +3053,217 @@
         }
       }
     },
+    "/courses/{courseId}/comments": {
+      "get": {
+        "tags": [
+          "Courses-front"
+        ],
+        "summary": "取得單筆課程全部評論",
+        "description": "取得單筆課程全部評論",
+        "parameters": [
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "要取得的課程 ID"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/courses/comments/{commentId}": {
+      "get": {
+        "tags": [
+          "Courses-front"
+        ],
+        "summary": "取得單筆評論",
+        "description": "取得單筆評論",
+        "parameters": [
+          {
+            "name": "commentId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "要取得的評論 ID"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/courses/comments": {
+      "post": {
+        "tags": [
+          "Courses-front"
+        ],
+        "summary": "新增評論",
+        "description": "新增評論",
+        "parameters": [
+          {
+            "name": "newComment",
+            "in": "body",
+            "description": "新增評論",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "memberId": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "會員 ID"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                },
+                "courseId": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "課程 ID"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                },
+                "content": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "評論內容"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                },
+                "images": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "array"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "評論圖片 (最多 5 張)"
+                    }
+                  }
+                },
+                "tags": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "array"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "評論標籤"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "enum": {
+                          "type": "array",
+                          "example": [
+                            "師生互動",
+                            "教學環境",
+                            "專業度",
+                            "其他"
+                          ],
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "rating": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "number"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "評分"
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                },
+                "likes": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "number"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "按讚數"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/vendors/manage/{vendorId}": {
       "post": {
         "tags": [
           "Vendors-manage"
         ],
+        "summary": "審核後給予賳戶密碼 (Manage)",
         "description": "審核後給予賣家密碼 (Manage)",
         "parameters": [
           {
@@ -3550,40 +3280,18 @@
               "type": "object",
               "properties": {
                 "adminPassword": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "管理員密碼"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "管理員密碼"
                 },
                 "password": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "新密碼"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "新密碼"
                 }
-              }
+              },
+              "required": [
+                "adminPassword",
+                "password"
+              ]
             }
           }
         ],
@@ -3599,6 +3307,7 @@
         "tags": [
           "Vendors-manage"
         ],
+        "summary": "寄開通信給賣家 (Manage)",
         "description": "寄開通信給賣家 (Manage)",
         "parameters": [
           {
@@ -3615,57 +3324,23 @@
               "type": "object",
               "properties": {
                 "adminPassword": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "管理員密碼"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "管理員密碼"
                 },
                 "subject": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "主旨"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "主旨"
                 },
                 "text": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "內文"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "內文"
                 }
-              }
+              },
+              "required": [
+                "adminPassword",
+                "subject",
+                "text"
+              ]
             }
           }
         ],
@@ -3681,6 +3356,7 @@
         "tags": [
           "Vendors-manage"
         ],
+        "summary": "取得全部賣家資料 (Manage)",
         "description": "取得全部賣家資料 (Manage)",
         "parameters": [
           {
@@ -3691,23 +3367,13 @@
               "type": "object",
               "properties": {
                 "adminPassword": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "管理員密碼"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "管理員密碼"
                 }
-              }
+              },
+              "required": [
+                "adminPassword"
+              ]
             }
           }
         ],
@@ -3723,6 +3389,7 @@
         "tags": [
           "Vendors-back"
         ],
+        "summary": "登入 (Back)",
         "description": "登入 (Back)",
         "parameters": [
           {
@@ -3734,40 +3401,18 @@
               "type": "object",
               "properties": {
                 "account": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "帳號 (電子郵件)"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "帳號 (電子郵件)"
                 },
                 "password": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "密碼"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "密碼"
                 }
-              }
+              },
+              "required": [
+                "account",
+                "password"
+              ]
             }
           }
         ],
@@ -3780,7 +3425,11 @@
     },
     "/vendors/admin/checkAccount/{account}": {
       "get": {
-        "description": "",
+        "tags": [
+          "Vendors-back"
+        ],
+        "summary": "確認賣家帳號是否存在 (Back)",
+        "description": "確認賣家帳號是否存在 (Back)",
         "parameters": [
           {
             "name": "account",
@@ -3801,6 +3450,7 @@
         "tags": [
           "Vendors-back"
         ],
+        "summary": "取得登入賣家資料 (Back)",
         "description": "取得登入賣家資料 (Back)",
         "parameters": [
           {
@@ -3819,6 +3469,7 @@
         "tags": [
           "Vendors-back"
         ],
+        "summary": "編輯賣家資料 (Back)",
         "description": "編輯賣家資料 (Back)",
         "parameters": [
           {
@@ -3834,267 +3485,85 @@
               "type": "object",
               "properties": {
                 "mobile": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "手機號碼"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "手機號碼"
                 },
                 "brandName": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "品牌名稱"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "品牌名稱"
                 },
                 "avatar": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "品牌頭像"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "品牌頭像連結"
                 },
                 "bannerImage": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "品牌封面"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "品牌封面連結"
                 },
                 "intro": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "品牌介紹"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "品牌介紹"
                 },
                 "socialMedias": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "array"
-                    },
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "example": "object"
-                        },
-                        "properties": {
-                          "type": "object",
-                          "properties": {
-                            "name": {
-                              "type": "object",
-                              "properties": {
-                                "type": {
-                                  "type": "string",
-                                  "example": "string"
-                                },
-                                "description": {
-                                  "type": "string",
-                                  "example": "社群名稱"
-                                },
-                                "required": {
-                                  "type": "boolean",
-                                  "example": true
-                                }
-                              }
-                            },
-                            "link": {
-                              "type": "object",
-                              "properties": {
-                                "type": {
-                                  "type": "string",
-                                  "example": "string"
-                                },
-                                "description": {
-                                  "type": "string",
-                                  "example": "連結"
-                                },
-                                "required": {
-                                  "type": "boolean",
-                                  "example": true
-                                }
-                              }
-                            }
-                          }
-                        }
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "example": "instagram"
+                      },
+                      "link": {
+                        "type": "string",
+                        "example": "連結"
                       }
                     }
                   }
                 },
                 "bankName": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "銀行名稱"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "銀行名稱"
                 },
                 "bankCode": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "銀行代碼"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "銀行代碼"
                 },
                 "bankBranch": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "分行名稱"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "分行名稱"
                 },
                 "bankAccountName": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "銀行戶名"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "銀行戶名"
                 },
                 "bankAccount": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "銀行帳號"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "銀行帳號"
                 },
                 "address": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "地址"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "銀行帳號"
                 },
                 "notice": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "公告"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "公告"
                 }
-              }
+              },
+              "required": [
+                "mobile",
+                "brandName",
+                "avatar",
+                "bannerImage",
+                "intro",
+                "socialMedias",
+                "bankName",
+                "bankCode",
+                "bankBranch",
+                "bankAccountName",
+                "bankAccount",
+                "address",
+                "notice"
+              ]
             }
           }
         ],
@@ -4110,6 +3579,7 @@
         "tags": [
           "Vendors-back"
         ],
+        "summary": "修改密碼 (Back)",
         "description": "修改密碼 (Back)",
         "parameters": [
           {
@@ -4125,57 +3595,23 @@
               "type": "object",
               "properties": {
                 "currentPassword": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "舊密碼"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "舊密碼"
                 },
                 "password": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "新密碼"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "新密碼"
                 },
                 "confirmPassword": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "新密碼確認"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "新密碼確認"
                 }
-              }
+              },
+              "required": [
+                "currentPassword",
+                "password",
+                "confirmPassword"
+              ]
             }
           }
         ],
@@ -4191,6 +3627,7 @@
         "tags": [
           "Vendors-front"
         ],
+        "summary": "新增賣家申請 (Front)",
         "description": "新增賣家申請 (Front)",
         "parameters": [
           {
@@ -4201,135 +3638,61 @@
               "type": "object",
               "properties": {
                 "representative": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "申請人名稱"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "申請人名稱"
                 },
                 "account": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "帳號(電子郵件)"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "帳號(電子郵件)"
                 },
                 "mobile": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "手機號碼"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "手機號碼"
                 },
                 "brandName": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "品牌名稱"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "品牌名稱"
                 },
                 "reviewLinks": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "array"
-                    },
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "example": "string"
-                        }
-                      }
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
+                  "type": "array",
+                  "example": [
+                    "網站1",
+                    "網站2",
+                    "網站3",
+                    "網站4",
+                    "網站5"
+                  ],
+                  "items": {
+                    "type": "string"
                   }
                 },
                 "reviewBrief": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "審核用簡介"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "審核用簡介"
                 },
                 "reviewImages": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "array"
-                    },
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "example": "string"
-                        }
-                      }
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
+                  "type": "array",
+                  "example": [
+                    "圖片1",
+                    "圖片2",
+                    "圖片3",
+                    "圖片4",
+                    "圖片5"
+                  ],
+                  "items": {
+                    "type": "string"
                   }
                 }
-              }
+              },
+              "required": [
+                "representative",
+                "account",
+                "mobile",
+                "brandName",
+                "reviewLinks",
+                "reviewBrief",
+                "reviewImages"
+              ]
             }
           }
         ],
@@ -4345,6 +3708,7 @@
         "tags": [
           "Vendors-front"
         ],
+        "summary": "確認賣家帳號是否重複 (Front)",
         "description": "確認賣家帳號是否重複 (Front)",
         "parameters": [
           {
@@ -4366,6 +3730,7 @@
         "tags": [
           "Vendors-front"
         ],
+        "summary": "取得單筆賣家綜合資料 (需計算學員數、全部課程、師資) (Front)",
         "description": "取得單筆賣家綜合資料 (需計算學員數、全部課程、師資) (Front)",
         "parameters": [
           {
@@ -4387,6 +3752,7 @@
         "tags": [
           "Teachers-manage"
         ],
+        "summary": "取得所有老師 (Manage)",
         "description": "取得所有老師 (Manage)",
         "parameters": [
           {
@@ -4398,23 +3764,13 @@
               "type": "object",
               "properties": {
                 "adminPassword": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "管理員密碼"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "管理員密碼"
                 }
-              }
+              },
+              "required": [
+                "adminPassword"
+              ]
             }
           }
         ],
@@ -4430,6 +3786,7 @@
         "tags": [
           "Teachers-back"
         ],
+        "summary": "取得所有老師 (Back)",
         "description": "取得所有老師 (Back)",
         "parameters": [
           {
@@ -4478,6 +3835,7 @@
         "tags": [
           "Teachers-front"
         ],
+        "summary": "取得單筆老師資料 (Front)",
         "description": "取得單筆老師資料 (Front)",
         "parameters": [
           {
@@ -4497,7 +3855,8 @@
         "tags": [
           "Teachers-back"
         ],
-        "description": "編輯老師 (Back)",
+        "summary": "編輯老師 (Back)",
+        "description": "編輯老師 (Back) <br>\r  name: 老師名稱 (string) <br>\r  description: 老師描述 (string) <br>\r  photo: 老師頭像 (string) <br>\r  intro: 老師簡述 (編輯器) (string) <br>\r  socialMediaInfo: 老師社群連結 (object)；platform 可帶入 \"facebook\", \"instagram\", \"website\" <br>\r  order: 老師排序 (int)；數字越小越前面 <br>",
         "parameters": [
           {
             "name": "teacherId",
@@ -4511,109 +3870,54 @@
             "type": "string"
           },
           {
-            "name": "updateTeacher",
+            "name": "body",
             "in": "body",
             "description": "老師資訊",
             "required": true,
             "schema": {
               "type": "object",
               "properties": {
-                "type": {
+                "name": {
                   "type": "string",
-                  "example": "object"
+                  "example": "老師名稱"
                 },
-                "properties": {
-                  "type": "object",
-                  "properties": {
-                    "name": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "example": "string"
-                        },
-                        "description": {
-                          "type": "string",
-                          "example": "老師名稱"
-                        },
-                        "required": {
-                          "type": "boolean",
-                          "example": true
-                        }
-                      }
-                    },
-                    "description": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "example": "string"
-                        },
-                        "description": {
-                          "type": "string",
-                          "example": "老師描述"
-                        }
-                      }
-                    },
-                    "photo": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "example": "string"
-                        },
-                        "description": {
-                          "type": "string",
-                          "example": "老師頭像"
-                        }
-                      }
-                    },
-                    "intro": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "example": "string"
-                        },
-                        "description": {
-                          "type": "string",
-                          "example": "老師簡述 (編輯器)"
-                        }
-                      }
-                    },
-                    "socialMediaInfo": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "example": "object"
-                        },
-                        "description": {
-                          "type": "string",
-                          "example": "老師社群連結"
-                        }
-                      }
-                    },
-                    "order": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "example": "number"
-                        },
-                        "description": {
-                          "type": "string",
-                          "example": "老師排序 (數字越小越前面)"
-                        },
-                        "required": {
-                          "type": "boolean",
-                          "example": true
-                        }
+                "description": {
+                  "type": "string",
+                  "example": "老師描述"
+                },
+                "photo": {
+                  "type": "string",
+                  "example": "老師頭像"
+                },
+                "intro": {
+                  "type": "string",
+                  "example": "老師簡述 (編輯器)"
+                },
+                "socialMediaInfo": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "platform": {
+                        "type": "string",
+                        "example": "instagram"
+                      },
+                      "link": {
+                        "type": "string",
+                        "example": "連結"
                       }
                     }
                   }
+                },
+                "order": {
+                  "type": "number",
+                  "example": 1
                 }
-              }
+              },
+              "required": [
+                "name",
+                "order"
+              ]
             }
           }
         ],
@@ -4627,6 +3931,7 @@
         "tags": [
           "Teachers-manage"
         ],
+        "summary": "刪除老師 (Manage)",
         "description": "刪除老師 (Manage)",
         "parameters": [
           {
@@ -4644,21 +3949,8 @@
               "type": "object",
               "properties": {
                 "adminPassword": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "example": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "管理員密碼"
-                    },
-                    "required": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  }
+                  "type": "string",
+                  "example": "管理員密碼"
                 }
               }
             }
@@ -4676,6 +3968,7 @@
         "tags": [
           "Teachers-back"
         ],
+        "summary": "取得單筆老師資料 (Back)",
         "description": "取得單筆老師資料 (Back)",
         "parameters": [
           {
@@ -4702,7 +3995,8 @@
         "tags": [
           "Teachers-back"
         ],
-        "description": "新增老師 (Back)",
+        "summary": "新增老師 (Back)",
+        "description": "新增老師 (Back) <br>\r  vendorId: 供應商 ID，由登入資訊取得 <br>\r  name: 老師名稱 (string) <br>\r  description: 老師描述 (string) <br>\r  photo: 老師頭像 (string) <br>\r  intro: 老師簡述 (編輯器) (string) <br>\r  socialMediaInfo: 老師社群連結 (object)；platform 可帶入 \"facebook\", \"instagram\", \"website\" <br>\r  order: 老師排序 (int)；數字越小越前面 <br>",
         "parameters": [
           {
             "name": "token",
@@ -4717,119 +4011,52 @@
             "schema": {
               "type": "object",
               "properties": {
-                "type": {
+                "vendorId": {
                   "type": "string",
-                  "example": "object"
+                  "example": "供應商 ID"
                 },
-                "properties": {
-                  "type": "object",
-                  "properties": {
-                    "vendorId": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "example": "string"
-                        },
-                        "description": {
-                          "type": "string",
-                          "example": "供應商 ID"
-                        },
-                        "required": {
-                          "type": "boolean",
-                          "example": true
-                        }
-                      }
-                    },
-                    "name": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "example": "string"
-                        },
-                        "description": {
-                          "type": "string",
-                          "example": "老師名稱"
-                        },
-                        "required": {
-                          "type": "boolean",
-                          "example": true
-                        }
-                      }
-                    },
-                    "description": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "example": "string"
-                        },
-                        "description": {
-                          "type": "string",
-                          "example": "老師描述"
-                        }
-                      }
-                    },
-                    "photo": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "example": "string"
-                        },
-                        "description": {
-                          "type": "string",
-                          "example": "老師頭像"
-                        }
-                      }
-                    },
-                    "intro": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "example": "string"
-                        },
-                        "description": {
-                          "type": "string",
-                          "example": "老師簡述 (編輯器)"
-                        }
-                      }
-                    },
-                    "socialMediaInfo": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "example": "object"
-                        },
-                        "description": {
-                          "type": "string",
-                          "example": "老師社群連結"
-                        }
-                      }
-                    },
-                    "order": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "example": "number"
-                        },
-                        "description": {
-                          "type": "string",
-                          "example": "老師排序 (數字越小越前面)"
-                        },
-                        "required": {
-                          "type": "boolean",
-                          "example": true
-                        }
+                "name": {
+                  "type": "string",
+                  "example": "老師名稱"
+                },
+                "description": {
+                  "type": "string",
+                  "example": "老師描述"
+                },
+                "photo": {
+                  "type": "string",
+                  "example": "老師頭像連結"
+                },
+                "intro": {
+                  "type": "string",
+                  "example": "老師簡述 (編輯器)"
+                },
+                "socialMediaInfo": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "platform": {
+                        "type": "string",
+                        "example": "instagram"
+                      },
+                      "link": {
+                        "type": "string",
+                        "example": "連結"
                       }
                     }
                   }
+                },
+                "order": {
+                  "type": "number",
+                  "example": 1
                 }
-              }
+              },
+              "required": [
+                "vendorId",
+                "name",
+                "order"
+              ]
             }
           }
         ],
@@ -4845,6 +4072,7 @@
         "tags": [
           "Teachers-back"
         ],
+        "summary": "刪除老師 (偽刪除) (Back)",
         "description": "刪除老師 (偽刪除) (Back)",
         "parameters": [
           {

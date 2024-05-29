@@ -4,16 +4,22 @@ const appError = require('../utils/appError');
 const handleSuccess = require('../utils/handleSuccess');
 
 const platformController = {
-    // 取得平台資訊
-    getPlatform: async (req, res, next) => {
-        const { platformNameEn } = req.query;
-
-        // 驗證 query string 是否有 platformNameEn 
-        if (!platformNameEn) {
-            return next(appError(400, '請於 query string 中輸入 platformNameEn=xxx 來取得平台資訊'));
+    // 取得全部平台資訊
+    getAllPlatforms: async (req, res, next) => {
+        // 驗證管理員密碼
+        const adminPassword = req.body.adminPassword;
+        if (adminPassword !== process.env.ADMIN_PASSWORD) {
+            return next(appError(401, "管理員密碼錯誤"));
         }
 
-        const platform = await Platform.findOne({ platformNameEn: platformNameEn });
+        const platforms = await Platform.find();
+        handleSuccess(res, platforms, '取得全部平台資訊成功');
+    },
+
+    // 取得單一平台資訊
+    getPlatform: async (req, res, next) => {
+        const platformId = req.params.platformId;
+        const platform = await Platform.findById(platformId);
 
         // 無結果回傳找不到平台資訊
         if (!platform) {
@@ -70,14 +76,10 @@ const platformController = {
 
     // 修改平台資訊
     updatePlatform: async (req, res, next) => {
+        const platformId = req.params.platformId;
         const { platformNameCn, platformNameEn, platformCompanyName, platformLogo, platformEmail, platformInfo, copyright } = req.body;
-        const originalPlatformNameEn = req.query.platformNameEn;
 
-        if (!originalPlatformNameEn) {
-            return next(appError(400, '請於 query string 中輸入 platformNameEn=xxx 來修改平台資訊'));
-        }
-
-        const platform = await Platform.findOne({ platformNameEn: originalPlatformNameEn });
+        const platform = await Platform.findById(platformId);
 
         if (!platform) {
             return next(appError(404, '找不到平台資訊'));

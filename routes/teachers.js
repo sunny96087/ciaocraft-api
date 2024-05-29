@@ -15,6 +15,7 @@ router.get(
   handleErrorAsync(teacherController.getManageTeachers)
   /*
     #swagger.tags = ['Teachers-manage']
+    #swagger.summary = '取得所有老師 (Manage)'
     #swagger.description = '取得所有老師 (Manage)'
 
     #swagger.parameters['getManageTeachers'] = {
@@ -22,11 +23,7 @@ router.get(
         description: '使用管理員密碼取得所有老師',
         required: true,
         schema: {
-            adminPassword: {
-                type: 'string',
-                description: '管理員密碼',
-                required: true
-            },
+            $adminPassword: '管理員密碼',
         }
     }
     */
@@ -39,6 +36,7 @@ router.get(
   handleErrorAsync(teacherController.getAdminTeachers)
   /*
     #swagger.tags = ['Teachers-back']
+    #swagger.summary = '取得所有老師 (Back)'
     #swagger.description = '取得所有老師 (Back)'
 
     #swagger.parameters['sort'] = {
@@ -74,6 +72,7 @@ router.get(
   handleErrorAsync(teacherController.getTeacher)
   /*
       #swagger.tags = ['Teachers-front']
+      #swagger.summary = '取得單筆老師資料 (Front)'
       #swagger.description = '取得單筆老師資料 (Front)'
       */
 );
@@ -85,6 +84,7 @@ router.get(
   handleErrorAsync(teacherController.getAdminTeacher)
   /*
     #swagger.tags = ['Teachers-back']
+    #swagger.summary = '取得單筆老師資料 (Back)'
     #swagger.description = '取得單筆老師資料 (Back)'
     */
 );
@@ -95,50 +95,40 @@ router.post(
   isVendorAuth,
   handleErrorAsync(teacherController.newTeacher)
   /*
-    #swagger.tags = ['Teachers-back']
-    #swagger.description = '新增老師 (Back)'
-
-    #swagger.parameters['newTeacher'] = {
-        in: 'body',
-        description: '老師資訊',
-        required: true,
-        schema: {
-            type: 'object',
-            properties: {
-                vendorId: {
-                    type: 'string',
-                    description: '供應商 ID',
-                    required: true
-                },
-                name: {
-                    type: 'string',
-                    description: '老師名稱',
-                    required: true
-                },
-                description: {
-                    type: 'string',
-                    description: '老師描述'
-                },
-                photo: {
-                    type: 'string',
-                    description: '老師頭像'
-                },
-                intro: {
-                    type: 'string',
-                    description: '老師簡述 (編輯器)'
-                },
-                socialMediaInfo: {
-                    type: 'object',
-                    description: '老師社群連結'
-                },
-                order: {
-                    type: 'number',
-                    description: '老師排序 (數字越小越前面)',
-                    required: true
-                }
+        #swagger.tags = ['Teachers-back']
+        #swagger.summary = '新增老師 (Back)'
+        #swagger.description = `新增老師 (Back) <br>
+                                vendorId: 供應商 ID，由登入資訊取得 <br>
+                                name: 老師名稱 (string) <br>
+                                description: 老師描述 (string) <br>
+                                photo: 老師頭像 (string) <br>
+                                intro: 老師簡述 (編輯器) (string) <br>
+                                socialMediaInfo: 老師社群連結 (object)；platform 可帶入 "facebook", "instagram", "website" <br>
+                                order: 老師排序 (int)；數字越小越前面 <br>`                                
+        `
+        #swagger.parameters['newTeacher'] = {
+            in: 'body',
+            description: '老師資訊',
+            required: true,
+            schema: {
+                $vendorId: '供應商 ID',
+                $name: '老師名稱',
+                description:'老師描述',
+                photo: '老師頭像連結',
+                intro: '老師簡述 (編輯器)',
+                socialMediaInfo: [
+                    {
+                        platform: 'facebook',
+                        link: '連結',
+                    },
+                    {
+                        platform: 'instagram',
+                        link: '連結',
+                    }
+                ],
+                $order: 1
             }
         }
-    }
     */
 );
 
@@ -147,9 +137,10 @@ router.patch(
   "/admin/deactivate/:teacherId",
   isVendorAuth,
   handleErrorAsync(teacherController.deactivateTeacher)
-  /*
-    #swagger.tags = ['Teachers-back']
-    #swagger.description = '刪除老師 (偽刪除) (Back)'
+    /*
+        #swagger.tags = ['Teachers-back']
+        #swagger.summary = '刪除老師 (偽刪除) (Back)'
+        #swagger.description = '刪除老師 (偽刪除) (Back)'
     */
 );
 
@@ -158,46 +149,39 @@ router.patch(
   "/:teacherId",
   isVendorAuth,
   handleErrorAsync(teacherController.updateTeacher)
-  /*
-    #swagger.tags = ['Teachers-back']
-    #swagger.description = '編輯老師 (Back)'
-    
-    #swagger.parameters['updateTeacher'] = {
-        in: 'body',
-        description: '老師資訊',
-        required: true,
-        schema: {
-            type: 'object',
-            properties: {
-                name: {
-                    type: 'string',
-                    description: '老師名稱',
-                    required: true
-                },
-                description: {
-                    type: 'string',
-                    description: '老師描述'
-                },
-                photo: {
-                    type: 'string',
-                    description: '老師頭像'
-                },
-                intro: {
-                    type: 'string',
-                    description: '老師簡述 (編輯器)'
-                },
-                socialMediaInfo: {
-                    type: 'object',
-                    description: '老師社群連結'
-                },
-                order: {
-                    type: 'number',
-                    description: '老師排序 (數字越小越前面)',
-                    required: true
-                }
+    /*
+        #swagger.tags = ['Teachers-back']
+        #swagger.summary = '編輯老師 (Back)'
+        #swagger.description = `編輯老師 (Back) <br>
+                                name: 老師名稱 (string) <br>
+                                description: 老師描述 (string) <br>
+                                photo: 老師頭像 (string) <br>
+                                intro: 老師簡述 (編輯器) (string) <br>
+                                socialMediaInfo: 老師社群連結 (object)；platform 可帶入 "facebook", "instagram", "website" <br>
+                                order: 老師排序 (int)；數字越小越前面 <br>`
+        
+        #swagger.parameters['body'] = {
+            in: 'body',
+            description: '老師資訊',
+            required: true,
+            schema: {
+                $name: '老師名稱',
+                description: '老師描述',
+                photo: '老師頭像',
+                intro:'老師簡述 (編輯器)',
+                socialMediaInfo:[
+                    {
+                        platform: 'facebook',
+                        link: '連結'
+                    },
+                    {
+                        platform: 'instagram',
+                        link: '連結'
+                    }
+                ],
+                $order: 1
             }
         }
-    }
     */
 );
 
@@ -207,6 +191,7 @@ router.delete(
   handleErrorAsync(teacherController.deleteTeacherManage)
   /*
     #swagger.tags = ['Teachers-manage']
+    #swagger.summary = '刪除老師 (Manage)'
     #swagger.description = '刪除老師 (Manage)'
         
     #swagger.parameters['deleteTeacherManage'] = {
@@ -214,11 +199,7 @@ router.delete(
         description: '使用管理員密碼刪除老師',
         required: true,
         schema: {
-            adminPassword: {
-                type: 'string',
-                description: '管理員密碼',
-                required: true
-            },
+            adminPassword: '管理員密碼',
         }
     }
     */

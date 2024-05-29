@@ -114,10 +114,10 @@ router.post(
   "/singleImage/admin",
   handleFileUpload,
   handleErrorAsync(uploadController.uploadVendorImage)
-  /*
-    #swagger.tags = ['Upload-back']
-    #swagger.description = '上傳單張圖片 (back)'
-    #swagger.parameters['upload'] = {
+  /*  #swagger.tags = ['Upload-back']
+      #swagger.summary = '上傳單張圖片 (back)'
+      #swagger.description = '上傳單張圖片 (back)'
+      #swagger.parameters['upload'] = {
         in: 'formData',
         required: true,
         type: 'file',
@@ -128,7 +128,7 @@ router.post(
             format: 'binary',
             required: true
         }
-    }
+      }
   */
 );
 
@@ -137,10 +137,10 @@ router.post(
   "/multipleImage/admin",
   handleFilesUpload,
   handleErrorAsync(uploadController.uploadVendorImages)
-  /*
-    #swagger.tags = ['Upload-back']
-    #swagger.description = '上傳多張圖片 (不超過 5 張) (back)'
-    #swagger.parameters['upload'] = {
+  /*  #swagger.tags = ['Upload-back']
+      #swagger.summary = '上傳多張圖片 (不超過 5 張) (back)'
+      #swagger.description = '上傳多張圖片 (不超過 5 張) (back)'
+      #swagger.parameters['upload'] = {
         in: 'formData',
         required: true,
         type: 'file',
@@ -151,7 +151,7 @@ router.post(
             format: 'binary',
             required: true
         }
-    }
+      }
   */
 );
 
@@ -162,12 +162,11 @@ router.post(
   "/image",
   handleFileUpload,
   handleErrorAsync(uploadController.uploadImage)
+  /*  #swagger.tags = ['Upload']
+      #swagger.description = '上傳圖片'
+      #swagger.description = '上傳圖片'
 
-  /** 
-    #swagger.tags = ['Upload']
-    #swagger.description = '上傳圖片'
-
-    #swagger.parameters['upload'] = {
+      #swagger.parameters['body'] = {
         in: 'body',
         required: true,
         schema: {
@@ -178,8 +177,8 @@ router.post(
                 required: true
             }
         }
-    }
-    */
+      }
+  */
 );
 
 // 上傳圖片 -> 要登入才能用的版本
@@ -188,12 +187,11 @@ router.post(
   isAuth,
   handleFileUpload,
   handleErrorAsync(uploadController.uploadUserImage)
+  /*  #swagger.tags = ['Upload']
+      #swagger.summary = '上傳圖片 -> 要登入才能用的版本'
+      #swagger.description = '上傳圖片 -> 要登入才能用的版本'
 
-  /** 
-    #swagger.tags = ['Upload']
-    #swagger.description = '上傳圖片 -> 要登入才能用的版本'
-
-    #swagger.parameters['upload'] = {
+      #swagger.parameters['body'] = {
         in: 'body',
         required: true,
         schema: {
@@ -204,20 +202,19 @@ router.post(
                 required: true
             }
         }
-    }
-    */
+      }
+  */
 );
 
 // 刪除圖片
 router.delete(
   "/image",
   handleErrorAsync(uploadController.deleteImage)
+  /*  #swagger.tags = ['Upload']
+      #swagger.summary = '刪除圖片'
+      #swagger.description = '刪除圖片'
 
-  /** 
-    #swagger.tags = ['Upload']
-    #swagger.description = '刪除圖片'
-
-    #swagger.parameters['upload'] = {
+      #swagger.parameters['upload'] = {
         in: 'query',
         required: true,
         name: 'fileName',
@@ -226,19 +223,18 @@ router.delete(
                 description: '圖片檔案名稱',
                 required: true,
         }
-    }
-    */
+      }
+  */
 );
 
 // 獲取所有圖片列表
 router.get(
   "/image",
   handleErrorAsync(uploadController.getImages)
-
-  /** 
-    #swagger.tags = ['Upload']
-    #swagger.description = '獲取所有圖片列表'
-    */
+  /*  #swagger.tags = ['Upload']
+      #swagger.summary = '獲取所有圖片列表'
+      #swagger.description = '獲取所有圖片列表'
+  */
 );
 
 module.exports = router;

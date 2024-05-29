@@ -5,25 +5,22 @@ const memberController = require('../controllers/memberController');
 const handleErrorAsync = require('../utils/handleErrorAsync');
 
 // 取得所有會員資料 (開發方便查詢用)
-router.get(
-    "/",
+router.post(
+    "/manage",
     handleErrorAsync(memberController.getAllMembers)
     /*  #swagger.tags = ['Members-front']
         #swagger.summary = '取得所有會員 (開發查詢用)'
-        #swagger.description = '取得所有會員 (方便開發查詢用)'
-        #swagger.parameters['adminPasswird'] = {
+        #swagger.description = `取得所有會員資料 (方便開發查詢用) <br>
+                                body 需帶入管理員密碼`
+        #swagger.parameters['body'] = {
             in: 'body',
             description: '管理者密碼',
             required: true,
             schema: {
-                adminPassword: {
-                    type: 'string',
-                    description: '管理者密碼',
-                    required: true
-                }
+                $adminPassword: "管理員密碼"
             }
         }
-     */
+    */
 )
 
 // 取得登入會員資料
@@ -34,7 +31,7 @@ router.get(
     /*  #swagger.tags = ['Members-front']
         #swagger.summary = '取得登入會員資料'
         #swagger.description = '取得登入會員資料'
-     */
+    */
 );
 
 // 修改登入會員資料
@@ -44,37 +41,20 @@ router.patch(
     handleErrorAsync(memberController.updateMember)
     /*  #swagger.tags = ['Members-front']
         #swagger.summary = '修改會員資料'
-        #swagger.description = '修改登入會員資料，欄位只需填寫要修改的部分'
-        #swagger.parameters['member'] = {
+        #swagger.description = `修改登入會員資料，只需帶入欲修改欄位 <br>
+                                interests 陣列中可帶入值為: ['工藝手作','烹飪烘烤','藝術人文','生活品味'] <br>
+                                gender 可帶入值為: male, female, other <br>
+                                birthday 格式需為 Date 物件格式: YYYY-MM-DD、YYYY-MM-DD HH:mm:ss.SSS 等 <br>`
+        #swagger.parameters['body'] = {
             in: 'body',
             schema: {
-                nickname: {
-                    type: 'string',
-                    description: '暱稱'
-                },
-                interests: {
-                    type: 'array',
-                    items: {
-                        type: 'string'
-                    },
-                    description: '興趣；目前僅可帶入: 工藝手作,烹飪烘烤,藝術人文, 生活品味'
-                },
-                name: {
-                    type: 'string',
-                    description: '姓名'
-                },
-                gender: {
-                    type: 'string',
-                    description: '性別；僅可帶入 male, female, other'
-                },
-                birthday: {
-                    type: 'string',
-                    description: '生日；請帶入DateTime格式，例如: 2024-01-01 或 2024-01-01T00:00:00.000Z'
-                },
-                phone: {
-                    type: 'string',
-                    description: '電話'
-                }
+                nickname: "瑄瑄仔",
+                interests: ['工藝手作','烹飪烘烤'],
+                name:"",
+                gender: "female",
+                birthday: "2000-01-01 12:00:00.000",
+                phone: "886912345678",
+                point:10000
             }
         }
     */
@@ -90,10 +70,10 @@ router.get(
         #swagger.description = '取得登入會員收藏'
         #swagger.parameters['courseTerm'] = {
             in: 'query',
-            description: '課程期別',
+            description: '課程時長；0:體驗課程 1:培訓課程',
             type: 'string'
         }
-     */
+    */
 );
 
 // 新增登入會員收藏
@@ -108,11 +88,7 @@ router.post(
             in: 'body',
             required: true,
             schema: {
-                courseId: { 
-                    type: 'string',
-                    description: '課程 ID',
-                    required: true
-                }
+                $courseId: "帶入有效課程 Id",
             }
         }
     */
@@ -147,7 +123,7 @@ router.get(
             description: '訂單狀態；0:未付款, 1:已付款, 2:已確認收款, 3:已完成, 4:已取消, 5:訂單取消(不需退款), 6:訂單取消(待退款), 7:訂單取消(已退款)',
             type: 'string'
         }
-     */
+    */
 );
 
 // 修改會員密碼
@@ -157,21 +133,15 @@ router.put(
     handleErrorAsync(memberController.updatePassword)
     /*  #swagger.tags = ['Members-front']
         #swagger.summary = '修改會員密碼'
-        #swagger.description = '修改會員密碼'
-        #swagger.parameters['password'] = {
+        #swagger.description = `修改會員密碼 <br>
+                                newPassword: 新密碼需包含英文及數字，且至少 8 碼 <br>
+                                confirmPassword: 確認新密碼 <br>`
+        #swagger.parameters['body'] = {
             in: 'body',
             required: true,
             schema: {
-                newPassword: {
-                    type: 'string',
-                    description: '新密碼; 密碼需包含英文及數字，且至少 8 碼',
-                    required: true
-                },
-                confirmPassword: {
-                    type: 'string',
-                    description: '確認新密碼',
-                    required: true
-                }
+                $newPassword: "Abc123456",
+                $confirmPassword: "Abc123456"
             }
         }
     */

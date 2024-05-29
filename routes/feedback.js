@@ -10,30 +10,14 @@ router.post(
     /*  #swagger.tags = ['Feedback-front']
         #swagger.summary = '新增回饋'   
         #swagger.description = '新增回饋'
-        #swagger.parameters['feedback'] = {
+        #swagger.parameters['body'] = {
             in: 'body',
             required: true,
             schema:{
-                contactPerson: { 
-                    type: 'string',
-                    description: '姓名',
-                    required: true
-                },
-                phone: { 
-                    type: 'string',
-                    description: '電話',
-                    required: true
-                },
-                email: { 
-                    type: 'string',
-                    description: '信箱',
-                    required: true
-                },
-                feedback: { 
-                    type: 'string',
-                    description: '內容',
-                    required: true
-                }
+                $contactPerson:'姓名',
+                $phone:'電話',
+                $email: '信箱',
+                $feedback: '內容',
             }
         }
         

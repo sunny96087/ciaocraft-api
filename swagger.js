@@ -9,11 +9,11 @@ const doc = {
     description: "六角課程團體專題用 api",
   },
   // * 開發
-  // host: 'localhost:3666',
-  // schemes: ['http', 'https'],
+  host: 'localhost:3666',
+  schemes: ['http', 'https'],
   // * 部署
-  host: "ciaocraft-api.onrender.com",
-  schemes: ["https"],
+  // host: "ciaocraft-api.onrender.com",
+  // schemes: ["https"],
 
   basePath: "/",
   tags: [
