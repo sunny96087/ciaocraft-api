@@ -2314,7 +2314,7 @@
           "Orders-front"
         ],
         "summary": "新增訂單",
-        "description": "新增訂單",
+        "description": "新增訂單 <br>\r  memberId: 會員 ID <br>\r  vendorId: 賣家 ID <br>\r  courseId: 課程 ID <br>\r  courseItemId: 課程時段 ID <br>\r  brandName: 品牌名稱 (string) <br>\r  courseName: 課程名稱 (string)；ex. 培訓課格式: 2024-05-29 課程名稱, 體驗課格式: 2024-05-29 10:00 ~ 12:00 <br>\r  courseItemName: 課程時段名稱 (string) <br>\r  count: 購買數量 (int) <br>\r  price: 單價 (int) <br>\r  totalPrice: 總價 (int) <br>\r  courseLocation: 上課地點 (string) <br>\r  startTime: 上課時間 (string)；帶入 Date 物件格式 ex. 2024-05-29 10:00:00.000 <br>\r  endTime: 下課時間 (string)；帶入 Date 物件格式 ex. 2024-05-29 12:00:00.000 <br>\r  note: 備註 (string)",
         "parameters": [
           {
             "name": "token",
@@ -2323,8 +2323,84 @@
           },
           {
             "name": "body",
-            "in": "query",
-            "type": "string"
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "memberId": {
+                  "type": "string",
+                  "example": "會員 ID"
+                },
+                "vendorId": {
+                  "type": "string",
+                  "example": "賣家 ID"
+                },
+                "courseId": {
+                  "type": "string",
+                  "example": "課程 ID"
+                },
+                "courseItemId": {
+                  "type": "string",
+                  "example": "課程項目 ID"
+                },
+                "brandName": {
+                  "type": "string",
+                  "example": "品牌名稱"
+                },
+                "courseName": {
+                  "type": "string",
+                  "example": "課程名稱"
+                },
+                "courseItemName": {
+                  "type": "string",
+                  "example": "2024-05-29 10:00 ~ 12:00"
+                },
+                "count": {
+                  "type": "number",
+                  "example": 1
+                },
+                "price": {
+                  "type": "number",
+                  "example": 666
+                },
+                "totalPrice": {
+                  "type": "number",
+                  "example": 666
+                },
+                "courseLocation": {
+                  "type": "string",
+                  "example": "台北市信義區"
+                },
+                "startTime": {
+                  "type": "string",
+                  "example": "2024-05-29 10:00:00.000"
+                },
+                "endTime": {
+                  "type": "string",
+                  "example": "2024-05-29 12:00:00.000"
+                },
+                "note": {
+                  "type": "string",
+                  "example": "太貴了，你應該給我半價"
+                }
+              },
+              "required": [
+                "memberId",
+                "vendorId",
+                "courseId",
+                "courseItemId",
+                "brandName",
+                "courseName",
+                "courseItemName",
+                "count",
+                "price",
+                "totalPrice",
+                "courseLocation",
+                "startTime",
+                "endTime"
+              ]
+            }
           }
         ],
         "responses": {
@@ -2729,14 +2805,14 @@
             "in": "query",
             "description": "當前頁碼，預設 1",
             "required": false,
-            "type": "number"
+            "type": "string"
           },
           {
             "name": "pageSize",
             "in": "query",
             "description": "每頁筆數，預設 20 筆，上限 100 筆",
             "required": false,
-            "type": "number"
+            "type": "string"
           }
         ],
         "responses": {

@@ -151,8 +151,41 @@ router.post(
   handleErrorAsync(orderController.newOrder)
   /*  #swagger.tags = ['Orders-front']
       #swagger.summary = '新增訂單'
-      #swagger.description = '新增訂單'
-      #swagger.parameters['body'] = {}
+      #swagger.description = `新增訂單 <br>
+                              memberId: 會員 ID <br>
+                              vendorId: 賣家 ID <br>
+                              courseId: 課程 ID <br>
+                              courseItemId: 課程時段 ID <br>
+                              brandName: 品牌名稱 (string) <br>
+                              courseName: 課程名稱 (string)；ex. 培訓課格式: 2024-05-29 課程名稱, 體驗課格式: 2024-05-29 10:00 ~ 12:00 <br>
+                              courseItemName: 課程時段名稱 (string) <br>
+                              count: 購買數量 (int) <br>
+                              price: 單價 (int) <br>
+                              totalPrice: 總價 (int) <br>
+                              courseLocation: 上課地點 (string) <br>
+                              startTime: 上課時間 (string)；帶入 Date 物件格式 ex. 2024-05-29 10:00:00.000 <br>
+                              endTime: 下課時間 (string)；帶入 Date 物件格式 ex. 2024-05-29 12:00:00.000 <br>
+                              note: 備註 (string)`
+      #swagger.parameters['body'] = {
+        in: 'body',
+        required: true,
+        schema : {
+          $memberId: '會員 ID',
+          $vendorId: '賣家 ID',
+          $courseId: '課程 ID',
+          $courseItemId: '課程項目 ID',
+          $brandName: '品牌名稱',
+          $courseName: '課程名稱',
+          $courseItemName: '2024-05-29 10:00 ~ 12:00',
+          $count: 1,
+          $price: 666,
+          $totalPrice: 666,
+          $courseLocation: '台北市信義區',
+          $startTime: '2024-05-29 10:00:00.000',
+          $endTime: '2024-05-29 12:00:00.000',
+          note: '太貴了，你應該給我半價'
+        }
+      }
   */
 );
 
