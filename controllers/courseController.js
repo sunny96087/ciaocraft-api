@@ -624,13 +624,14 @@ const courseController = {
       return;
     }
 
-    const isCourseExist = await Course.find({ courseId: courseId, courseStatus: 1 });
+    const isCourseExist = await Course.find({ _id: courseId, courseStatus: 1 });
+    console.log("isCourseExist", isCourseExist);
     if (!isCourseExist) {
       return next(appError(404, "課程不存在 或 已下架"));
     }
 
     // 查詢課程全部評價
-    const comments = await CourseComment.findById(courseId)
+    const comments = await CourseComment.find({courseId: courseId})
       .populate({
         path: "memberId",
         select: "name"
