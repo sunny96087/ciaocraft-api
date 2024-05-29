@@ -12,8 +12,8 @@ const courseController = {
     // 取得賣家 id
     const vendorId = req.vendor.id;
 
-    console.log("vendorId", vendorId);
-    console.log("req.query", req.query);
+    // console.log("vendorId", vendorId);
+    // console.log("req.query", req.query);
 
     // 從請求中取得查詢參數
     const { startDate, courseTerm, courseStatus, keyword } = req.query;
@@ -36,10 +36,27 @@ const courseController = {
 
     // 根據 keyword 過濾課程
     if (keyword !== "") {
-      query.$or = [
-        { "teacherId.name": { $regex: keyword, $options: "i" } },
-        { courseName: { $regex: keyword, $options: "i" } },
-      ];
+      const keywordCourses = await Course.aggregate([
+        {
+          $lookup: {
+            from: "teachers", // 請根據你的實際情況替換為 teacher 集合的名稱
+            localField: "teacherId",
+            foreignField: "_id",
+            as: "teacher",
+          },
+        },
+        { $unwind: "$teacher" },
+        {
+          $match: {
+            $or: [
+              { "teacher.name": { $regex: keyword, $options: "i" } },
+              { courseName: { $regex: keyword, $options: "i" } },
+            ],
+          },
+        },
+      ]);
+
+      query._id = { $in: keywordCourses.map(course => course._id) };
     }
 
     // 根據 createdAt 排序課程
@@ -462,6 +479,15 @@ const courseController = {
     if (!teacher) {
       return next(appError(400, "找不到相對應的老師"));
     }
+
+    // 找到原來的老師並從其 courseId 陣列中移除該課程 _id
+    const originalTeacher = await Teacher.findOne({ courseId: course._id });
+    if (originalTeacher) {
+      originalTeacher.courseId = originalTeacher.courseId.filter(id => !id.equals(course._id));
+      await originalTeacher.save();
+    }
+
+    // 將課程 _id 添加到新老師的 courseId 陣列
     teacher.courseId.push(course._id);
     await teacher.save();
 
@@ -493,6 +519,12 @@ const courseController = {
       // 如果課程項目存在，則更新課程項目
       if (courseItem) {
         Object.assign(courseItem, item);
+        // 更新其他欄位
+        courseItem.capacity = data.courseCapacity;
+        courseItem.mainCourseName = data.courseName;
+        courseItem.startTime = item.startTime;
+        courseItem.endTime = item.endTime;
+        courseItem.itemName = item.itemName;
         await courseItem.save();
       } else {
         // 如果課程項目不存在，則創建新的課程項目
@@ -514,9 +546,6 @@ const courseController = {
 
     handleSuccess(res, course, "編輯課程及時段成功");
   },
-
-  // ? 取得所有訂單 (關聯課程 + 項目) (Back)
-  // ? 取得單筆訂單資料 (關聯課程 + 項目) (Back)
 
   // 取得單一課程資料 (Front)
   getCourse: async (req, res, next) => {
