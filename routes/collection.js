@@ -7,19 +7,17 @@ const collectionController = require("../controllers/collectionsController");
 router.post(
     "/",
     handleErrorAsync(collectionController.newCollection)
-    /* #swagger.tags = ['Collections-front']
-       #swagger.description = '新增收藏'
-       #swagger.parameters['collection'] = {
+    /* 
+        #swagger.tags = ['Collections-front']
+        #swagger.summary = '新增收藏'
+        #swagger.description = '新增收藏'
+        #swagger.parameters['body'] = {
            in: 'body',
            required: true,
            schema: {
-               courseId: { 
-                   type: 'string',
-                   description: '課程 ID',
-                   required: true
-               }
-           }
-       }
+               courseId:'課程 ID'
+            }
+        }    
     
     */
 );
@@ -28,13 +26,15 @@ router.post(
 router.delete(
     "/:collectionId",
     handleErrorAsync(collectionController.deleteCollection)
-    /* #swagger.tags = ['Collections-front']
-       #swagger.description = '刪除收藏'
-       #swagger.parameters['collectionId'] = {
+    /* 
+        #swagger.tags = ['Collections-front']
+        #swagger.summary = '刪除收藏'
+        #swagger.description = '刪除收藏'
+        #swagger.parameters['collectionId'] = {
            in: 'path',
            required: true,
            type: 'string'
-       }
+        }
     */
 );
 
