@@ -203,10 +203,14 @@ const orderController = {
     // 建立查詢條件
     let query = {};
 
-    // 課程狀態
+    // 課程狀態 // 若是回傳 4, 回傳 4 和 5 都是已取消的訂單
     console.log("paidStatus:", paidStatus);
     if (paidStatus) {
-      query.paidStatus = Number(paidStatus);
+      if (Number(paidStatus) === 4) {
+        query.paidStatus = { $in: [4, 5] };
+      } else {
+        query.paidStatus = Number(paidStatus);
+      }
     }
 
     // 訂單日期區間 (訂單建立時間)
@@ -242,13 +246,35 @@ const orderController = {
       .populate("courseItemId")
       .sort(sort);
 
+    // if (keyword) {
+    //   // 在應用程式中過濾結果
+    //   orders = orders.filter(
+    //     (order) =>
+    //       new RegExp(keyword, "i").test(order._id.toString()) ||
+    //       new RegExp(keyword, "i").test(order.memberId.name)
+    //   );
+    // }
     if (keyword) {
-      // 在應用程式中過濾結果
-      orders = orders.filter(
-        (order) =>
-          new RegExp(keyword, "i").test(order._id.toString()) ||
-          new RegExp(keyword, "i").test(order.memberId.name)
-      );
+      // 在資料庫中過濾結果
+      orders = await Order.aggregate([
+        {
+          $lookup: {
+            from: "members", // 請根據你的實際情況替換為 member 集合的名稱
+            localField: "memberId",
+            foreignField: "_id",
+            as: "member",
+          },
+        },
+        { $unwind: "$member" },
+        {
+          $match: {
+            $or: [
+              { "_id": { $regex: keyword, $options: "i" } },
+              { "member.name": { $regex: keyword, $options: "i" } },
+            ],
+          },
+        },
+      ]);
     }
 
     handleSuccess(res, orders, "取得所有訂單成功");
