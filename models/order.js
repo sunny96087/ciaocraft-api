@@ -98,7 +98,7 @@ const orderSchema = new mongoose.Schema(
         refundTime: {
             type: Date,
         },
-        // 訂單編號
+        // 銀行帳號後五碼
         lastFiveDigits: {
             type: String,
         },
