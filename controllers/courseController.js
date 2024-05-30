@@ -16,7 +16,7 @@ const courseController = {
     const vendorId = req.vendor.id;
 
     // 從請求中取得查詢參數
-    const { startDate, endDate, tags, keyword } = req.query;
+    const { startDate, endDate, tags, keyword, sort } = req.query;
 
     // 先查詢賣家的所有訂單
     const orders = await Order.find({ vendorId });
@@ -26,21 +26,6 @@ const courseController = {
     const query = { orderId: { $in: orderIds } };
 
     // 根據 startDate 和 endDate 查詢評價
-    // if (startDate && endDate) {
-    //   // 包含結束日期的整個時間範圍 -> 23:59:59：
-    //   let start = new Date(startDate);
-    //   let end = new Date(endDate);
-
-    //   // 轉換為 UTC
-    //   start.setUTCHours(0);
-    //   start.setUTCMinutes(0);
-    //   start.setUTCSeconds(0);
-    //   end.setUTCHours(23);
-    //   end.setUTCMinutes(59);
-    //   end.setUTCSeconds(59);
-
-    //   query.createdAt = { $gte: start, $lte: end };
-    // }
     if (startDate && endDate) {
       // 包含結束日期的整個時間範圍 -> 23:59:59：
       let end = new Date(endDate);
@@ -71,11 +56,41 @@ const courseController = {
     }
 
     // 查詢賣家的所有課程評價
-    const comments = await CourseComment.find(query)
+    let commentsQuery = CourseComment.find(query)
       .populate("memberId")
       .populate("orderId")
       .populate("courseId")
-      .select("content images tags rating likes createAt orderId courseId");
+      .select("content images tags rating likes createdAt orderId courseId");
+
+    // 如果請求的 query 中有 sort 參數，則進行排序
+    if (sort) {
+      let sortField, sortOrder;
+      switch (sort) {
+        case 'createdAtAsc': // 建立日期舊到新
+          sortField = 'createdAt';
+          sortOrder = 1;
+          break;
+        case 'createdAtDesc': // 建立日期新到舊 (預設)
+          sortField = 'createdAt';
+          sortOrder = -1;
+          break;
+        case 'ratingAsc': // 評分低到高
+          sortField = 'rating';
+          sortOrder = 1;
+          break;
+        case 'ratingDesc': // 評分高到低
+          sortField = 'rating';
+          sortOrder = -1;
+          break;
+        default:
+          sortField = 'createdAt';
+          sortOrder = -1;
+      }
+
+      commentsQuery = commentsQuery.sort({ [sortField]: sortOrder });
+    }
+
+    const comments = await commentsQuery;
 
     handleSuccess(res, comments, "取得所有評價成功");
   },

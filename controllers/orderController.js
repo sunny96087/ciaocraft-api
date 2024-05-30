@@ -185,8 +185,11 @@ const orderController = {
       });
     }
 
-    // 將資料排序，日期從新到舊
+    // 將資料排序，日期從新到舊，如果日期相同，則根據 createdAt 欄位從新到舊排序
     paymentInfo.sort((a, b) => {
+      if (b.transactionTime - a.transactionTime === 0) {
+        return b.createdAt - a.createdAt;
+      }
       return b.transactionTime - a.transactionTime;
     });
 
