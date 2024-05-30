@@ -9,6 +9,49 @@ const tools = require("../utils/tools");
 const validator = require("validator");
 
 const courseController = {
+  // ? 取得賣家所有課程評價 (query: startDate + endDate, tags, keyword(orderId || content))  (Back)
+  getAdminCourseComments: async (req, res, next) => {
+    // 取得賣家 id
+    const vendorId = req.vendor.id;
+
+    // 從請求中取得查詢參數
+    const { startDate, endDate, tags, keyword } = req.query;
+
+    // 建立查詢條件
+    const query = { vendorId };
+
+    // 根據 startDate 和 endDate 查詢評價
+    if (startDate && endDate) {
+      // 包含結束日期的整個時間範圍 -> 23:59:59：
+      let end = new Date(endDate);
+      end.setHours(23);
+      end.setMinutes(59);
+      end.setSeconds(59);
+
+      query.createAt = { $gte: new Date(startDate), $lte: end };
+    }
+
+    // 根據 tags 查詢評價
+    if (tags) {
+      query.tags = { $in: tags.split(",") };
+    }
+
+    // 根據 keyword 查詢評價
+    if (keyword) {
+      query.$or = [
+        { orderId: { $regex: keyword, $options: "i" } },
+        { content: { $regex: keyword, $options: "i" } },
+      ];
+    }
+
+    // 查詢賣家的所有課程評價
+    const comments = await CourseComment.find(query)
+      .populate("memberId")
+      .select("content images tags rating likes createAt");
+
+    handleSuccess(res, comments, "取得所有評價成功");
+  },
+
   // ? 取得全部課程 (query: createdAt, courseTerm, courseStatus, keyword(teacherId > name || courseName)) (Back)
   getAdminCourses: async (req, res, next) => {
     // 取得賣家 id
@@ -58,7 +101,7 @@ const courseController = {
         },
       ]);
 
-      query._id = { $in: keywordCourses.map(course => course._id) };
+      query._id = { $in: keywordCourses.map((course) => course._id) };
     }
 
     // 根據 createdAt 排序課程
@@ -302,7 +345,7 @@ const courseController = {
               },
             },
             commentCount: {
-              $sum: { comments: 1 }
+              $sum: { comments: 1 },
             },
             createdAt: { $first: "$createdAt" },
           },
@@ -483,7 +526,9 @@ const courseController = {
     // 找到原來的老師並從其 courseId 陣列中移除該課程 _id
     const originalTeacher = await Teacher.findOne({ courseId: course._id });
     if (originalTeacher) {
-      originalTeacher.courseId = originalTeacher.courseId.filter(id => !id.equals(course._id));
+      originalTeacher.courseId = originalTeacher.courseId.filter(
+        (id) => !id.equals(course._id)
+      );
       await originalTeacher.save();
     }
 
@@ -552,7 +597,11 @@ const courseController = {
     const { courseId } = req.params;
 
     // 驗證 courseId 格式和是否存在
-    const isValidCourseId = await tools.findModelByIdNext(Course, courseId, next);
+    const isValidCourseId = await tools.findModelByIdNext(
+      Course,
+      courseId,
+      next
+    );
     if (!isValidCourseId) {
       return;
     }
@@ -561,48 +610,62 @@ const courseController = {
     const course = await Course.findById(courseId)
       .populate({
         path: "teacherId",
-        select: "name photo"
+        select: "name photo",
       })
       .populate({
         path: "vendorId",
         match: { status: 1 },
-        select: "brandName intro"
+        select: "brandName intro",
       })
       .populate({
         path: "courseItemId",
         match: { status: 1 },
-        select: "capacity startTime endTime itemName"
+        select: "capacity startTime endTime itemName",
       })
-      .select(`courseName courseType courseTerm coursePrice courseSummary 
+      .select(
+        `courseName courseType courseTerm coursePrice courseSummary 
                courseLocation courseAddress courseRemark courseImage courseContent courseStatus 
-               createdAt updatedAt`)
+               createdAt updatedAt`
+      )
       .lean();
 
     // 如果課程不存在，則返回錯誤
     if (!course) {
-      return next(appError(404, "課程不存在 或 已下架"))
-    };
+      return next(appError(404, "課程不存在 或 已下架"));
+    }
 
     // 計算 賣家 評價分數：取得該賣家所有課程的評價，計算評價總數和平均值
     // 取得該賣家的所有 courseId
-    const allVendorCourses = await Course.find({ vendorId: course.vendorId }).select("courseId");
+    const allVendorCourses = await Course.find({
+      vendorId: course.vendorId,
+    }).select("courseId");
 
     // 取得所有課程的評價數值
     let allVendorCommentsRatings = [];
     for (const course of allVendorCourses) {
-      const courseComments = await CourseComment.find({ courseId: course.courseId }).select("rating");
-      allRatingsValue = courseComments.map(comment => comment.rating);
+      const courseComments = await CourseComment.find({
+        courseId: course.courseId,
+      }).select("rating");
+      allRatingsValue = courseComments.map((comment) => comment.rating);
       allVendorCommentsRatings.push(...allRatingsValue);
     }
 
     // 計算賣家 評價總數 和 平均值
-    const totalVendorComments = allVendorCommentsRatings.reduce((acc, cur) => acc + cur, 0);
+    const totalVendorComments = allVendorCommentsRatings.reduce(
+      (acc, cur) => acc + cur,
+      0
+    );
     const vendorAvgRating = totalVendorComments / allVendorCourses.length;
 
     // 計算 課程 評價總數 和 平均值
-    const courseComments = await CourseComment.find({ courseId: courseId }).select("rating");
+    const courseComments = await CourseComment.find({
+      courseId: courseId,
+    }).select("rating");
     const totalCourseComments = courseComments.length;
-    const courseAvgRating = courseComments.reduce((acc, cur) => acc + cur.rating, 0);
+    const courseAvgRating = courseComments.reduce(
+      (acc, cur) => acc + cur.rating,
+      0
+    );
 
     // 更新 course 物件
     course.totalVendorComments = totalVendorComments;
@@ -618,7 +681,11 @@ const courseController = {
     const { courseId } = req.params;
 
     // 驗證 courseId 格式和是否存在
-    const isValidCourseId = await tools.findModelByIdNext(Course, courseId, next);
+    const isValidCourseId = await tools.findModelByIdNext(
+      Course,
+      courseId,
+      next
+    );
     if (!isValidCourseId) {
       return;
     }
@@ -632,7 +699,7 @@ const courseController = {
     const comments = await CourseComment.find({ courseId: courseId })
       .populate({
         path: "memberId",
-        select: "name"
+        select: "name",
       })
       .select("content images tags rating likes createAt");
 
@@ -645,12 +712,19 @@ const courseController = {
     const { commentId } = req.params;
 
     // 驗證 commentId 格式和是否存在
-    const isValidCommentId = await tools.findModelByIdNext(CourseComment, commentId, next);
+    const isValidCommentId = await tools.findModelByIdNext(
+      CourseComment,
+      commentId,
+      next
+    );
     if (!isValidCommentId) {
       return;
     }
 
-    const isMeberComment = await CourseComment.findOne({ _id: commentId, memberId: memberId });
+    const isMeberComment = await CourseComment.findOne({
+      _id: commentId,
+      memberId: memberId,
+    });
     if (!isMeberComment) {
       return next(appError(403, "無權限查看該評價"));
     }
@@ -659,7 +733,7 @@ const courseController = {
     const comment = await Course.findById(commentId)
       .populate({
         path: "courseId",
-        select: "courseName"
+        select: "courseName",
       })
       .select("content images tags rating createAt");
 
@@ -681,8 +755,12 @@ const courseController = {
       return next(appError(400, "orderId, content, rating, tags 為必填欄位"));
     }
 
-    // 驗證 courseId 格式和是否存在 
-    const isValidCourseId = await tools.findModelByIdNext(Course, courseId, next);
+    // 驗證 courseId 格式和是否存在
+    const isValidCourseId = await tools.findModelByIdNext(
+      Course,
+      courseId,
+      next
+    );
     if (!isValidCourseId) {
       return;
     }
@@ -694,7 +772,11 @@ const courseController = {
     }
 
     // 驗證是否已評價過
-    const isCommentExist = await CourseComment.findOne({ memberId: memberId, courseId: courseId, orderId: orderId });
+    const isCommentExist = await CourseComment.findOne({
+      memberId: memberId,
+      courseId: courseId,
+      orderId: orderId,
+    });
     if (isCommentExist) {
       return next(appError(400, "已評價過該課程"));
     }
@@ -721,14 +803,16 @@ const courseController = {
       content: content,
       images: images,
       tags: tags,
-      rating: rating
+      rating: rating,
     });
 
     if (!newComment) {
       return next(appError(500, "新增課程評價失敗"));
     }
 
-    const newCommentToCourse = await Course.findByIdAndUpdate(courseId, { $push: { comments: newComment._id } });
+    const newCommentToCourse = await Course.findByIdAndUpdate(courseId, {
+      $push: { comments: newComment._id },
+    });
     if (!newCommentToCourse) {
       return next(appError(500, "新增課程評價失敗"));
     }
@@ -742,24 +826,39 @@ const courseController = {
     const { commentId } = req.body;
 
     // 驗證 commentId 格式和是否存在
-    const isValidCommentId = await tools.findModelByIdNext(CourseComment, commentId, next);
+    const isValidCommentId = await tools.findModelByIdNext(
+      CourseComment,
+      commentId,
+      next
+    );
     if (!isValidCommentId) {
       return;
     }
 
     // 驗證 memberId 是否按讚過，如果按讚過，則取消按讚；如果未按讚，則按讚
-    const isLike = await CourseComment.findOne({ _id: commentId, likes: { $in: memberId } });
-    
+    const isLike = await CourseComment.findOne({
+      _id: commentId,
+      likes: { $in: memberId },
+    });
+
     if (isLike) {
       // 取消按讚
-      const unLikeComment = await CourseComment.findByIdAndUpdate(commentId, { $pull: { likes: memberId } }, { new: true })
+      const unLikeComment = await CourseComment.findByIdAndUpdate(
+        commentId,
+        { $pull: { likes: memberId } },
+        { new: true }
+      );
       if (!unLikeComment) {
         return next(appError(400, "取消按讚失敗"));
       }
       handleSuccess(res, null, "取消按讚成功");
     } else {
       // 按讚
-      const likeComment = await CourseComment.findByIdAndUpdate(commentId, { $push: { likes: memberId } }, { new: true });
+      const likeComment = await CourseComment.findByIdAndUpdate(
+        commentId,
+        { $push: { likes: memberId } },
+        { new: true }
+      );
       if (!likeComment) {
         return next(appError(400, "按讚失敗"));
       }

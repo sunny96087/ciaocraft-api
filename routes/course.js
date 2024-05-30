@@ -5,6 +5,43 @@ const { isVendorAuth } = require("../utils/vendorAuth");
 const { isAuth } = require("../utils/auth");
 const courseController = require("../controllers/courseController");
 
+// ? 取得賣家所有課程評價 (query: startDate + endDate, tags, keyword(orderId || content)) (Back)
+router.get(
+    "/admin/comments",
+    isVendorAuth,
+    handleErrorAsync(courseController.getAdminCourseComments)
+    /*
+        #swagger.tags = ['Courses-back']
+        #swagger.summary = '取得所有評價 (Back)'
+        #swagger.description = '取得所有評價 (Back)'
+
+        #swagger.parameters['keyword'] = {
+            in: 'query',
+            description: '搜尋關鍵字, 查詢老師姓名或課程名稱',
+            required: false,
+            type: 'string'
+        }
+        #swagger.parameters['tags'] = {
+            in: 'query',
+            description: '評論標籤, 可帶入值包含 "師生互動", "教學環境", "專業度", "其他"',
+            required: false,
+            type: 'string'
+        }
+        #swagger.parameters['startDate'] = {
+            in: 'query',
+            description: '開始日期',
+            required: false,
+            type: 'string'
+        }
+        #swagger.parameters['endDate'] = {
+            in: 'query',
+            description: '結束日期',
+            required: false,
+            type: 'string'
+        }
+    */
+);
+
 // ? 取得全部課程 (query: createdAt, courseTerm, courseStatus, keyword(teacherId > name || courseName)) (Back)
 router.get(
     "/admin",
