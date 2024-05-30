@@ -17,7 +17,7 @@ router.get(
 
         #swagger.parameters['keyword'] = {
             in: 'query',
-            description: '搜尋關鍵字, 查詢老師姓名或課程名稱',
+            description: '搜尋關鍵字, 查詢訂單編號或評價內容',
             required: false,
             type: 'string'
         }

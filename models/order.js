@@ -118,4 +118,14 @@ const orderSchema = new mongoose.Schema(
 )
 
 const Order = mongoose.model('Order', orderSchema);
+
+// ? 查詢時自動填充相關的欄位
+orderSchema.pre('find', function () {
+    this.populate('memberId');
+    this.populate('vendorId');
+    this.populate('courseId');
+    this.populate('courseItemId');
+    this.populate('commentId');
+})
+
 module.exports = Order;  

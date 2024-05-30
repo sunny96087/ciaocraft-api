@@ -240,23 +240,10 @@ const orderController = {
     }
 
     console.log("query:", query);
-    let orders = await Order.find(query)
-      .populate("memberId")
-      .populate("courseId")
-      .populate("courseItemId")
-      .sort(sort);
 
-    // if (keyword) {
-    //   // 在應用程式中過濾結果
-    //   orders = orders.filter(
-    //     (order) =>
-    //       new RegExp(keyword, "i").test(order._id.toString()) ||
-    //       new RegExp(keyword, "i").test(order.memberId.name)
-    //   );
-    // }
-    if (keyword) {
-      // 在資料庫中過濾結果
-      orders = await Order.aggregate([
+    // 根據 keyword 過濾訂單
+    if (keyword !== "") {
+      const keywordOrders = await Order.aggregate([
         {
           $lookup: {
             from: "members", // 請根據你的實際情況替換為 member 集合的名稱
@@ -269,38 +256,27 @@ const orderController = {
         {
           $match: {
             $or: [
-              { "_id": { $regex: keyword, $options: "i" } },
               { "member.name": { $regex: keyword, $options: "i" } },
+              {
+                _id: mongoose.Types.ObjectId.isValid(keyword)
+                  ? new mongoose.Types.ObjectId(keyword)
+                  : keyword,
+              },
             ],
           },
         },
       ]);
+
+      query._id = { $in: keywordOrders.map((order) => order._id) };
     }
 
-    handleSuccess(res, orders, "取得所有訂單成功");
-  },
-
-  // ? 取得單筆訂單資料 (Back)
-  getAdminOrder: async (req, res, next) => {
-    const { orderId } = req.params;
-    // console.log(orderId);
-
-    // 檢查 ID 格式及是否存在
-    const isIdExist = await tools.findModelByIdNext(Order, orderId, next);
-    if (!isIdExist) {
-      return;
-    }
-
-    const order = await Order.findById(orderId)
+    // 取回所有訂單
+    let orders = await Order.find(query)
       .populate("memberId")
-      .populate("courseId")
-      .populate("courseItemId");
+      .populate("vendorId")
+      .sort(sort);
 
-    if (!order) {
-      return next(new appError("找不到此訂單", 404));
-    }
-
-    handleSuccess(res, order, "取得單筆訂單成功");
+    handleSuccess(res, orders, "取得單筆訂單成功");
   },
 
   // ? 修改訂單 (賣家確認收款、取消訂單) (Back)
@@ -363,41 +339,68 @@ const orderController = {
     const orderId = req.params.orderId;
 
     // 檢查訂單是否存在
-    const order = await Order
-      .findOne({ _id: orderId, memberId: memberId })
+    const order = await Order.findOne({ _id: orderId, memberId: memberId })
       .populate({
-        path: 'vendorId',
-        select: 'bankName bankCode bankBranch bankAccountName bankAccount'
+        path: "vendorId",
+        select: "bankName bankCode bankBranch bankAccountName bankAccount",
       })
       .populate({
-        path: 'commentId',
-        select: 'content images tags rating likes createdAt',
+        path: "commentId",
+        select: "content images tags rating likes createdAt",
       })
-      .select(`_id memberId vendorId courseId courseItemId commentId
+      .select(
+        `_id memberId vendorId courseId courseItemId commentId
                 brandName courseLocation 
                 paymentType paidStatus 
                 count price totalPrice 
                 startTime endTime note 
                 confirmTime refundTime
                 cancelTime cancelReason 
-                createdAt`)
+                createdAt`
+      )
       .lean();
 
     if (!order) {
-      return next(appError(400, '會員無此訂單資料'));
+      return next(appError(400, "會員無此訂單資料"));
     }
 
-    handleSuccess(res, order, '取得訂單資料成功');
+    handleSuccess(res, order, "取得訂單資料成功");
   },
 
   // 新增訂單
   newOrder: async (req, res, next) => {
     const memberId = req.user.id;
-    const { vendorId, courseId, courseItemId, brandName, courseName, courseItemName, count, price, totalPrice, startTime, endTime, note, courseLocation } = req.body;
+    const {
+      vendorId,
+      courseId,
+      courseItemId,
+      brandName,
+      courseName,
+      courseItemName,
+      count,
+      price,
+      totalPrice,
+      startTime,
+      endTime,
+      note,
+      courseLocation,
+    } = req.body;
 
     // 驗證必填欄位
-    if (!vendorId || !courseId || !courseItemId || !brandName || !courseItemName || !count || !price || !totalPrice || !startTime || !endTime || !courseLocation) {
-      return next(appError(400, '請輸入所有必填欄位'));
+    if (
+      !vendorId ||
+      !courseId ||
+      !courseItemId ||
+      !brandName ||
+      !courseItemName ||
+      !count ||
+      !price ||
+      !totalPrice ||
+      !startTime ||
+      !endTime ||
+      !courseLocation
+    ) {
+      return next(appError(400, "請輸入所有必填欄位"));
     }
 
     // 驗證 vendorId 格式、是否存在 及 是否啟用
@@ -406,9 +409,11 @@ const orderController = {
       return;
     }
 
-    const vendorStatus = await Vendor.findById({ _id: vendorId }).select('status');
+    const vendorStatus = await Vendor.findById({ _id: vendorId }).select(
+      "status"
+    );
     if (vendorStatus.status !== 1) {
-      return next(appError(400, '此廠商已停用'));
+      return next(appError(400, "此廠商已停用"));
     }
 
     // 驗證 courseId 格式、是否存在 及 是否啟用
@@ -416,44 +421,52 @@ const orderController = {
     if (!isCourseExist) {
       return;
     }
-    const course = await Course.findById({ _id: courseId }).select('courseStatus');
+    const course = await Course.findById({ _id: courseId }).select(
+      "courseStatus"
+    );
 
     if (course.courseStatus !== 1) {
-      return next(appError(400, '非上架課程'));
+      return next(appError(400, "非上架課程"));
     }
 
     // 驗證 courseItemId 格式、是否存在 及 是否啟用
-    const isCourseItemExist = await tools.findModelByIdNext(CourseItem, courseItemId, next);
+    const isCourseItemExist = await tools.findModelByIdNext(
+      CourseItem,
+      courseItemId,
+      next
+    );
     if (!isCourseItemExist) {
       return;
     }
-    const courseItemStatus = await CourseItem.findById({ _id: courseItemId }).select('status');
+    const courseItemStatus = await CourseItem.findById({
+      _id: courseItemId,
+    }).select("status");
     if (courseItemStatus.status !== 1) {
-      return next(appError(400, '非上架課程項目'));
+      return next(appError(400, "非上架課程項目"));
     }
 
     // 驗證 count, price, totalPrice 須為大於 0 之正整數
     if (!Number.isInteger(count) || count <= 0) {
-      return next(appError(400, 'count 須為大於 0 之正整數'));
+      return next(appError(400, "count 須為大於 0 之正整數"));
     }
     if (!Number.isInteger(price) || price <= 0) {
-      return next(appError(400, 'price 須為大於 0 之正整數'));
+      return next(appError(400, "price 須為大於 0 之正整數"));
     }
     if (!Number.isInteger(totalPrice) || totalPrice <= 0) {
-      return next(appError(400, 'totalPrice 須為大於 0 之正整數'));
+      return next(appError(400, "totalPrice 須為大於 0 之正整數"));
     }
 
     // 驗證 startTime 和轉換 Date 物件
     const isValidStartTimeStr = Date.parse(startTime);
     if (!isValidStartTimeStr) {
-      return next(appError(400, 'startTime 格式錯誤'));
+      return next(appError(400, "startTime 格式錯誤"));
     }
     const startTimeDateObj = new Date(startTime);
 
     // 驗證 endTime 和轉換 Date 物件
     const isValidEndTimeStr = Date.parse(endTime);
     if (!isValidEndTimeStr) {
-      return next(appError(400, 'endTime 格式錯誤'));
+      return next(appError(400, "endTime 格式錯誤"));
     }
     const endTimeDateObj = new Date(endTime);
 
@@ -472,20 +485,22 @@ const orderController = {
       courseLocation: courseLocation,
       startTime: startTimeDateObj,
       endTime: endTimeDateObj,
-      note: note
+      note: note,
     });
 
     if (!newOrder) {
-      return next(appError(500, '新增訂單失敗'));
+      return next(appError(500, "新增訂單失敗"));
     }
 
     // 課程項目人數減少
-    const updateCourseItem = await CourseItem.findByIdAndUpdate(courseItemId, { $inc: { capacity: -count } });
+    const updateCourseItem = await CourseItem.findByIdAndUpdate(courseItemId, {
+      $inc: { capacity: -count },
+    });
     if (!updateCourseItem) {
-      return next(appError(500, '更新課程項目人數失敗'));
+      return next(appError(500, "更新課程項目人數失敗"));
     }
 
-    handleSuccess(res, newOrder, '新增訂單成功');
+    handleSuccess(res, newOrder, "新增訂單成功");
   },
 
   // 更新訂單資料 (前台會員僅可更新後5碼)
@@ -502,33 +517,34 @@ const orderController = {
 
     // 檢查 lastFiveDigits 格式
     if (!lastFiveDigits || lastFiveDigits.length !== 5) {
-      return next(appError(400, 'lastFiveDigits 錯誤'));
+      return next(appError(400, "lastFiveDigits 錯誤"));
     }
 
     // 檢查會員是否有此待付款訂單
     const order = await Order.findOne({ _id: orderId, memberId: memberId });
     if (!order) {
-      return next(appError(400, '會員無此訂單資料'));
+      return next(appError(400, "會員無此訂單資料"));
     }
 
     // 檢查訂單是否為待付款狀態
-    if(order.paidStatus !== 0){
-      return next(appError(400, '訂單為已付款狀態，無法更新後五碼'));
+    if (order.paidStatus !== 0) {
+      return next(appError(400, "訂單為已付款狀態，無法更新後五碼"));
     }
 
-    // 更新後五碼並將訂單更改為已付款；0: 待付款, 1: 已付款 
+    // 更新後五碼並將訂單更改為已付款；0: 待付款, 1: 已付款
     const status = 1;
     const updateOrder = await Order.findOneAndUpdate(
       { _id: orderId, memberId: memberId, paidStatus: 0 },
       { lastFiveDigits: lastFiveDigits, paidStatus: status },
-      { new: true });
-    
+      { new: true }
+    );
+
     if (!updateOrder) {
-      return next(appError(400, '更新訂單資料失敗'));
+      return next(appError(400, "更新訂單資料失敗"));
     }
 
-    handleSuccess(res, null, '更新訂單資料成功');
+    handleSuccess(res, null, "更新訂單資料成功");
   },
-}
+};
 
 module.exports = orderController;
