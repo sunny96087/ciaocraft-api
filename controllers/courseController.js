@@ -720,7 +720,7 @@ const courseController = {
     }
 
     // 查詢評價
-    const comment = await Course.findById(commentId)
+    const comment = await CourseComment.findById(commentId)
       .populate({
         path: "courseId",
         select: "courseName",

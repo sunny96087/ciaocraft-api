@@ -23,7 +23,7 @@ router.get(
         }
         #swagger.parameters['tags'] = {
             in: 'query',
-            description: '評論標籤, 可帶入值包含 "師生互動", "教學環境", "專業度", "其他"',
+            description: '評論標籤, 可帶入值包含 師生互動, 教學環境, 專業度, 其他',
             required: false,
             type: 'string'
         }

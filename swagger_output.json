@@ -2682,6 +2682,55 @@
         }
       }
     },
+    "/courses/admin/comments": {
+      "get": {
+        "tags": [
+          "Courses-back"
+        ],
+        "summary": "取得所有評價 (Back)",
+        "description": "取得所有評價 (Back)",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "description": "搜尋關鍵字, 查詢老師姓名或課程名稱",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "tags",
+            "in": "query",
+            "description": "評論標籤, 可帶入值包含 師生互動, 教學環境, 專業度, 其他",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "description": "開始日期",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "description": "結束日期",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/courses/admin": {
       "get": {
         "tags": [
