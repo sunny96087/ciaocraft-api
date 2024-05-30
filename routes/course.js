@@ -39,6 +39,13 @@ router.get(
             required: false,
             type: 'string'
         }
+        #swagger.parameters['sort'] = {
+            in: 'query',
+            description: '排序方式，建立日期新到舊: createdAtDesc (預設) 、舊到新: createdAtAsc、評分高到低: ratingAsc、評分低到高: ratingDesc',
+            required: false,
+            type: 'string',
+            default: 'createdAtDesc'
+        }
     */
 );
 
