@@ -27,20 +27,32 @@ const memberController = {
 
         // 取得會員資料
         const member = await Member.findById(memberId)
-            .select("nickname name gender birthday phone interests point");
+            .select("nickname name gender birthday phone interests point").lean();
 
-        // 取得 收藏 總數 (只含上架課程)
+        // 取得會員收藏總數
         const collections = await Collection
-            .find({ memberId: memberId, status: 1 });
+            .find({memberId: memberId})
+            .populate({
+                path: "courseId",
+                select: "courseId  courseStatus"
+            })
+            .sort({ createdAt: -1 })
+            
+        let collectionCount = 0;
+        collections.forEach((collection) => {
+            if(collection.courseId.courseStatus === 1) {
+                collectionCount++;
+            }
+        })
 
-        member.totalCollections = collections.length;
+        member.collectionCount = collectionCount;
         
         // 取得 上過的課程 總數 (只包含 3:已完課 不重複)
         const courses = await Order
-            .find({ memberId: memberId, status: 3 })
+            .find({ memberId: memberId, paidStatus: 3 })
             .distinct("courseId");
 
-        member.totalCourses = courses.length;
+        member.completedCourseCount = courses.length;
 
         handleSuccess(res, member, "取得會員資料成功");
     },
@@ -51,19 +63,26 @@ const memberController = {
         const courseTerm = req.query.courseTerm;
 
         // 查詢條件
-        let queryField = { memberId: memberId };
+        let queryField = { memberId: memberId};
+
+        // 取得會員收藏
+        let collections = await Collection
+            .find(queryField)
+            .populate({
+                path: "courseId",
+                select: "courseId courseName courseTerm courseType courseStatus coursePrice createdAt"
+            })
+            .sort({ createdAt: -1 })
+            .select("courseId courseName courseTerm courseType courseStatus coursePrice createdAt")
+            .lean();
 
         // 加入課程時長條件
         if (courseTerm) {
-            queryField.courseTerm = parseInt(courseTerm);
+            if(!["0","1"].includes(courseTerm)) {
+                return next(appError(400, 'courseTerm 須為 0:體驗課程 或 1:培訓課程'));
+            }
+            collections = collections.filter((collection) => collection.courseId.courseTerm === parseInt(courseTerm));
         }
-
-        // 取得會員收藏
-        const collections = await Collection
-            .find(queryField)
-            .populate("courseId")
-            .sort({ createdAt: -1 }
-            );
 
         handleSuccess(res, collections, "取得會員收藏成功");
     },
@@ -155,8 +174,12 @@ const memberController = {
 
         const orders = await Order
             .find(queryField)
-            .populate("courseId")
-            .sort({ createdAt: sortByCreateAt });
+            .populate({
+                path: "courseId",
+                select: "courseId coursePrice courseTerm"
+            })
+            .sort({ createdAt: sortByCreateAt })
+            .select("courseId courseName brandName count coursePrice totalPrice paidStatus createdAt");
 
         handleSuccess(res, orders, "取得會員訂單成功");
     },

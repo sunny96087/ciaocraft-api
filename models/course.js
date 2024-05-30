@@ -65,6 +65,10 @@ const courseSchema = new mongoose.Schema(
     courseSkillsLearned: String,
     // 課程總時數 (時長)
     courseTotalHours: Number,
+    clickCounts: {
+      type: Number,
+      default: 0,
+    }
   },
   {
     versionKey: false,
@@ -166,7 +170,7 @@ const courseCommentSchema = new mongoose.Schema(
     // 評論讚數會員Id
     likes: [
       { type: mongoose.Schema.Types.ObjectId, ref: "Member" }
-    ],
+    ]
   },
   {
     timestamps: true,
