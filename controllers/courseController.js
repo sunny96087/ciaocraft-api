@@ -230,19 +230,35 @@ const courseController = {
     sortBy = sortBy || "newest";
     if (sortBy === "newest") {
       // 依照最新時間排序
-      courses = await Course.find(queryField)
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .select(
-          "brandName courseName courseType courseTerm coursePrice createdAt"
-        );
+      courses = await Course.aggregate([
+        { $match: queryField },
+        {
+          $lookup: {
+            from: "vendors",
+            localField: "vendorId",
+            foreignField: "_id",
+            as: "vendor",
+          }
+        },
+        { $unwind: "$vendor" },
+        {
+          $project: {
+            courseName: 1,
+            brandName: "$vendor.brandName",
+            courseType: 1,
+            courseTerm: 1,
+            coursePrice: 1,
+            createdAt: 1
+          }
+        },
+        { $sort: { createdAt: -1 } },
+        { $skip: skip },
+        { $limit: limit }
+      ])
     } else if (sortBy === "mostPopular") {
       // 依照訂單被預訂數量 status=3(已完課) -> 收藏數量 -> 最新時間
       courses = await Course.aggregate([
-        {
-          $match: queryField,
-        },
+        { $match: queryField },
         {
           $lookup: {
             from: "vendors",
@@ -251,9 +267,7 @@ const courseController = {
             as: "vendor",
           },
         },
-        {
-          $unwind: "$vendor",
-        },
+        { $unwind: "$vendor" },
         {
           $lookup: {
             from: "orders",
@@ -337,22 +351,16 @@ const courseController = {
             coursePrice: { $first: "$coursePrice" },
             averageRate: {
               $avg: {
-                $cond: {
-                  if: { $ne: ["$comments.rating", null] },
-                  then: "$comments.rating",
-                  else: null, // 不存在 rate 欄位，則返回 null
-                },
+                $cond: [{ $ifNull: ["$comments.rating", false] }, "$comments.rating", 0],  
               },
             },
             commentCount: {
-              $sum: { comments: 1 },
+              $sum: { $cond: [{ $ifNull: ["$comments._id", false] }, 1, 0] },
             },
             createdAt: { $first: "$createdAt" },
           },
         },
-        {
-          $sort: { averageRate: -1, commentCount: -1, createdAt: -1 },
-        },
+        { $sort: { averageRate: -1, commentCount: -1, createdAt: -1 } },
         { $skip: skip },
         { $limit: limit },
         {
@@ -369,6 +377,7 @@ const courseController = {
         },
       ]);
     } else {
+      return next(appError(400, "無效的排序方式"));
     }
 
     handleSuccess(res, courses, "取得課程列表成功");
@@ -624,8 +633,8 @@ const courseController = {
       })
       .select(
         `courseName courseType courseTerm coursePrice courseSummary 
-               courseLocation courseAddress courseRemark courseImage courseContent courseStatus 
-               createdAt updatedAt`
+         courseLocation courseAddress courseRemark courseImage courseContent courseStatus 
+         createdAt updatedAt`
       )
       .lean();
 
@@ -658,10 +667,14 @@ const courseController = {
     const courseAvgRating = totalCourseComments / courseComments.length;  // 評價平均分數
 
     // 更新 course 物件
-    course.vendorCommentsCount = allVendorCommentsRatings.length; // 賣家評價總數
-    course.vendorAvgRating = vendorAvgRating;                     // 賣家評價平均分數
-    course.courseCommentsCount = courseComments.length;           // 課程評價總數
-    course.courseAvgRating = courseAvgRating;                     // 課程評價平均分數
+    course.vendorCommentsCount = allVendorCommentsRatings.length;     // 賣家評價總數
+    course.vendorAvgRating = parseFloat(vendorAvgRating.toFixed(2));  // 賣家評價平均分數
+    course.courseCommentsCount = courseComments.length;               // 課程評價總數
+    course.courseAvgRating = parseFloat(courseAvgRating.toFixed(2));  // 課程評價平均分數
+
+    // 如果有課程則將 clickCount +1
+    const updateClickCount = await Course.findByIdAndUpdate(courseId, { $inc: { clickCounts: 1 } }, { new: true });
+    console.log("updateClickCount", updateClickCount);
 
     handleSuccess(res, course, "取得單一課程資料成功");
   },

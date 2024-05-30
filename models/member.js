@@ -48,10 +48,6 @@ const memberSchema = new mongoose.Schema(
                 message: props => `${props.value} 非有效 interests 值`
             }
         },
-        collections: [{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Course",
-        }],
         isAdmin: {
             type: Boolean,
             default: false,
