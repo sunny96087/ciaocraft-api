@@ -7,6 +7,7 @@ const handleSuccess = require("../utils/handleSuccess");
 const { isVendorAuth, generateSendJWT } = require("../utils/vendorAuth");
 const tools = require("../utils/tools");
 const validator = require("validator");
+const mongoose = require("mongoose");
 
 const courseController = {
   // ? 取得賣家所有課程評價 (query: startDate + endDate, tags, keyword(orderId || content))  (Back)
@@ -17,10 +18,29 @@ const courseController = {
     // 從請求中取得查詢參數
     const { startDate, endDate, tags, keyword } = req.query;
 
+    // 先查詢賣家的所有訂單
+    const orders = await Order.find({ vendorId });
+    const orderIds = orders.map((order) => order._id);
+
     // 建立查詢條件
-    const query = { vendorId };
+    const query = { orderId: { $in: orderIds } };
 
     // 根據 startDate 和 endDate 查詢評價
+    // if (startDate && endDate) {
+    //   // 包含結束日期的整個時間範圍 -> 23:59:59：
+    //   let start = new Date(startDate);
+    //   let end = new Date(endDate);
+
+    //   // 轉換為 UTC
+    //   start.setUTCHours(0);
+    //   start.setUTCMinutes(0);
+    //   start.setUTCSeconds(0);
+    //   end.setUTCHours(23);
+    //   end.setUTCMinutes(59);
+    //   end.setUTCSeconds(59);
+
+    //   query.createdAt = { $gte: start, $lte: end };
+    // }
     if (startDate && endDate) {
       // 包含結束日期的整個時間範圍 -> 23:59:59：
       let end = new Date(endDate);
@@ -28,7 +48,7 @@ const courseController = {
       end.setMinutes(59);
       end.setSeconds(59);
 
-      query.createAt = { $gte: new Date(startDate), $lte: end };
+      query.createdAt = { $gte: new Date(startDate), $lte: end };
     }
 
     // 根據 tags 查詢評價
@@ -38,16 +58,24 @@ const courseController = {
 
     // 根據 keyword 查詢評價
     if (keyword) {
-      query.$or = [
-        { orderId: { $regex: keyword, $options: "i" } },
-        { content: { $regex: keyword, $options: "i" } },
-      ];
+      if (mongoose.Types.ObjectId.isValid(keyword)) {
+        query.$or = [
+          { 'orderId': keyword },
+          { content: { $regex: new RegExp(keyword, 'i') } },
+        ];
+      } else {
+        query.$or = [
+          { content: { $regex: new RegExp(keyword, 'i') } },
+        ];
+      }
     }
 
     // 查詢賣家的所有課程評價
     const comments = await CourseComment.find(query)
       .populate("memberId")
-      .select("content images tags rating likes createAt");
+      .populate("orderId")
+      .populate("courseId")
+      .select("content images tags rating likes createAt orderId courseId");
 
     handleSuccess(res, comments, "取得所有評價成功");
   },
@@ -643,25 +671,36 @@ const courseController = {
     // 取得所有課程的評價數值
     let allVendorCommentsRatings = []; // 賣家所有評價
     for (const course of allVendorCourses) {
-      const courseComments = await CourseComment.find({ courseId: course._id }).select("rating");
-      allRatingsValue = courseComments.map(comment => comment.rating);
+      const courseComments = await CourseComment.find({
+        courseId: course._id,
+      }).select("rating");
+      allRatingsValue = courseComments.map((comment) => comment.rating);
       allVendorCommentsRatings.push(...allRatingsValue);
     }
 
     // 計算賣家 評價總數 和 平均值
-    const totalVendorComments = allVendorCommentsRatings.reduce((acc, cur) => acc + cur, 0); // 賣家評價總分數
-    const vendorAvgRating = totalVendorComments / allVendorCommentsRatings.length; // 賣家評價平均分數
+    const totalVendorComments = allVendorCommentsRatings.reduce(
+      (acc, cur) => acc + cur,
+      0
+    ); // 賣家評價總分數
+    const vendorAvgRating =
+      totalVendorComments / allVendorCommentsRatings.length; // 賣家評價平均分數
 
     // 計算 課程 評價總數 和 平均值
-    const courseComments = await CourseComment.find({ courseId: courseId }).select("rating"); // 取得該課程的所有評價
-    const totalCourseComments = courseComments.reduce((acc, cur) => acc + cur.rating, 0); // 評價總分數
-    const courseAvgRating = totalCourseComments / courseComments.length;  // 評價平均分數
+    const courseComments = await CourseComment.find({
+      courseId: courseId,
+    }).select("rating"); // 取得該課程的所有評價
+    const totalCourseComments = courseComments.reduce(
+      (acc, cur) => acc + cur.rating,
+      0
+    ); // 評價總分數
+    const courseAvgRating = totalCourseComments / courseComments.length; // 評價平均分數
 
     // 更新 course 物件
     course.vendorCommentsCount = allVendorCommentsRatings.length; // 賣家評價總數
-    course.vendorAvgRating = vendorAvgRating;                     // 賣家評價平均分數
-    course.courseCommentsCount = courseComments.length;           // 課程評價總數
-    course.courseAvgRating = courseAvgRating;                     // 課程評價平均分數
+    course.vendorAvgRating = vendorAvgRating; // 賣家評價平均分數
+    course.courseCommentsCount = courseComments.length; // 課程評價總數
+    course.courseAvgRating = courseAvgRating; // 課程評價平均分數
 
     handleSuccess(res, course, "取得單一課程資料成功");
   },
@@ -761,7 +800,10 @@ const courseController = {
       return;
     }
 
-    const isCourseFinished = await Order.findOne({ _id: orderId, paidStatus: 3 });
+    const isCourseFinished = await Order.findOne({
+      _id: orderId,
+      paidStatus: 3,
+    });
     if (!isCourseFinished) {
       return next(appError(400, "尚未完課，無法評價"));
     }
@@ -812,7 +854,9 @@ const courseController = {
       return next(appError(500, "新增課程評價失敗 #2"));
     }
 
-    const newCommentToOrder = await Order.findByIdAndUpdate(orderId, { commentId: newComment._id });
+    const newCommentToOrder = await Order.findByIdAndUpdate(orderId, {
+      commentId: newComment._id,
+    });
     if (!newCommentToOrder) {
       return next(appError(500, "新增課程評價失敗 #3"));
     }
