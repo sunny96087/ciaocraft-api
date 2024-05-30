@@ -379,7 +379,7 @@ const courseController = {
             coursePrice: { $first: "$coursePrice" },
             averageRate: {
               $avg: {
-                $cond: [{ $ifNull: ["$comments.rating", false] }, "$comments.rating", 0],  
+                $cond: [{ $ifNull: ["$comments.rating", false] }, "$comments.rating", 0],
               },
             },
             commentCount: {
@@ -661,7 +661,7 @@ const courseController = {
       })
       .select(
         `courseName courseType courseTerm coursePrice courseSummary 
-         courseLocation courseAddress courseRemark courseImage courseContent courseStatus 
+         courseLocation courseAddress courseRemark courseImage courseContent courseTotalHours courseStatus
          createdAt updatedAt`
       )
       .lean();
@@ -673,13 +673,13 @@ const courseController = {
 
     // 計算 賣家 評價分數：取得該賣家所有課程的評價，計算評價總數和平均值
     // 取得該賣家的所有 courseId
-    const allVendorCourses = await Course.find({
+    const vendorCourses = await Course.find({
       vendorId: course.vendorId,
     }).select("courseId");
 
     // 取得所有課程的評價數值
     let allVendorCommentsRatings = []; // 賣家所有評價
-    for (const course of allVendorCourses) {
+    for (const course of vendorCourses) {
       const courseComments = await CourseComment.find({
         courseId: course._id,
       }).select("rating");
@@ -687,33 +687,27 @@ const courseController = {
       allVendorCommentsRatings.push(...allRatingsValue);
     }
 
-    // 計算賣家 評價總數 和 平均值
-    const totalVendorComments = allVendorCommentsRatings.reduce(
-      (acc, cur) => acc + cur,
-      0
-    ); // 賣家評價總分數
-    const vendorAvgRating =
-      totalVendorComments / allVendorCommentsRatings.length; // 賣家評價平均分數
+    // 計算 賣家所有課程 評論總數 和 評論平均分數 (如賣家尚無評論則回傳 0)
+    const vendorCommentsCounts = allVendorCommentsRatings.reduce((acc, cur) => acc + cur, 0);
+    const vendorAvgRating = allVendorCommentsRatings.length === 0 ? 0 : vendorCommentsCounts / allVendorCommentsRatings.length;
 
-    // 計算 課程 評價總數 和 平均值
+    // 取得 此課程 的所有評論
     const courseComments = await CourseComment.find({
       courseId: courseId,
-    }).select("rating"); // 取得該課程的所有評價
-    const totalCourseComments = courseComments.reduce(
-      (acc, cur) => acc + cur.rating,
-      0
-    ); // 評價總分數
-    const courseAvgRating = totalCourseComments / courseComments.length; // 評價平均分數
+    }).select("rating");
+
+    // 計算 此課程 評論總數 和 評論平均分數 (如課程尚無評論則回傳 0)
+    const totalCourseComments = courseComments.reduce((acc, cur) => acc + cur.rating, 0);
+    const courseAvgRating = courseComments.length === 0 ? 0 : totalCourseComments / courseComments.length;
 
     // 更新 course 物件
-    course.vendorCommentsCount = allVendorCommentsRatings.length;     // 賣家評價總數
-    course.vendorAvgRating = parseFloat(vendorAvgRating.toFixed(2));  // 賣家評價平均分數
-    course.courseCommentsCount = courseComments.length;               // 課程評價總數
-    course.courseAvgRating = parseFloat(courseAvgRating.toFixed(2));  // 課程評價平均分數
+    course.vendorCommentsCount = allVendorCommentsRatings.length;     // 賣家評論總數
+    course.vendorAvgRating = parseFloat(vendorAvgRating.toFixed(2));  // 賣家評論平均分數
+    course.courseCommentsCount = courseComments.length;               // 課程評論總數
+    course.courseAvgRating = parseFloat(courseAvgRating.toFixed(2));  // 課程評論平均分數
 
     // 如果有課程則將 clickCount +1
     const updateClickCount = await Course.findByIdAndUpdate(courseId, { $inc: { clickCounts: 1 } }, { new: true });
-    console.log("updateClickCount", updateClickCount);
 
     handleSuccess(res, course, "取得單一課程資料成功");
   },
