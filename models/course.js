@@ -125,6 +125,10 @@ const courseCommentSchema = new mongoose.Schema(
       ref: "Course",
       required: [true, "courseId 為必填"],
     },
+    orderId:{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Order"
+    },
     content: {
       type: String,
       required: [true, "content 為必填"],

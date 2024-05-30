@@ -366,7 +366,7 @@ const orderController = {
         path: 'vendorId',
         select: 'bankName bankCode bankBranch bankAccountName bankAccount'
       })
-      .select(`_id memberId vendorId courseId courseItemId 
+      .select(`_id memberId vendorId courseId courseItemId
                 brandName courseLocation 
                 paymentType paidStatus 
                 count price totalPrice 
@@ -381,13 +381,12 @@ const orderController = {
       return next(appError(400, '會員無此訂單資料'));
     }
 
-    const isCommentExist = await CourseComment.findOne({ memberId: memberId, courseId: order.courseId });
-
-    if (isCommentExist) {
-      order.isCommented = true;
+    const comment = await CourseComment.findOne({ orderId: orderId });
+    if (comment) {
+      order.comment = comment;
     }
-    else {
-      order.isCommented = false;
+    else{
+      order.comment = null;
     }
 
     handleSuccess(res, order, '取得訂單資料成功');
@@ -508,20 +507,19 @@ const orderController = {
       return next(appError(400, 'lastFiveDigits 錯誤'));
     }
 
-    // 檢查會員是否有此訂單
+    // 檢查會員是否有此待付款訂單
     const order = await Order.findOne({ _id: orderId, memberId: memberId });
     if (!order) {
       return next(appError(400, '會員無此訂單資料'));
     }
 
-    // 0: 待付款, 1: 已付款, 2: 已確認收到款, 3:已完課, 4:訂單取消(已過期), 5:訂單取消(不需退款), 6:訂單取消(待退款), 7:訂單取消(已退款)
+    // 更新後五碼並將訂單更改為已付款；0: 待付款, 1: 已付款 
     const status = 1;
-
-    // 更新後五碼
     const updateOrder = await Order.findOneAndUpdate(
-      { _id: orderId, memberId: memberId },
-      { lastFiveDigits: lastFiveDigits, status: status },
+      { _id: orderId, memberId: memberId, paidStatus: 0 },
+      { lastFiveDigits: lastFiveDigits, paidStatus: status },
       { new: true });
+
     handleSuccess(res, updateOrder, '更新訂單資料成功');
   },
 }

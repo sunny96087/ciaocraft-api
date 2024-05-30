@@ -1860,7 +1860,7 @@
             "type": "string"
           },
           {
-            "name": "collection",
+            "name": "body",
             "in": "body",
             "required": true,
             "schema": {
@@ -1939,12 +1939,12 @@
       }
     },
     "/members/memberOne/password": {
-      "put": {
+      "patch": {
         "tags": [
           "Members-front"
         ],
         "summary": "修改會員密碼",
-        "description": "修改會員密碼 <br>\r  newPassword: 新密碼需包含英文及數字，且至少 8 碼 <br>\r  confirmPassword: 確認新密碼 <br>",
+        "description": "修改會員密碼 <br>\r  newPassword: 新密碼需包含英文及數字，且至少 8 碼 <br>\r  confirmNewPassword: 確認新密碼 <br>",
         "parameters": [
           {
             "name": "token",
@@ -1962,14 +1962,14 @@
                   "type": "string",
                   "example": "Abc123456"
                 },
-                "confirmPassword": {
+                "confirmNewPassword": {
                   "type": "string",
                   "example": "Abc123456"
                 }
               },
               "required": [
                 "newPassword",
-                "confirmPassword"
+                "confirmNewPassword"
               ]
             }
           }
@@ -2314,7 +2314,7 @@
           "Orders-front"
         ],
         "summary": "新增訂單",
-        "description": "新增訂單 <br>\r  memberId: 會員 ID <br>\r  vendorId: 賣家 ID <br>\r  courseId: 課程 ID <br>\r  courseItemId: 課程時段 ID <br>\r  brandName: 品牌名稱 (string) <br>\r  courseName: 課程名稱 (string)；ex. 培訓課格式: 2024-05-29 課程名稱, 體驗課格式: 2024-05-29 10:00 ~ 12:00 <br>\r  courseItemName: 課程時段名稱 (string) <br>\r  count: 購買數量 (int) <br>\r  price: 單價 (int) <br>\r  totalPrice: 總價 (int) <br>\r  courseLocation: 上課地點 (string) <br>\r  startTime: 上課時間 (string)；帶入 Date 物件格式 ex. 2024-05-29 10:00:00.000 <br>\r  endTime: 下課時間 (string)；帶入 Date 物件格式 ex. 2024-05-29 12:00:00.000 <br>\r  note: 備註 (string)",
+        "description": "新增訂單 <br>\r  vendorId: 賣家 ID <br>\r  courseId: 課程 ID <br>\r  courseItemId: 課程時段 ID <br>\r  brandName: 品牌名稱 (string) <br>\r  courseName: 課程名稱 (string)；ex. 培訓課格式: 2024-05-29 課程名稱, 體驗課格式: 2024-05-29 10:00 ~ 12:00 <br>\r  courseItemName: 課程時段名稱 (string) <br>\r  count: 購買數量 (int) <br>\r  price: 單價 (int) <br>\r  totalPrice: 總價 (int) <br>\r  courseLocation: 上課地點 (string) <br>\r  startTime: 上課時間 (string)；帶入 Date 物件格式 ex. 2024-05-29 10:00:00.000 <br>\r  endTime: 下課時間 (string)；帶入 Date 物件格式 ex. 2024-05-29 12:00:00.000 <br>\r  note: 備註 (string)",
         "parameters": [
           {
             "name": "token",
@@ -2328,10 +2328,6 @@
             "schema": {
               "type": "object",
               "properties": {
-                "memberId": {
-                  "type": "string",
-                  "example": "會員 ID"
-                },
                 "vendorId": {
                   "type": "string",
                   "example": "賣家 ID"
@@ -2386,7 +2382,6 @@
                 }
               },
               "required": [
-                "memberId",
                 "vendorId",
                 "courseId",
                 "courseItemId",
@@ -3185,7 +3180,7 @@
           "Courses-front"
         ],
         "summary": "新增評論",
-        "description": "新增評論 <br>\r  memberId: 會員 ID <br>\r  courseId: 課程 ID <br>\r  content: 評論內容 <br>\r  images: 圖片連結 (Array<string>)，最多 5 張 <br>\r  tags: 評論標籤 (Array<string>)，可帶入值包含 \"師生互動\", \"教學環境\", \"專業度\", \"其他\" <br>\r  rating: 評分 <br>\r  likes: 按讚數 <br>",
+        "description": "新增評論 <br>\r  courseId: 課程 ID <br>\r  orderId: 訂單 ID <br>\r  content: 評論內容 <br>\r  images: 圖片連結 (Array<string>)，最多 5 張 <br>\r  tags: 評論標籤 (Array<string>)，可帶入值包含 \"師生互動\", \"教學環境\", \"專業度\", \"其他\" <br>\r  rating: 評分 <br>",
         "parameters": [
           {
             "name": "token",
@@ -3203,6 +3198,10 @@
                 "courseId": {
                   "type": "string",
                   "example": "課程 ID"
+                },
+                "orderId": {
+                  "type": "string",
+                  "example": "訂單 ID"
                 },
                 "content": {
                   "type": "string",
@@ -3240,6 +3239,7 @@
               },
               "required": [
                 "courseId",
+                "orderId",
                 "content",
                 "tags",
                 "rating"
@@ -3259,8 +3259,8 @@
         "tags": [
           "Courses-front"
         ],
-        "summary": "課程評論按讚",
-        "description": "課程評論按讚",
+        "summary": "課程評論按讚/取消按讚",
+        "description": "課程評論按讚/取消按讚 <br>\r  如果已按讚，則取消按讚；如果未按讚，則按讚 <br>",
         "parameters": [
           {
             "name": "token",

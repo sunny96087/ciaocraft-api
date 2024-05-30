@@ -2,6 +2,7 @@ const Platform = require('../models/platform');
 const validator = require('validator');
 const appError = require('../utils/appError');
 const handleSuccess = require('../utils/handleSuccess');
+const tools = require('../utils/tools');
 
 const platformController = {
     // 取得全部平台資訊
@@ -19,13 +20,14 @@ const platformController = {
     // 取得單一平台資訊
     getPlatform: async (req, res, next) => {
         const platformId = req.params.platformId;
+
+        // 驗證 platformId 是否為有效格式
+        const isValidplatformId = tools.findModelById(Platform, platformId, res);
+        if (!isValidplatformId) return;
+
+        // 取得平台資訊，無結果回傳找不到平台資訊，成功回傳平台資訊
         const platform = await Platform.findById(platformId);
-
-        // 無結果回傳找不到平台資訊
-        if (!platform) {
-            return next(appError(404, '找不到平台資訊'));
-        }
-
+        if (!platform) { return next(appError(404, '找不到平台資訊')); }
         handleSuccess(res, platform, '取得平台資訊成功');
     },
 
@@ -44,7 +46,7 @@ const platformController = {
         }
 
         // 驗證 platformNameEn 不可包含非英文、數字或符號字元
-        if(!validator.isAscii(platformNameEn)) {
+        if (!validator.isAscii(platformNameEn)) {
             return next(appError(400, 'platformNameEn 只能是英文或數字'));
         }
 
@@ -89,7 +91,7 @@ const platformController = {
         let updateFields = {}
 
         if (platformNameCn) updateFields.platformNameCn = platformNameCn;
-        if (platformNameEn){
+        if (platformNameEn) {
             if (!validator.isAscii(platformNameEn)) {
                 return next(appError(400, 'platformNameEn 只能包含英文、數字或符號字元'));
             }

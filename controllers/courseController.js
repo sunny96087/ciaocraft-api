@@ -1,5 +1,6 @@
 const Vendor = require("../models/vendor");
 const Teacher = require("../models/teacher");
+const Order = require("../models/order");
 const { Course, CourseItem, CourseComment } = require("../models/course");
 const appError = require("../utils/appError");
 const handleSuccess = require("../utils/handleSuccess");
@@ -151,7 +152,6 @@ const courseController = {
 
   // * 取得課程列表 (Front)
   getCourses: async (req, res, next) => {
-    console.log("取得課程列表 (Front)");
     let { keyword, courseTerm, courseType, sortBy, pageNo, pageSize } =
       req.query;
 
@@ -194,7 +194,6 @@ const courseController = {
         .select(
           "brandName courseName courseType courseTerm coursePrice createdAt"
         );
-      console.log("time");
     } else if (sortBy === "mostPopular") {
       // 依照訂單被預訂數量 status=3(已完課) -> 收藏數量 -> 最新時間
       courses = await Course.aggregate([
@@ -625,13 +624,12 @@ const courseController = {
     }
 
     const isCourseExist = await Course.find({ _id: courseId, courseStatus: 1 });
-    console.log("isCourseExist", isCourseExist);
     if (!isCourseExist) {
       return next(appError(404, "課程不存在 或 已下架"));
     }
 
     // 查詢課程全部評價
-    const comments = await CourseComment.find({courseId: courseId})
+    const comments = await CourseComment.find({ courseId: courseId })
       .populate({
         path: "memberId",
         select: "name"
@@ -676,11 +674,11 @@ const courseController = {
   // 新增課程評價 (Front)
   newComment: async (req, res, next) => {
     const memberId = req.user.id;
-    let { courseId, content, images, tags, rating } = req.body;
+    let { courseId, orderId, content, images, tags, rating } = req.body;
 
     // 驗證必填欄位
-    if (!content || !rating || !tags) {
-      return next(appError(400, "content, rating, tags 為必填欄位"));
+    if (!orderId || !content || !rating || !tags) {
+      return next(appError(400, "orderId, content, rating, tags 為必填欄位"));
     }
 
     // 驗證 courseId 格式和是否存在 
@@ -689,12 +687,24 @@ const courseController = {
       return;
     }
 
+    // 驗證 orderId 格式和是否存在
+    const isValidOrderId = await tools.findModelByIdNext(Order, orderId, next);
+    if (!isValidOrderId) {
+      return;
+    }
+
+    // 驗證是否已評價過
+    const isCommentExist = await CourseComment.findOne({ memberId: memberId, courseId: courseId, orderId: orderId });
+    if (isCommentExist) {
+      return next(appError(400, "已評價過該課程"));
+    }
+
     if (content.length > 500) {
       return next(appError(400, "content 長度不得超過 500 字元"));
     }
 
     // 驗證 rating 格式
-    if ( !Number.isInteger(rating) && rating >= 1 && rating <= 5) {
+    if (!Number.isInteger(rating) && rating >= 1 && rating <= 5) {
       return next(appError(400, "rating 應介於 1 到 5 之正整數"));
     }
 
@@ -707,6 +717,7 @@ const courseController = {
     const newComment = await CourseComment.create({
       memberId: memberId,
       courseId: courseId,
+      orderId: orderId,
       content: content,
       images: images,
       tags: tags,
@@ -721,7 +732,7 @@ const courseController = {
     if (!newCommentToCourse) {
       return next(appError(500, "新增課程評價失敗"));
     }
-  
+
     handleSuccess(res, newComment, "新增課程評價成功");
   },
 
@@ -736,22 +747,24 @@ const courseController = {
       return;
     }
 
-    // 驗證 memberId 是否按讚過，
+    // 驗證 memberId 是否按讚過，如果按讚過，則取消按讚；如果未按讚，則按讚
     const isLike = await CourseComment.findOne({ _id: commentId, likes: { $in: memberId } });
+    
     if (isLike) {
-      const disLike = await CourseComment.findByIdAndDelete(commentId, );
-      if (!disLike) {
+      // 取消按讚
+      const unLikeComment = await CourseComment.findByIdAndUpdate(commentId, { $pull: { likes: memberId } }, { new: true })
+      if (!unLikeComment) {
         return next(appError(400, "取消按讚失敗"));
       }
+      handleSuccess(res, null, "取消按讚成功");
+    } else {
+      // 按讚
+      const likeComment = await CourseComment.findByIdAndUpdate(commentId, { $push: { likes: memberId } }, { new: true });
+      if (!likeComment) {
+        return next(appError(400, "按讚失敗"));
+      }
+      handleSuccess(res, null, "按讚成功");
     }
-
-    // 按讚
-    const comment = await CourseComment.findByIdAndUpdate(commentId, { $push: { likes: memberId } }, { new: true });
-    if(!comment) {
-      return next(appError(400, "按讚失敗"));
-    }
-
-    handleSuccess(res, null, "按讚/取消按讚成功");
   },
 };
 

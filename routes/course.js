@@ -299,19 +299,19 @@ router.post(
         #swagger.tags = ['Courses-front']
         #swagger.summary = '新增評論'
         #swagger.description = `新增評論 <br>
-                                memberId: 會員 ID <br>
                                 courseId: 課程 ID <br>
+                                orderId: 訂單 ID <br>
                                 content: 評論內容 <br>
                                 images: 圖片連結 (Array<string>)，最多 5 張 <br>
                                 tags: 評論標籤 (Array<string>)，可帶入值包含 "師生互動", "教學環境", "專業度", "其他" <br>
-                                rating: 評分 <br>
-                                likes: 按讚數 <br>`
+                                rating: 評分 <br>`
         #swagger.parameters['body'] = {
             in: 'body',
             description: '新增評論',
             required: true,
             schema: {
                 $courseId:'課程 ID',
+                $orderId: '訂單 ID',
                 $content: '評論內容',
                 images: ['圖片1', '圖片2', '圖片3', '圖片4', '圖片'],
                 $tags: ['師生互動', '教學環境', '專業度', '其他'],
@@ -321,15 +321,16 @@ router.post(
     */
 )
 
-// 課程評論按讚 (Front)
+// 課程評論按讚/取消按讚 (Front)
 router.post(
     "/comments/like",
     isAuth,
     handleErrorAsync(courseController.likeComment)
     /* 
         #swagger.tags = ['Courses-front']
-        #swagger.summary = '課程評論按讚'
-        #swagger.description = '課程評論按讚'
+        #swagger.summary = '課程評論按讚/取消按讚'
+        #swagger.description = `課程評論按讚/取消按讚 <br>
+                                如果已按讚，則取消按讚；如果未按讚，則按讚 <br>`
         #swagger.parameters['body'] = {
             in: 'body',
             description: '按讚評論',

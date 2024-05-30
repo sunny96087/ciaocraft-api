@@ -84,11 +84,11 @@ router.post(
     /*  #swagger.tags = ['Members-front']
         #swagger.summary = '會員新增收藏'
         #swagger.description = '會員新增收藏'
-        #swagger.parameters['collection'] = {
+        #swagger.parameters['body'] = {
             in: 'body',
             required: true,
             schema: {
-                $courseId: "帶入有效課程 Id",
+                $courseId: "帶入有效課程 Id"
             }
         }
     */
@@ -127,7 +127,7 @@ router.get(
 );
 
 // 修改會員密碼
-router.put(
+router.patch(
     "/memberOne/password",
     isAuth,
     handleErrorAsync(memberController.updatePassword)
@@ -135,13 +135,13 @@ router.put(
         #swagger.summary = '修改會員密碼'
         #swagger.description = `修改會員密碼 <br>
                                 newPassword: 新密碼需包含英文及數字，且至少 8 碼 <br>
-                                confirmPassword: 確認新密碼 <br>`
+                                confirmNewPassword: 確認新密碼 <br>`
         #swagger.parameters['body'] = {
             in: 'body',
             required: true,
             schema: {
                 $newPassword: "Abc123456",
-                $confirmPassword: "Abc123456"
+                $confirmNewPassword: "Abc123456"
             }
         }
     */

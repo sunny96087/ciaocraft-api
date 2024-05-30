@@ -152,7 +152,6 @@ router.post(
   /*  #swagger.tags = ['Orders-front']
       #swagger.summary = '新增訂單'
       #swagger.description = `新增訂單 <br>
-                              memberId: 會員 ID <br>
                               vendorId: 賣家 ID <br>
                               courseId: 課程 ID <br>
                               courseItemId: 課程時段 ID <br>
@@ -170,7 +169,6 @@ router.post(
         in: 'body',
         required: true,
         schema : {
-          $memberId: '會員 ID',
           $vendorId: '賣家 ID',
           $courseId: '課程 ID',
           $courseItemId: '課程項目 ID',

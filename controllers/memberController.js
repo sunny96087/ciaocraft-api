@@ -1,11 +1,12 @@
 const Member = require("../models/member");
 const Collection = require("../models/collection");
 const Order = require("../models/order");
-const Course = require("../models/course");
+const {Course} = require("../models/course");
 const validator = require("validator");
 const tools = require("../utils/tools");
 const appError = require("../utils/appError");
 const handleSuccess = require("../utils/handleSuccess");
+const bcrypt = require("bcryptjs");
 
 const memberController = {
     // 取得所有會員資料 (開發方便查詢用)
@@ -99,10 +100,10 @@ const memberController = {
     },
 
     // 刪除會員收藏
-    deleteMemberCollections: async (req, res, next) => {
+    deleteMemberCollection: async (req, res, next) => {
         const memberId = req.user.id;
         const collectionId = req.params.collectionId;
-
+        
         // 驗證 collectionId 格式和是否存在
         const isValidCollectionId = await tools.findModelByIdNext(Collection, collectionId, next);
         if (!isValidCollectionId) {
@@ -121,7 +122,7 @@ const memberController = {
             return next(appError(400, "刪除收藏失敗"));
         }
 
-        handleSuccess(res, deleteCollection, "刪除收藏成功");
+        handleSuccess(res, null, "刪除收藏成功");
     },
 
     // 取得會員訂單
@@ -232,7 +233,7 @@ const memberController = {
         }
 
         // 驗證密碼格式
-        const isValidPassword = /^(?=.*[a-zA-Z])(?=.*[0-9]).{8,}$/.test(password);
+        const isValidPassword = /^(?=.*[a-zA-Z])(?=.*[0-9]).{8,}$/.test(newPassword);
         if (!isValidPassword) {
             return next(appError(400, '密碼需包含英文及數字，且至少 8 碼'));
         }
@@ -241,7 +242,7 @@ const memberController = {
         newPassword = await bcrypt.hash(newPassword, 12);
         const updatePassword = await Member.findByIdAndUpdate(memberId, { password: newPassword }, { new: true })
 
-        if (!updateMember) {
+        if (!updatePassword) {
             return next(appError(404, "找不到會員資料，更新失敗"));
         }
 
