@@ -588,27 +588,27 @@ const courseController = {
     const allVendorCourses = await Course.find({ vendorId: course.vendorId }).select("courseId");
 
     // 取得所有課程的評價數值
-    let allVendorCommentsRatings = [];
+    let allVendorCommentsRatings = []; // 賣家所有評價
     for (const course of allVendorCourses) {
-      const courseComments = await CourseComment.find({ courseId: course.courseId }).select("rating");
+      const courseComments = await CourseComment.find({ courseId: course._id }).select("rating");
       allRatingsValue = courseComments.map(comment => comment.rating);
       allVendorCommentsRatings.push(...allRatingsValue);
     }
 
     // 計算賣家 評價總數 和 平均值
-    const totalVendorComments = allVendorCommentsRatings.reduce((acc, cur) => acc + cur, 0);
-    const vendorAvgRating = totalVendorComments / allVendorCourses.length;
+    const totalVendorComments = allVendorCommentsRatings.reduce((acc, cur) => acc + cur, 0); // 賣家評價總分數
+    const vendorAvgRating = totalVendorComments / allVendorCommentsRatings.length; // 賣家評價平均分數
 
     // 計算 課程 評價總數 和 平均值
-    const courseComments = await CourseComment.find({ courseId: courseId }).select("rating");
-    const totalCourseComments = courseComments.length;
-    const courseAvgRating = courseComments.reduce((acc, cur) => acc + cur.rating, 0);
+    const courseComments = await CourseComment.find({ courseId: courseId }).select("rating"); // 取得該課程的所有評價
+    const totalCourseComments = courseComments.reduce((acc, cur) => acc + cur.rating, 0); // 評價總分數
+    const courseAvgRating = totalCourseComments / courseComments.length;  // 評價平均分數
 
     // 更新 course 物件
-    course.totalVendorComments = totalVendorComments;
-    course.vendorAvgRating = vendorAvgRating;
-    course.totalCourseComments = totalCourseComments;
-    course.courseAvgRating = courseAvgRating;
+    course.vendorCommentsCount = allVendorCommentsRatings.length; // 賣家評價總數
+    course.vendorAvgRating = vendorAvgRating;                     // 賣家評價平均分數
+    course.courseCommentsCount = courseComments.length;           // 課程評價總數
+    course.courseAvgRating = courseAvgRating;                     // 課程評價平均分數
 
     handleSuccess(res, course, "取得單一課程資料成功");
   },
@@ -693,6 +693,11 @@ const courseController = {
       return;
     }
 
+    const isCourseFinished = await Order.findOne({ _id: orderId, paidStatus: 3 });
+    if (!isCourseFinished) {
+      return next(appError(400, "尚未完課，無法評價"));
+    }
+
     // 驗證是否已評價過
     const isCommentExist = await CourseComment.findOne({ memberId: memberId, courseId: courseId, orderId: orderId });
     if (isCommentExist) {
@@ -725,12 +730,17 @@ const courseController = {
     });
 
     if (!newComment) {
-      return next(appError(500, "新增課程評價失敗"));
+      return next(appError(500, "新增課程評價失敗 #1"));
     }
 
     const newCommentToCourse = await Course.findByIdAndUpdate(courseId, { $push: { comments: newComment._id } });
     if (!newCommentToCourse) {
-      return next(appError(500, "新增課程評價失敗"));
+      return next(appError(500, "新增課程評價失敗 #2"));
+    }
+
+    const newCommentToOrder = await Order.findByIdAndUpdate(orderId, { commentId: newComment._id });
+    if (!newCommentToOrder) {
+      return next(appError(500, "新增課程評價失敗 #3"));
     }
 
     handleSuccess(res, newComment, "新增課程評價成功");

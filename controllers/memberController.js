@@ -55,7 +55,7 @@ const memberController = {
 
         // 加入課程時長條件
         if (courseTerm) {
-            queryField.courseTerm = courseTerm;
+            queryField.courseTerm = parseInt(courseTerm);
         }
 
         // 取得會員收藏

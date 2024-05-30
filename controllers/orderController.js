@@ -366,27 +366,22 @@ const orderController = {
         path: 'vendorId',
         select: 'bankName bankCode bankBranch bankAccountName bankAccount'
       })
-      .select(`_id memberId vendorId courseId courseItemId
+      .populate({
+        path: 'commentId',
+        select: 'content images tags rating likes createdAt',
+      })
+      .select(`_id memberId vendorId courseId courseItemId commentId
                 brandName courseLocation 
                 paymentType paidStatus 
                 count price totalPrice 
                 startTime endTime note 
                 confirmTime refundTime
                 cancelTime cancelReason 
-                bankName bankCode bankBranch bankAccountName bankAccount 
                 createdAt`)
       .lean();
 
     if (!order) {
       return next(appError(400, '會員無此訂單資料'));
-    }
-
-    const comment = await CourseComment.findOne({ orderId: orderId });
-    if (comment) {
-      order.comment = comment;
-    }
-    else{
-      order.comment = null;
     }
 
     handleSuccess(res, order, '取得訂單資料成功');
@@ -513,14 +508,23 @@ const orderController = {
       return next(appError(400, '會員無此訂單資料'));
     }
 
+    // 檢查訂單是否為待付款狀態
+    if(order.paidStatus !== 0){
+      return next(appError(400, '訂單為已付款狀態，無法更新後五碼'));
+    }
+
     // 更新後五碼並將訂單更改為已付款；0: 待付款, 1: 已付款 
     const status = 1;
     const updateOrder = await Order.findOneAndUpdate(
       { _id: orderId, memberId: memberId, paidStatus: 0 },
       { lastFiveDigits: lastFiveDigits, paidStatus: status },
       { new: true });
+    
+    if (!updateOrder) {
+      return next(appError(400, '更新訂單資料失敗'));
+    }
 
-    handleSuccess(res, updateOrder, '更新訂單資料成功');
+    handleSuccess(res, null, '更新訂單資料成功');
   },
 }
 

@@ -21,6 +21,10 @@ const orderSchema = new mongoose.Schema(
             ref: 'CourseItem',
             required: [true, "courseItemId 為必填"]
         },
+        commentId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'CourseComment',
+        },
         // 顯示廠商名稱，避免廠商名稱更動後，訂單顯示不同名稱
         brandName: {
             type: String,
