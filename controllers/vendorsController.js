@@ -183,6 +183,7 @@ const vendorController = {
       {
         $match: {
           vendorId: vendorId,
+          paidStatus: { $in: [0, 1, 2, 3] },
           createdAt: {
             $gte: dayjs().startOf("day").toDate(),
             $lte: dayjs().endOf("day").toDate(),
@@ -234,6 +235,7 @@ const vendorController = {
       {
         $match: {
           vendorId: new mongoose.Types.ObjectId(vendorId),
+          paidStatus: { $in: [0, 1, 2, 3] },
           createdAt: {
             $gte: sevenDaysAgo,
             $lte: dayjs().toDate(),
@@ -268,6 +270,7 @@ const vendorController = {
       {
         $match: {
           vendorId: new mongoose.Types.ObjectId(vendorId),
+          paidStatus: { $in: [0, 1, 2, 3] },
           createdAt: {
             $gte: dayjs().subtract(7, "day").toDate(),
             $lte: dayjs().toDate(),
@@ -342,6 +345,7 @@ const vendorController = {
       {
         $match: {
           vendorId: new mongoose.Types.ObjectId(vendorId),
+          paidStatus: { $in: [0, 1, 2, 3] },
           createdAt: {
             $gte: sevenDaysAgo,
             $lte: dayjs().toDate(),
@@ -399,6 +403,7 @@ const vendorController = {
       {
         $match: {
           vendorId: new mongoose.Types.ObjectId(vendorId),
+          paidStatus: { $in: [0, 1, 2, 3] },
           createdAt: {
             $gte: thirtyDaysAgo,
             $lte: dayjs().toDate(),
@@ -430,6 +435,7 @@ const vendorController = {
       {
         $match: {
           vendorId: new mongoose.Types.ObjectId(vendorId),
+          paidStatus: { $in: [0, 1, 2, 3] },
           createdAt: {
             $gte: thirtyDaysAgo,
             $lte: dayjs().toDate(),
@@ -504,6 +510,7 @@ const vendorController = {
       {
         $match: {
           vendorId: new mongoose.Types.ObjectId(vendorId),
+          paidStatus: { $in: [0, 1, 2, 3] },
           createdAt: {
             $gte: thirtyDaysAgo,
             $lte: dayjs().toDate(),
