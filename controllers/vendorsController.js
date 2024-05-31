@@ -649,7 +649,7 @@ const vendorController = {
     // 設定 token 有效時間
     const resetTokenExpires = new Date(Date.now() + 3600000); // 1 小時
 
-    const verificationUrl = `https://ciaocraft-api.onrender.com/resetVendorPassword?token=${hashedToken}`;
+    const verificationUrl = `https://ciaocraft-website.vercel.app/resetVendorPassword?token=${hashedToken}`;
 
     // 更新資料庫中的 token
     await Vendor.findByIdAndUpdate(vendor._id, {
