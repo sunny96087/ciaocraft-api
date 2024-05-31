@@ -625,8 +625,115 @@ const vendorController = {
   },
 
   // ? 忘記密碼 (Back)
+  forgotVendorPassword: async function (req, res, next) {
+    const { account } = req.body;
+
+    if (!account) {
+      return next(appError(400, "請輸入帳號"));
+    }
+
+    const vendor = await Vendor.findOne({ account });
+    if (!vendor) {
+      return next(appError(400, "找不到該帳號"));
+    }
+
+    // 產生重設密碼 token
+    const resetToken = crypto.randomBytes(32).toString("hex");
+
+    // 加密 token
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+
+    // 設定 token 有效時間
+    const resetTokenExpires = new Date(Date.now() + 3600000); // 1 小時
+
+    const verificationUrl = `https://ciaocraft-api.onrender.com/resetVendorPassword?token=${hashedToken}`;
+
+    // 更新資料庫中的 token
+    await Vendor.findByIdAndUpdate(vendor._id, {
+      resetPasswordToken: hashedToken,
+      resetPasswordExpires: resetTokenExpires,
+    });
+
+    // 讓 Google 驗證專案
+    const oauth2Client = new OAuth2(
+      process.env.GOOGLE_AUTH_CLIENTID,
+      process.env.GOOGLE_AUTH_CLIENT_SECRET,
+      "https://developers.google.com/oauthplayground"
+    );
+
+    oauth2Client.setCredentials({
+      refresh_token: process.env.GOOGLE_AUTH_REFRESH_TOKEN,
+    });
+
+    // 取得一次性的 access token
+    const accessToken = oauth2Client.getAccessToken();
+
+    let transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        type: "OAuth2",
+        user: "yu13142013@gmail.com",
+        clientId: process.env.GOOGLE_AUTH_CLIENTID,
+        clientSecret: process.env.GOOGLE_AUTH_CLIENT_SECRET,
+        refreshToken: process.env.GOOGLE_AUTH_REFRESH_TOKEN,
+        accessToken: accessToken,
+      },
+    });
+
+    // 發送郵件
+    const mailOptions = {
+      from: "巧手玩藝 Ciao!Craft <yu13142013@gmail.com>",
+      to: vendor.account,
+      subject: `巧手玩藝 Ciao!Craft 重設密碼`,
+      text: `請點擊以下連結重設密碼：${verificationUrl}，連結將在 1 小時後失效。`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    // 回應成功
+    handleSuccess(res, null, "重設密碼郵件已成功發送");
+  },
 
   // ? 忘記密碼 -> 重設密碼 (Back)
+  resetVendorPassword: async function (req, res, next) {
+    const { token, password, confirmPassword } = req.body;
+
+    if (!token || !password || !confirmPassword) {
+      return next(appError(400, "請輸入所有必填欄位"));
+    }
+
+    // 檢查密碼是否符合規則
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      return next(appError(400, "密碼必須為英數混合且至少 8 碼"));
+    }
+
+    if (password !== confirmPassword) {
+      return next(appError(400, "密碼不一致！"));
+    }
+
+    // 檢查 token 是否有效
+    const vendor = await Vendor.findOne({
+      resetPasswordToken: token,
+      // resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!vendor) {
+      return next(appError(400, "token 無效或已過期"));
+    }
+
+    // 更新密碼
+    const hashedPassword = await bcrypt.hash(password, 12);
+    vendor.password = hashedPassword;
+    vendor.resetPasswordToken = undefined;
+    vendor.resetPasswordExpires = undefined;
+    await vendor.save();
+
+    generateSendJWT(vendor, 200, res, "重設密碼成功");
+  },
 
   // ? 取得登入賣家資料 (Back)
   getVendorAdmin: async function (req, res, next) {

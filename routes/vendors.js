@@ -123,8 +123,38 @@ router.get(
 );
 
 // ? 忘記密碼 (Back)
+router.post('/forgetPassword', handleErrorAsync(vendorsController.forgotVendorPassword)
+    /*
+        #swagger.tags = ['Vendors-back']
+        #swagger.summary = '忘記密碼 (Back)'
+        #swagger.description = '忘記密碼 (Back)' 
+        #swagger.parameters['body'] = {
+            in: 'body',
+            required: true,
+            schema: {
+                $account: '帳號 (電子郵件)'
+                }
+            }
+        */
+)
 
 // ? 忘記密碼 -> 重設密碼 (Back)
+router.post('/resetPassword', handleErrorAsync(vendorsController.resetVendorPassword)
+    /*
+        #swagger.tags = ['Vendors-back']
+        #swagger.summary = '忘記密碼 -> 重設密碼 (Back)'
+        #swagger.description = '忘記密碼 -> 重設密碼 (Back)' 
+        #swagger.parameters['body'] = {
+            in: 'body',
+            required: true,
+            schema: {
+                $token: '重設密碼 token, 從 query 取得',
+                $password: '新密碼',
+                $confirmPassword: '新密碼確認'
+                }
+            }
+        */
+)
 
 // ? 取得登入賣家資料 (Back)
 router.get(

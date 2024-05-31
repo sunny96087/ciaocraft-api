@@ -3537,6 +3537,103 @@
         }
       }
     },
+    "/vendors/admin/overview": {
+      "get": {
+        "tags": [
+          "Vendors-back"
+        ],
+        "summary": "賣家儀表板總覽 (Back)",
+        "description": "  近7日 訂單數量 orderCountLast7Days <br>  近7日 訪問用戶數 userCountLast7Days <br>  近7日 每日的日期 & (體驗課 & 培訓課)銷售金額 & % 數佔比 salesDataLast7Days<br>  近7日 體驗課 & 培訓課 銷售總額 & % 數佔比 salesSummaryLast7Days <br>  近30日 訂單收入(NT$) incomeLast30Days <br>  近30日 訂單數量 orderCountLast30Days <br>  近30日 訪問用戶數 visitCountLast30Days <br>  近30日 每日的日期 & (體驗課 & 培訓課)銷售金額 & % 數佔比 salesDataLast30Days <br>  近30日 體驗課 & 培訓課 銷售總額 & % 數佔比 salesSummaryLast30Days <br>  訂單 待退款, 待付款, 待確認 數量 orderStatusCount ",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/vendors/forgetPassword": {
+      "post": {
+        "tags": [
+          "Vendors-back"
+        ],
+        "summary": "忘記密碼 (Back)",
+        "description": "忘記密碼 (Back)",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "account": {
+                  "type": "string",
+                  "example": "帳號 (電子郵件)"
+                }
+              },
+              "required": [
+                "account"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/vendors/resetPassword": {
+      "post": {
+        "tags": [
+          "Vendors-back"
+        ],
+        "summary": "忘記密碼 -> 重設密碼 (Back)",
+        "description": "忘記密碼 -> 重設密碼 (Back)",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "example": "重設密碼 token, 從 query 取得"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "新密碼"
+                },
+                "confirmPassword": {
+                  "type": "string",
+                  "example": "新密碼確認"
+                }
+              },
+              "required": [
+                "token",
+                "password",
+                "confirmPassword"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/vendors/admin": {
       "get": {
         "tags": [

@@ -134,6 +134,16 @@ const vendorSchema = new mongoose.Schema(
     },
     // 關聯課程
     courseId: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
+    // 重設密碼 token
+    resetPasswordToken: {
+      type: String,
+      select: false,
+    },
+    // 重設密碼 token 有效時間
+    resetPasswordExpires: {
+      type: Date,
+      select: false,
+    },
   },
   {
     timestamps: true,
