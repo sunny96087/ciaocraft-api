@@ -8,6 +8,9 @@ const jwt = require("jsonwebtoken");
 const { isVendorAuth, generateSendJWT } = require("../utils/vendorAuth");
 const Vendor = require("../models/vendor");
 const { Course, CourseItem, CourseComment } = require("../models/course");
+const Order = require("../models/order");
+const Member = require("../models/member");
+
 const nodemailer = require("nodemailer");
 const { google } = require("googleapis");
 const OAuth2 = google.auth.OAuth2;
@@ -15,6 +18,7 @@ const OAuth2 = google.auth.OAuth2;
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
 const crypto = require("crypto");
+const mongoose = require("mongoose");
 
 const vendorController = {
   // todo : 分成 3 個使用方 ( Front 前台, Back 後台, Manage 平台管理 )
@@ -169,6 +173,453 @@ const vendorController = {
       return next(appError(400, "該帳號不存在"));
     }
   },
+
+  // ? 賣家儀表板總覽 (Back) => 缺 訪問用戶數
+  getVendorAdminOverview: async function (req, res, next) {
+    const vendorId = req.vendor.id;
+
+    // note 今日 訂單收入（NT$）
+    const todayIncome = await Order.aggregate([
+      {
+        $match: {
+          vendorId: vendorId,
+          createdAt: {
+            $gte: dayjs().startOf("day").toDate(),
+            $lte: dayjs().endOf("day").toDate(),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$totalAmount" },
+        },
+      },
+    ]);
+
+    // note 今日 訂單數量
+    const todayOrderCount = await Order.find({
+      vendorId: new mongoose.Types.ObjectId(vendorId),
+      createdAt: {
+        $gte: dayjs().startOf("day").toDate(),
+        $lte: dayjs().endOf("day").toDate(),
+      },
+    }).countDocuments();
+
+    // note 今日 訪問人數
+    // const todayVisitCount = await Course.find({
+    //   vendorId: new mongoose.Types.ObjectId(vendorId),
+    //   createdAt: {
+    //     $gte: dayjs().startOf("day").toDate(),
+    //     $lte: dayjs().endOf("day").toDate(),
+    //   },
+    // }).countDocuments();
+
+    // note 今日 開課中課程
+    const todaySaleCourseCount = await Course.countDocuments({
+      vendorId: new mongoose.Types.ObjectId(vendorId),
+      courseStatus: 1,
+    });
+
+    // note 今日 已完售課程
+    const todaySoldCourseCount = await Course.countDocuments({
+      vendorId: new mongoose.Types.ObjectId(vendorId),
+      courseStatus: 2,
+    });
+
+    // note 近7日 訂單收入(NT$)
+    const sevenDaysAgo = dayjs().subtract(7, "day").toDate();
+
+    const income7Days = await Order.aggregate([
+      {
+        $match: {
+          vendorId: new mongoose.Types.ObjectId(vendorId),
+          createdAt: {
+            $gte: sevenDaysAgo,
+            $lte: dayjs().toDate(),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$totalPrice" },
+        },
+      },
+    ]);
+
+    const totalIncomeLast7Days =
+      income7Days.length > 0 ? income7Days[0].total : 0;
+
+    // note 近7日 訂單數量
+    const orderCountLast7Days = await Order.countDocuments({
+      vendorId: new mongoose.Types.ObjectId(vendorId),
+      createdAt: {
+        $gte: sevenDaysAgo,
+        $lte: dayjs().toDate(),
+      },
+    });
+
+    // note 近7日 訪問用戶數
+    // visitCountLast7Days
+
+    // note 近7日 每日的日期 & (體驗課 & 培訓課)銷售金額 & % 數佔比
+    const salesDataLast7Days = await Order.aggregate([
+      {
+        $match: {
+          vendorId: new mongoose.Types.ObjectId(vendorId),
+          createdAt: {
+            $gte: dayjs().subtract(7, "day").toDate(),
+            $lte: dayjs().toDate(),
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "courses",
+          localField: "courseId",
+          foreignField: "_id",
+          as: "course",
+        },
+      },
+      {
+        $unwind: "$course",
+      },
+      {
+        $addFields: {
+          date: {
+            $dateToString: { format: "%Y-%m-%d", date: "$createdAt" },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            date: "$date",
+            courseTerm: "$course.courseTerm",
+          },
+          totalSales: { $sum: "$totalPrice" },
+        },
+      },
+      {
+        $group: {
+          _id: "$_id.date",
+          sales: {
+            $push: {
+              courseTerm: "$_id.courseTerm",
+              totalSales: "$totalSales",
+            },
+          },
+          totalSales: { $sum: "$totalSales" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          date: "$_id",
+          sales: {
+            $map: {
+              input: "$sales",
+              as: "sale",
+              in: {
+                courseTerm: "$$sale.courseTerm",
+                totalSales: "$$sale.totalSales",
+                percentage: {
+                  $multiply: [
+                    { $divide: ["$$sale.totalSales", "$totalSales"] },
+                    100,
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+    ]);
+
+    // note 近7日 體驗課 & 培訓課 銷售總額 & % 數佔比
+    const salesSummaryLast7Days = await Order.aggregate([
+      {
+        $match: {
+          vendorId: new mongoose.Types.ObjectId(vendorId),
+          createdAt: {
+            $gte: sevenDaysAgo,
+            $lte: dayjs().toDate(),
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "courses",
+          localField: "courseId",
+          foreignField: "_id",
+          as: "course",
+        },
+      },
+      {
+        $unwind: "$course",
+      },
+      {
+        $group: {
+          _id: "$course.courseTerm",
+          totalSales: { $sum: "$totalPrice" },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalSales: { $sum: "$totalSales" },
+          sales: {
+            $push: {
+              courseTerm: "$_id",
+              totalSales: "$totalSales",
+            },
+          },
+        },
+      },
+      {
+        $unwind: "$sales",
+      },
+      {
+        $project: {
+          _id: 0,
+          trem: "$sales.courseTerm",
+          total: "$sales.totalSales",
+          percentage: {
+            $multiply: [{ $divide: ["$sales.totalSales", "$totalSales"] }, 100],
+          },
+        },
+      },
+    ]);
+
+    // note 近30日 訂單收入(NT$)
+    const thirtyDaysAgo = dayjs().subtract(30, "day").toDate();
+
+    const incomeLast30Days = await Order.aggregate([
+      {
+        $match: {
+          vendorId: new mongoose.Types.ObjectId(vendorId),
+          createdAt: {
+            $gte: thirtyDaysAgo,
+            $lte: dayjs().toDate(),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$totalPrice" },
+        },
+      },
+    ]);
+
+    // note 近30日 訂單數量
+    const orderCountLast30Days = await Order.countDocuments({
+      vendorId: vendorId,
+      createdAt: {
+        $gte: thirtyDaysAgo,
+        $lte: dayjs().toDate(),
+      },
+    });
+
+    // note 近30日 訪問用戶數
+    // visitCountLast30Days
+
+    // note 近30日 每日的日期 & (體驗課 & 培訓課)銷售金額 & % 數佔比
+    const salesDataLast30Days = await Order.aggregate([
+      {
+        $match: {
+          vendorId: new mongoose.Types.ObjectId(vendorId),
+          createdAt: {
+            $gte: thirtyDaysAgo,
+            $lte: dayjs().toDate(),
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "courses",
+          localField: "courseId",
+          foreignField: "_id",
+          as: "course",
+        },
+      },
+      {
+        $unwind: "$course",
+      },
+      {
+        $addFields: {
+          date: {
+            $dateToString: { format: "%Y-%m-%d", date: "$createdAt" },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            date: "$date",
+            courseTerm: "$course.courseTerm",
+          },
+          totalSales: { $sum: "$totalPrice" },
+        },
+      },
+      {
+        $group: {
+          _id: "$_id.date",
+          sales: {
+            $push: {
+              courseTerm: "$_id.courseTerm",
+              totalSales: "$totalSales",
+            },
+          },
+          totalSales: { $sum: "$totalSales" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          date: "$_id",
+          sales: {
+            $map: {
+              input: "$sales",
+              as: "sale",
+              in: {
+                courseTerm: "$$sale.courseTerm",
+                totalSales: "$$sale.totalSales",
+                percentage: {
+                  $multiply: [
+                    { $divide: ["$$sale.totalSales", "$totalSales"] },
+                    100,
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+    ]);
+
+    // note 近30日 體驗課 & 培訓課 銷售總額 & % 數佔比
+    const salesSummaryLast30Days = await Order.aggregate([
+      {
+        $match: {
+          vendorId: new mongoose.Types.ObjectId(vendorId),
+          createdAt: {
+            $gte: thirtyDaysAgo,
+            $lte: dayjs().toDate(),
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "courses",
+          localField: "courseId",
+          foreignField: "_id",
+          as: "course",
+        },
+      },
+      {
+        $unwind: "$course",
+      },
+      {
+        $group: {
+          _id: "$course.courseTerm",
+          totalSales: { $sum: "$totalPrice" },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalSales: { $sum: "$totalSales" },
+          sales: {
+            $push: {
+              courseTerm: "$_id",
+              totalSales: "$totalSales",
+            },
+          },
+        },
+      },
+      {
+        $unwind: "$sales",
+      },
+      {
+        $project: {
+          _id: 0,
+          trem: "$sales.courseTerm",
+          total: "$sales.totalSales",
+          percentage: {
+            $multiply: [{ $divide: ["$sales.totalSales", "$totalSales"] }, 100],
+          },
+        },
+      },
+    ]);
+
+    // note 訂單 待退款, 待付款, 待確認 數量
+    const orderStatusCounts = await Order.aggregate([
+      {
+        $match: {
+          vendorId: new mongoose.Types.ObjectId(vendorId),
+          paidStatus: { $in: [0, 1, 6] },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          status0: {
+            $sum: {
+              $cond: [{ $eq: ["$paidStatus", 0] }, 1, 0],
+            },
+          },
+          status1: {
+            $sum: {
+              $cond: [{ $eq: ["$paidStatus", 1] }, 1, 0],
+            },
+          },
+          status6: {
+            $sum: {
+              $cond: [{ $eq: ["$paidStatus", 6] }, 1, 0],
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          status0: 1,
+          status1: 1,
+          status6: 1,
+        },
+      },
+    ]);
+
+    // 全部資料整合
+    const data = {
+      todayIncome: todayIncome[0] ? todayIncome[0].total : 0,
+      todayOrderCount,
+      // todayVisitCount,
+      todaySaleCourseCount,
+      todaySoldCourseCount,
+      totalIncomeLast7Days,
+      orderCountLast7Days,
+      // visitCountLast7Days,
+      salesDataLast7Days,
+      salesSummaryLast7Days,
+      totalIncomeLast30Days: incomeLast30Days[0]
+        ? incomeLast30Days[0].total
+        : 0,
+      orderCountLast30Days,
+      // visitCountLast30Days,
+      salesDataLast30Days,
+      salesSummaryLast30Days,
+      orderStatusCounts,
+    };
+
+    handleSuccess(res, data, "取得賣家儀表板總覽成功");
+  },
+
+  // ? 忘記密碼 (Back)
+
+  // ? 忘記密碼 -> 重設密碼 (Back)
 
   // ? 取得登入賣家資料 (Back)
   getVendorAdmin: async function (req, res, next) {

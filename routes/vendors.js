@@ -9,7 +9,7 @@ const dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
 const passport = require("passport");
 
-// * 審核後給予賣家密碼 (Manage)
+// >> 審核後給予賣家密碼 (Manage)
 router.post(
     "/manage/:vendorId",
     handleErrorAsync(vendorsController.updateVendorManage)
@@ -29,7 +29,7 @@ router.post(
     */
 );
 
-// * 寄開通信給賣家 (Manage)
+// >> 寄開通信給賣家 (Manage)
 router.post(
     "/sendEmail/:vendorId",
     handleErrorAsync(vendorsController.sendEmailToVendor)
@@ -50,7 +50,7 @@ router.post(
     */
 );
 
-// * 取得全部賣家資料 (Manage)
+// >> 取得全部賣家資料 (Manage)
 router.get(
     "/manage",
     handleErrorAsync(vendorsController.getVendorsManage)
@@ -69,7 +69,7 @@ router.get(
     */
 );
 
-// * 登入 (Back)
+// ? 登入 (Back)
 router.post(
     "/login",
     handleErrorAsync(vendorsController.vendorLogin)
@@ -89,7 +89,7 @@ router.post(
     */
 );
 
-// * 確認賣家帳號是否存在 (Back)
+// ? 確認賣家帳號是否存在 (Back)
 router.get(
     "/admin/checkAccount/:account",
     handleErrorAsync(vendorsController.checkAdminVendorAccount)
@@ -100,7 +100,33 @@ router.get(
     */
 );
 
-// * 取得登入賣家資料 (Back)
+// ? 賣家儀表板總覽 (Back)
+router.get(
+    "/admin/overview",
+    isVendorAuth,
+    handleErrorAsync(vendorsController.getVendorAdminOverview)
+    /*
+      #swagger.tags = ['Vendors-back']
+      #swagger.summary = '賣家儀表板總覽 (Back)'
+      #swagger.description = '
+        近7日 訂單數量 orderCountLast7Days <br>
+        近7日 訪問用戶數 userCountLast7Days <br>
+        近7日 每日的日期 & (體驗課 & 培訓課)銷售金額 & % 數佔比 salesDataLast7Days<br>
+        近7日 體驗課 & 培訓課 銷售總額 & % 數佔比 salesSummaryLast7Days <br>
+        近30日 訂單收入(NT$) incomeLast30Days <br>
+        近30日 訂單數量 orderCountLast30Days <br>
+        近30日 訪問用戶數 visitCountLast30Days <br>
+        近30日 每日的日期 & (體驗課 & 培訓課)銷售金額 & % 數佔比 salesDataLast30Days <br>
+        近30日 體驗課 & 培訓課 銷售總額 & % 數佔比 salesSummaryLast30Days <br>
+        訂單 待退款, 待付款, 待確認 數量 orderStatusCount ' 
+    */
+);
+
+// ? 忘記密碼 (Back)
+
+// ? 忘記密碼 -> 重設密碼 (Back)
+
+// ? 取得登入賣家資料 (Back)
 router.get(
     "/admin",
     isVendorAuth,
@@ -112,7 +138,7 @@ router.get(
     */
 );
 
-// * 編輯賣家資料 (Back)
+// ? 編輯賣家資料 (Back)
 router.patch(
     "/admin",
     isVendorAuth,
@@ -153,7 +179,7 @@ router.patch(
     */
 );
 
-// * 修改密碼 (Back)
+// ? 修改密碼 (Back)
 router.patch(
     "/password",
     isVendorAuth,
