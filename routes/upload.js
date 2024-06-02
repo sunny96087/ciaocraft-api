@@ -23,6 +23,8 @@ async function handleFileUpload(req, res, next) {
         "image/pjpeg",
         "image/png",
         "image/gif",
+        "image/jpg",
+        "image/webp",
       ];
 
       if (allowedMimes.includes(file.mimetype)) {
@@ -71,6 +73,8 @@ async function handleFilesUpload(req, res, next) {
         "image/pjpeg",
         "image/png",
         "image/gif",
+        "image/jpg",
+        "image/webp",
       ];
 
       if (allowedMimes.includes(file.mimetype)) {

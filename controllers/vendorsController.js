@@ -7,7 +7,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { isVendorAuth, generateSendJWT } = require("../utils/vendorAuth");
 const Vendor = require("../models/vendor");
-const { Course, CourseItem, CourseComment } = require("../models/course");
+const { Course, CourseItem, CourseComment, CourseClickLog } = require("../models/course");
 const Order = require("../models/order");
 const Member = require("../models/member");
 
@@ -208,13 +208,13 @@ const vendorController = {
     }).countDocuments();
 
     // note 今日 訪問人數
-    // const todayVisitCount = await Course.find({
-    //   vendorId: new mongoose.Types.ObjectId(vendorId),
-    //   createdAt: {
-    //     $gte: dayjs().startOf("day").toDate(),
-    //     $lte: dayjs().endOf("day").toDate(),
-    //   },
-    // }).countDocuments();
+    const todayVisitCount = await CourseClickLog.find({
+      vendorId: new mongoose.Types.ObjectId(vendorId),
+      createdAt: {
+        $gte: dayjs().startOf("day").toDate(),
+        $lte: dayjs().endOf("day").toDate(),
+      },
+    }).countDocuments();
 
     // note 今日 開課中課程
     const todaySaleCourseCount = await Course.countDocuments({
@@ -263,7 +263,13 @@ const vendorController = {
     });
 
     // note 近7日 訪問用戶數
-    // visitCountLast7Days
+    const visitCountLast7Days = await CourseClickLog.countDocuments({
+      vendorId: new mongoose.Types.ObjectId(vendorId),
+      createdAt: {
+        $gte: sevenDaysAgo,
+        $lte: dayjs().toDate(),
+      },
+    });
 
     // note 近7日 每日的日期 & (體驗課 & 培訓課)銷售金額 & % 數佔比
     const salesDataLast7Days = await Order.aggregate([
@@ -428,7 +434,13 @@ const vendorController = {
     });
 
     // note 近30日 訪問用戶數
-    // visitCountLast30Days
+    const visitCountLast30Days = await CourseClickLog.find({
+      vendorId: new mongoose.Types.ObjectId(vendorId),
+      createdAt: {
+        $gte: thirtyDaysAgo,
+        $lte: dayjs().toDate(),
+      },
+    }).countDocuments();
 
     // note 近30日 每日的日期 & (體驗課 & 培訓課)銷售金額 & % 數佔比
     const salesDataLast30Days = await Order.aggregate([
@@ -603,19 +615,19 @@ const vendorController = {
     const data = {
       todayIncome: todayIncome[0] ? todayIncome[0].total : 0,
       todayOrderCount,
-      // todayVisitCount,
+      todayVisitCount,
       todaySaleCourseCount,
       todaySoldCourseCount,
       totalIncomeLast7Days,
       orderCountLast7Days,
-      // visitCountLast7Days,
+      visitCountLast7Days,
       salesDataLast7Days,
       salesSummaryLast7Days,
       totalIncomeLast30Days: incomeLast30Days[0]
         ? incomeLast30Days[0].total
         : 0,
       orderCountLast30Days,
-      // visitCountLast30Days,
+      visitCountLast30Days,
       salesDataLast30Days,
       salesSummaryLast30Days,
       orderStatusCounts,
