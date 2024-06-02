@@ -386,4 +386,24 @@ router.post(
     */
 )
 
+router.post(
+    '/clickLogs',
+    handleErrorAsync(courseController.newClickLog)
+    /*
+        #swagger.tags = ['Courses-front']
+        #swagger.summary = '新增課程點擊紀錄'
+        #swagger.description = `新增課程點擊紀錄；會查詢 ip 地址，如果 課程、會員、賣家、ip地址 皆相同，則不新增新的點擊紀錄 <br>`
+        #swagger.parameters['body'] = {
+            in: 'body',
+            description: '點擊課程',
+            required: true,
+            schema: {
+                $courseId: '課程 ID',
+                $vendorId: '賣家 ID',
+                memberId: '會員 ID'
+            }
+        }
+    */
+)
+
 module.exports = router;
