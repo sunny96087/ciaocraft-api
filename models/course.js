@@ -64,11 +64,7 @@ const courseSchema = new mongoose.Schema(
     // 你可以學到
     courseSkillsLearned: String,
     // 課程總時數 (時長)
-    courseTotalHours: Number,
-    clickCounts: {
-      type: Number,
-      default: 0,
-    }
+    courseTotalHours: Number
   },
   {
     versionKey: false,
@@ -181,6 +177,35 @@ const courseCommentSchema = new mongoose.Schema(
 
 const CourseComment = mongoose.model("CourseComment", courseCommentSchema);
 
+// 課程點擊紀錄
+const courseClickLogSchema = new mongoose.Schema({
+  courseId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Course",
+    required: [true, "courseId 為必填"],
+  },
+  vendorId:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Vendor",
+    required: [true, "vendorId 為必填"],
+  },
+  memberId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Member",
+    required: [true, "memberId 為必填"],
+  },
+  ipAddress:{
+    type: String,
+    required: [true, "ipAddress 為必填"],
+  }
+},
+{
+  versionKey: false,
+  timestamps: true
+});
+const CourseClickLog = mongoose.model("CourseClickLog", courseClickLogSchema);
+
+
 // ? 查詢時自動填充相關的欄位
 
 courseSchema.pre("find", function () {
@@ -214,4 +239,5 @@ courseCommentSchema.pre("findOne", function () {
 });
 
 // 導出
-module.exports = { Course, CourseItem, CourseComment };
+
+module.exports = { Course, CourseItem, CourseComment, CourseClickLog };

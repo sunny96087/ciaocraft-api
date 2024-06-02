@@ -1,7 +1,8 @@
 const Vendor = require("../models/vendor");
 const Teacher = require("../models/teacher");
 const Order = require("../models/order");
-const { Course, CourseItem, CourseComment } = require("../models/course");
+const Member = require("../models/member");
+const { Course, CourseItem, CourseComment, CourseClickLog } = require("../models/course");
 const appError = require("../utils/appError");
 const handleSuccess = require("../utils/handleSuccess");
 const { isVendorAuth, generateSendJWT } = require("../utils/vendorAuth");
@@ -675,9 +676,10 @@ const courseController = {
         select: "capacity startTime endTime itemName",
       })
       .select(
-        `courseName courseType courseTerm coursePrice courseSummary 
-         courseLocation courseAddress courseRemark courseImage courseContent courseTotalHours courseStatus
-         createdAt updatedAt`
+        `courseType courseTerm courseName coursePrice courseStatus courseCapacity 
+         courseSummary courseLocation courseAddress courseRemark courseImage 
+         courseContent courseNotice courseSuitableFor courseSkillsLearned 
+         courseTotalHours createdAt updatedAt`
       )
       .lean();
 
@@ -720,9 +722,6 @@ const courseController = {
     course.vendorAvgRating = parseFloat(vendorAvgRating.toFixed(2));  // 賣家評論平均分數
     course.courseCommentsCount = courseComments.length;               // 課程評論總數
     course.courseAvgRating = parseFloat(courseAvgRating.toFixed(2));  // 課程評論平均分數
-
-    // 如果有課程則將 clickCount +1
-    const updateClickCount = await Course.findByIdAndUpdate(courseId, { $inc: { clickCounts: 1 } }, { new: true });
 
     handleSuccess(res, course, "取得單一課程資料成功");
   },
@@ -931,6 +930,61 @@ const courseController = {
       handleSuccess(res, null, "按讚成功");
     }
   },
+
+  // 新增課程點擊紀錄 (Front)
+  newClickLog: async (req, res, next) => {
+    const { courseId, vendorId, memberId } = req.body;
+    const ipAddress = req.ip;
+
+    // 驗證 courseId 格式和是否存在
+    const isValidCourseId = await tools.findModelByIdNext(Course, courseId, next);
+    if (!isValidCourseId) {
+      return;
+    }
+
+    // 驗證 memberId 格式和是否存在
+    const isValidMemberId = await tools.findModelByIdNext(Member, memberId, next);
+    if (!isValidMemberId) {
+      return;
+    }
+
+    // 今日開始時間和結束時間
+    const startTime = new Date();
+    startTime.setHours(0, 0, 0, 0);
+    const endTime = new Date();
+    endTime.setHours(23, 59, 59, 999);
+
+    // 新增點擊紀錄，如果已存在則會更新 updatedAt 
+    const newClickLog = await CourseClickLog.findOneAndUpdate(
+      {
+        courseId: courseId,
+        vendorId: vendorId,
+        memberId: memberId,
+        ipAddress: ipAddress,
+        createdAt: { $gte: startTime, $lte: endTime }
+      },
+      {
+        $setOnInsert: {
+          courseId: courseId,
+          memberId: memberId,
+          vendorId: vendorId,
+          ipAddress: ipAddress
+        }
+      },
+      {
+        new: true, 
+        upsert: true, // 如果查詢條件不存在，則新增一筆新的點擊紀錄
+        setDefaultsOnInsert: true 
+      }
+    );
+
+    if(newClickLog.createdAt === newClickLog.updatedAt) {
+      handleSuccess(res, newClickLog, "新增點擊紀錄成功");
+    }
+    else{
+      handleSuccess(res, null, "點擊紀錄已存在，將更新 updatedAt");
+    }
+  }
 };
 
 module.exports = courseController;
