@@ -10,6 +10,7 @@ const memberSchema = new mongoose.Schema(
         },
         password: {
             type: String,
+            select: false,
         },
         name: {
             type: String,
@@ -54,7 +55,15 @@ const memberSchema = new mongoose.Schema(
         },
         loginAt: {
             type: Date,
-        }
+        },
+        resetPasswordToken: {
+            type: String,
+            select: false,
+        },
+        resetPasswordExpires: {
+            type: Date,
+            select: false,
+        },
     },
     {
         timestamps: true,
@@ -62,13 +71,6 @@ const memberSchema = new mongoose.Schema(
         toObject: { virtuals: true }
     }
 )
-
-// 等 courses model 完成後再加入
-// memberSchema.virtual('courses', {
-//     ref: 'Course',
-//     localField: '_id',
-//     foreignField: 'collections'
-// })
 
 const Member = mongoose.model('Member', memberSchema)
 module.exports = Member;

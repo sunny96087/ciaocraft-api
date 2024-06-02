@@ -2,7 +2,6 @@ const Member = require("../models/member");
 const Collection = require("../models/collection");
 const Order = require("../models/order");
 const {Course} = require("../models/course");
-const validator = require("validator");
 const tools = require("../utils/tools");
 const appError = require("../utils/appError");
 const handleSuccess = require("../utils/handleSuccess");
