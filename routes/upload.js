@@ -155,11 +155,36 @@ router.post(
   */
 );
 
+// 前台圖片上傳-單張 (front)
+router.post(
+  "/singleImage/front",
+  isAuth,
+  handleFileUpload,
+  handleErrorAsync(uploadController.uploadMemberImage)
+  /*  #swagger.tags = ['Upload-front']
+      #swagger.summary = '上傳單張圖片 (front)'
+      #swagger.description = '上傳單張圖片 (front)'
+      #swagger.parameters['upload'] = {
+        in: 'formData',
+        required: true,
+        type: 'file',
+        name: 'file',
+        description: '圖片檔案',
+        schema: {
+            type: 'file',
+            format: 'binary',
+            required: true
+        }
+      }
+  */
+);
+
 // ! 分隔線
 
 // 上傳圖片
 router.post(
   "/image",
+  isAuth,
   handleFileUpload,
   handleErrorAsync(uploadController.uploadImage)
   /*  #swagger.tags = ['Upload']

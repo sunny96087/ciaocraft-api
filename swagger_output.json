@@ -1304,6 +1304,51 @@
         }
       }
     },
+    "/upload/singleImage/front": {
+      "post": {
+        "tags": [
+          "Upload-front"
+        ],
+        "summary": "上傳單張圖片 (front)",
+        "description": "上傳單張圖片 (front)",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "file",
+            "in": "formData",
+            "required": true,
+            "type": "file",
+            "description": "圖片檔案",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "file"
+                },
+                "format": {
+                  "type": "string",
+                  "example": "binary"
+                },
+                "required": {
+                  "type": "boolean",
+                  "example": true
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/upload/image": {
       "post": {
         "tags": [
@@ -1311,6 +1356,11 @@
         ],
         "description": "上傳圖片",
         "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "type": "string"
+          },
           {
             "name": "body",
             "in": "body",
@@ -1612,6 +1662,82 @@
               },
               "required": [
                 "account"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/auth/forgotPassword": {
+      "post": {
+        "tags": [
+          "Auth-front"
+        ],
+        "summary": "忘記密碼",
+        "description": "忘記密碼，發送重設密碼信至會員信箱，測試要收到信要帶真實信箱",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "account": {
+                  "type": "string",
+                  "example": "think242729@gmail.com"
+                }
+              },
+              "required": [
+                "account"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/auth/resetPassword": {
+      "post": {
+        "tags": [
+          "Auth-front"
+        ],
+        "summary": "重設密碼",
+        "description": "重設密碼",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "example": "重設密碼 token"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "Aa123456@"
+                },
+                "confirmPassword": {
+                  "type": "string",
+                  "example": "Aa123456@"
+                }
+              },
+              "required": [
+                "token",
+                "password",
+                "confirmPassword"
               ]
             }
           }
@@ -3586,7 +3712,7 @@
           "Vendors-back"
         ],
         "summary": "賣家儀表板總覽 (Back)",
-        "description": "  近7日 訂單數量 orderCountLast7Days <br>  近7日 訪問用戶數 userCountLast7Days <br>  近7日 每日的日期 & (體驗課 & 培訓課)銷售金額 & % 數佔比 salesDataLast7Days<br>  近7日 體驗課 & 培訓課 銷售總額 & % 數佔比 salesSummaryLast7Days <br>  近30日 訂單收入(NT$) incomeLast30Days <br>  近30日 訂單數量 orderCountLast30Days <br>  近30日 訪問用戶數 visitCountLast30Days <br>  近30日 每日的日期 & (體驗課 & 培訓課)銷售金額 & % 數佔比 salesDataLast30Days <br>  近30日 體驗課 & 培訓課 銷售總額 & % 數佔比 salesSummaryLast30Days <br>  訂單 待退款, 待付款, 待確認 數量 orderStatusCount ",
+        "description": "\r  近7日 訂單數量 orderCountLast7Days <br>\r  近7日 訪問用戶數 userCountLast7Days <br>\r  近7日 每日的日期 & (體驗課 & 培訓課)銷售金額 & % 數佔比 salesDataLast7Days<br>\r  近7日 體驗課 & 培訓課 銷售總額 & % 數佔比 salesSummaryLast7Days <br>\r  近30日 訂單收入(NT$) incomeLast30Days <br>\r  近30日 訂單數量 orderCountLast30Days <br>\r  近30日 訪問用戶數 visitCountLast30Days <br>\r  近30日 每日的日期 & (體驗課 & 培訓課)銷售金額 & % 數佔比 salesDataLast30Days <br>\r  近30日 體驗課 & 培訓課 銷售總額 & % 數佔比 salesSummaryLast30Days <br>\r  訂單 待退款, 待付款, 待確認 數量 orderStatusCount ",
         "parameters": [
           {
             "name": "token",
