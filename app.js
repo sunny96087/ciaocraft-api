@@ -6,7 +6,7 @@ var cookieParser = require("cookie-parser"); // 引入 cookie-parser 中間件�
 var morgan = require("morgan"); // 引入 morgan 中間件，用於日誌記錄
 var cors = require("cors"); // 引入允許跨網域套件 cors
 const logger = require("./logger"); // 引入 logger.js => Winston 日誌
-const deleteExpiredAccounts = require("./utils/cronJobs"); // 引入 cronJobs.js 定時任務
+const { updateFinishedOrders, updateExpiredOrders } = require("./utils/cronJobs"); // 引入 cronJobs.js 定時任務
 const swaggerUi = require("swagger-ui-express"); // swagger
 const swaggerFile = require("./swagger_output.json");
 const mongoose = require("mongoose");
@@ -38,7 +38,8 @@ mongoose
   });
 
 // 啟動定時任務
-deleteExpiredAccounts();
+updateFinishedOrders();
+updateExpiredOrders();
 
 // 引入自訂路由 routes
 const postsRouter = require("./routes/posts");

@@ -333,9 +333,6 @@ const orderController = {
     handleSuccess(res, order, "更新訂單成功");
   },
 
-  // todo 補充: 寫一支定時任務抓已確認訂單，且日期已過，將 paidStatus 改為 3 (已完課)
-  // todo 補充: 寫一支定時任務抓待付款訂單，且日期大於三天，將 paidStatus 改為 4 (訂單取消(已過期))
-
   // 取得單一訂單資料
   getOrder: async (req, res, next) => {
     const memberId = req.user.id;
