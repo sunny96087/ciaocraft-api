@@ -46,6 +46,25 @@ router.get(
   */
 );
 
+
+// ? 取得單筆訂單資料 (Back)
+router.get(
+  "/admin/:orderId",
+  isVendorAuth,
+  handleErrorAsync(orderController.getAdminOrder)
+  /*
+    #swagger.tags = ['Orders-back']
+    #swagger.summary = '取得單筆訂單資料 (Back)'
+    #swagger.description = '取得單筆訂單資料 (Back)'
+    #swagger.parameters['orderId'] = {
+        in: 'path',
+        description: '要取得的訂單 ID',
+        required: true,
+        type: 'string'
+    }
+  */
+);
+
 // ? 取得所有訂單 (query: 訂單狀態、日期區間、keyword (_id || member.name)) (Back)
 router.get(
   "/admin",
@@ -83,24 +102,6 @@ router.get(
         }
     }
  */
-);
-
-// ? 取得單筆訂單資料 (Back)
-router.get(
-  "/admin/:orderId",
-  isVendorAuth,
-  handleErrorAsync(orderController.getAdminOrder)
-  /*
-    #swagger.tags = ['Orders-back']
-    #swagger.summary = '取得單筆訂單資料 (Back)'
-    #swagger.description = '取得單筆訂單資料 (Back)'
-    #swagger.parameters['orderId'] = {
-        in: 'path',
-        description: '要取得的訂單 ID',
-        required: true,
-        type: 'string'
-    }
-  */
 );
 
 // ? 修改訂單 (賣家確認收到款項) (Back)

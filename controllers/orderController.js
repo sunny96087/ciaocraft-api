@@ -196,6 +196,25 @@ const orderController = {
     handleSuccess(res, paymentInfo, "取得進帳總覽成功");
   },
 
+  // ? 取得單筆訂單資料 (Back)
+  getAdminOrder: async (req, res, next) => {
+    const { orderId } = req.params;
+
+    // 檢查 ID 格式及是否存在
+    const isIdExist = await tools.findModelByIdNext(Order, orderId, next);
+    if (!isIdExist) {
+      return;
+    }
+
+    // 取回單筆訂單
+    const order = await Order.findById(orderId)
+      .populate("memberId")
+      .populate("vendorId")
+      .lean();
+
+    handleSuccess(res, order, "取得單筆訂單成功");
+  },
+
   // ? 取得所有訂單 (query: 訂單狀態、日期區間、keyword (_id || member.name)) (Back)
   getAdminOrders: async (req, res, next) => {
     // 取得登入賣家的 ID
