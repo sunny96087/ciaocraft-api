@@ -2227,6 +2227,82 @@
         }
       }
     },
+    "/orders/admin/{orderId}": {
+      "get": {
+        "tags": [
+          "Orders-back"
+        ],
+        "summary": "取得單筆訂單資料 (Back)",
+        "description": "取得單筆訂單資料 (Back)",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "要取得的訂單 ID"
+          },
+          {
+            "name": "token",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Orders-back"
+        ],
+        "summary": "修改訂單 (賣家確認收到款項) (Back)",
+        "description": "修改訂單 (賣家確認收到款項) (Back) <br>\r  paidStatus: 課程狀態 (int)；2: 已確認收到款, 5:訂單取消(不需退款), 6:訂單取消(待退款), 7:訂單取消(已退款) <br>\r  cancelReason: 5 || 6 要備註取消訂單原因",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "要修改的訂單 ID"
+          },
+          {
+            "name": "token",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "description": "各狀態碼說明：2 (已確認收款 + confirmTime)、5 (訂單取消(不需退款) + cancelTime)、6 (訂單取消(待退款) + cancelTime)、7 (訂單取消(已退款) + refundTime)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "paidStatus": {
+                  "type": "number",
+                  "example": 2
+                },
+                "cancelReason": {
+                  "type": "string",
+                  "example": "5 || 6 要備註取消訂單原因"
+                }
+              },
+              "required": [
+                "paidStatus"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/orders/admin": {
       "get": {
         "tags": [
@@ -2313,82 +2389,6 @@
                   }
                 }
               }
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/orders/admin/{orderId}": {
-      "get": {
-        "tags": [
-          "Orders-back"
-        ],
-        "summary": "取得單筆訂單資料 (Back)",
-        "description": "取得單筆訂單資料 (Back)",
-        "parameters": [
-          {
-            "name": "orderId",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "description": "要取得的訂單 ID"
-          },
-          {
-            "name": "token",
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      },
-      "patch": {
-        "tags": [
-          "Orders-back"
-        ],
-        "summary": "修改訂單 (賣家確認收到款項) (Back)",
-        "description": "修改訂單 (賣家確認收到款項) (Back) <br>\r  paidStatus: 課程狀態 (int)；2: 已確認收到款, 5:訂單取消(不需退款), 6:訂單取消(待退款), 7:訂單取消(已退款) <br>\r  cancelReason: 5 || 6 要備註取消訂單原因",
-        "parameters": [
-          {
-            "name": "orderId",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "description": "要修改的訂單 ID"
-          },
-          {
-            "name": "token",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "description": "各狀態碼說明：2 (已確認收款 + confirmTime)、5 (訂單取消(不需退款) + cancelTime)、6 (訂單取消(待退款) + cancelTime)、7 (訂單取消(已退款) + refundTime)",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "paidStatus": {
-                  "type": "number",
-                  "example": 2
-                },
-                "cancelReason": {
-                  "type": "string",
-                  "example": "5 || 6 要備註取消訂單原因"
-                }
-              },
-              "required": [
-                "paidStatus"
-              ]
             }
           }
         ],
@@ -4477,6 +4477,87 @@
             "name": "token",
             "in": "header",
             "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/messages/{roomId}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/messages/admin/rooms/{vendorId}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "vendorId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/messages/rooms/{memberId}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "memberId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/messages/rooms": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "memberId": {
+                  "example": "any"
+                },
+                "vendorId": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {

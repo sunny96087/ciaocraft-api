@@ -80,6 +80,7 @@ const authController = {
 
     // 會員登入
     login: async (req, res, next) => {
+        console.log('login')
         let { account, password } = req.body;
 
         // 驗證必填欄位
@@ -88,7 +89,7 @@ const authController = {
         }
 
         // 檢查帳號是否存在且未被停權
-        const member = await Member.findOne({ account: account });
+        const member = await Member.findOne({ account: account }).select("+password");
 
         if (!member) {
             return next(appError(400, '帳號錯誤'));
@@ -249,9 +250,9 @@ const authController = {
                 return next(appError(500, 'Google 登入失敗'));
             }
         }
-        
+
         // generateSendJWT(member, 200, res, 'Google 登入成功');
-        
+
         // 產生 token 並加入 cookie
         const token = generateJWT(member);
         res.cookie('user', token, {
