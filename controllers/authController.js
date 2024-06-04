@@ -98,9 +98,9 @@ const authController = {
             return next(appError(400, '此帳號已被停權'));
         }
 
-        if (member.password === undefined) {
-            return next(appError(400, '此為第三方登入帳號，請使用正確方式登入'));
-        }
+        // if (member.password === undefined) {
+        //     return next(appError(400, '此為第三方登入帳號，請使用正確方式登入'));
+        // }
 
         // 檢查密碼是否正確
         const isPasswordCorrect = await bcrypt.compare(password, member.password);
