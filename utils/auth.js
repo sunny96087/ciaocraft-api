@@ -66,7 +66,14 @@ const generateSendJWT = (user, statusCode, res, message) => {
   });
 };
 
+const generateJWT = (user) => {
+  return jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_DAY,
+  });
+}
+
 module.exports = {
   isAuth,
   generateSendJWT,
+  generateJWT,
 };

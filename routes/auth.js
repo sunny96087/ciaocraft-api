@@ -3,6 +3,17 @@ const router = express.Router();
 const handleErrorAsync = require("../utils/handleErrorAsync");
 const authController = require("../controllers/authController");
 const { isAuth } = require("../utils/auth");
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const passport = require("passport");
+
+passport.use(new GoogleStrategy(
+  {
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: "http://127.0.0.1:3666/auth/google/callback"
+  },
+  (accessToken, refreshToken, profile, cb) => cb(null, profile._json)
+));
 
 router.post(
   '/signup',
@@ -93,9 +104,9 @@ router.post(
   */
 )
 
-router.post(
-  "/googleLogin",
-  handleErrorAsync(authController.googleLogin)
+router.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] }),
   /** 
     #swagger.tags = ['Auth-front']
     #swagger.summary = 'Google 登入'
@@ -107,6 +118,17 @@ router.post(
           googleToken: ""
       }
     }
+  */
+);
+
+router.get(
+  "/google/callback",
+  passport.authenticate("google", { failureRedirect: 'http://localhost:3000', session: false}),
+  handleErrorAsync(authController.googleLoginCallback)
+  /** 
+    #swagger.tags = ['Auth-front']
+    #swagger.summary = 'Google 登入 callback'
+    #swagger.description = 'Google 登入 callback'
   */
 );
 
@@ -137,5 +159,19 @@ router.post(
     #swagger.description = 'Google 帳號解除綁定'
   */
 );
+
+router.get(
+  '/login',
+  (req, res) => {
+    res.render('login');
+  }
+)
+
+router.get(
+  '/fail',
+  (req, res) => {
+    res.render('fail');
+  }
+)
 
 module.exports = router;

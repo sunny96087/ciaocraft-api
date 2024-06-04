@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const validator = require('validator');
 const appError = require('../utils/appError');
 const handleSuccess = require('../utils/handleSuccess');
-const { generateSendJWT } = require('../utils/auth');
+const { generateSendJWT, generateJWT } = require('../utils/auth');
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const { google } = require("googleapis");
@@ -78,6 +78,7 @@ const authController = {
         handleSuccess(res, isAccountExist, '此 email 可以使用');
     },
 
+    // 會員登入
     login: async (req, res, next) => {
         let { account, password } = req.body;
 
@@ -95,6 +96,10 @@ const authController = {
 
         if (member.status === 0) {
             return next(appError(400, '此帳號已被停權'));
+        }
+
+        if (member.password === undefined) {
+            return next(appError(400, '此為第三方登入帳號，請使用正確方式登入'));
         }
 
         // 檢查密碼是否正確
@@ -126,7 +131,7 @@ const authController = {
         if (!member) {
             return next(appError(400, "此 email 未註冊"));
         }
-        
+
         // 產生重設密碼 token
         const resetToken = crypto.randomBytes(32).toString("hex");
 
@@ -188,7 +193,7 @@ const authController = {
     },
 
     // 重設密碼
-    resetPassword : async (req, res, next) => {
+    resetPassword: async (req, res, next) => {
         const { token, password, confirmPassword } = req.body;
 
         if (!token || !password || !confirmPassword) {
@@ -217,7 +222,7 @@ const authController = {
 
         // 更新密碼
         const hashedPassword = await bcrypt.hash(password, 12);
-        
+
         const updateMember = await Member.findByIdAndUpdate(member._id, {
             password: hashedPassword,
             resetPasswordToken: null,
@@ -227,17 +232,42 @@ const authController = {
         generateSendJWT(member, 200, res, "重設密碼成功");
     },
 
-    // google 登入
-    googleLogin: async (req, res, next) => {
-        // 處理 google 相關邏輯
-        // 創建會員資料
-        // 產生 token
-    },
 
-    // google 帳號綁定
-    linkGoogleAccount: async (req, res, next) => {
-        // 處理 google 相關邏輯
-        // 更新會員資料
+    googleLoginCallback: async (req, res, next) => {
+        // Successful authentication, redirect home.
+        let member = await Member.findOne({ googleId: req.user.sub });
+
+        if (!member) {
+            member = await Member.create({
+                googleId: req.user.sub,
+                account: req.user.email,
+                name: req.user.name,
+                photo: req.user.picture,
+            });
+
+            if (!member) {
+                return next(appError(500, 'Google 登入失敗'));
+            }
+        }
+        
+        // generateSendJWT(member, 200, res, 'Google 登入成功');
+        
+        // 產生 token 並加入 cookie
+        const token = generateJWT(member);
+        res.cookie('user', token, {
+            httpOnly: true,
+            secure: false,
+            maxAge: 3600000, // 1 小時
+            sameSite: 'None',
+        })
+
+        // 重導至首頁
+        if (process.env.NODE_ENV.trim() === 'dev') {
+            res.redirect(`http://localhost:3000/SSOLogin/?user=${token}`);
+        }
+        else {
+            res.redirect('https://ciaocraft-website.vercel.app/SSOLogin/?user=${token}');
+        }
     },
 
     // 取消連結 Google 帳號

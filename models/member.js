@@ -3,6 +3,7 @@ const memberSchema = new mongoose.Schema(
     {
         googleId: {
             type: String,
+            unique: true,
         },
         account: {
             type: String,

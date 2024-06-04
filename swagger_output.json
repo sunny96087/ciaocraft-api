@@ -1749,8 +1749,8 @@
         }
       }
     },
-    "/auth/googleLogin": {
-      "post": {
+    "/auth/google": {
+      "get": {
         "tags": [
           "Auth-front"
         ],
@@ -1772,6 +1772,20 @@
             }
           }
         ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/auth/google/callback": {
+      "get": {
+        "tags": [
+          "Auth-front"
+        ],
+        "summary": "Google 登入 callback",
+        "description": "Google 登入 callback",
         "responses": {
           "default": {
             "description": ""
@@ -1823,6 +1837,26 @@
             "type": "string"
           }
         ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "get": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/auth/fail": {
+      "get": {
+        "description": "",
         "responses": {
           "default": {
             "description": ""
