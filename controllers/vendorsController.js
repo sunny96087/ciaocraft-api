@@ -7,7 +7,12 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { isVendorAuth, generateSendJWT } = require("../utils/vendorAuth");
 const Vendor = require("../models/vendor");
-const { Course, CourseItem, CourseComment, CourseClickLog } = require("../models/course");
+const {
+  Course,
+  CourseItem,
+  CourseComment,
+  CourseClickLog,
+} = require("../models/course");
 const Order = require("../models/order");
 const Member = require("../models/member");
 
@@ -574,7 +579,7 @@ const vendorController = {
     ]);
 
     // note 訂單 待退款, 待付款, 待確認 數量
-    const orderStatusCounts = await Order.aggregate([
+    let orderStatusCounts = await Order.aggregate([
       {
         $match: {
           vendorId: new mongoose.Types.ObjectId(vendorId),
@@ -610,6 +615,17 @@ const vendorController = {
         },
       },
     ]);
+
+    // 如果查詢結果為空，則返回一個包含所有狀態並設為 0 的物件
+    if (orderStatusCounts.length === 0) {
+      orderStatusCounts = [{ status0: 0, status1: 0, status6: 0 }];
+    } else {
+      // 檢查每個狀態的數量，如果沒有該狀態的數量，則設為 0
+      const statusCounts = orderStatusCounts[0];
+      if (statusCounts.status0 === undefined) statusCounts.status0 = 0;
+      if (statusCounts.status1 === undefined) statusCounts.status1 = 0;
+      if (statusCounts.status6 === undefined) statusCounts.status6 = 0;
+    }
 
     // 全部資料整合
     const data = {
