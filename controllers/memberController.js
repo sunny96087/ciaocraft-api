@@ -69,10 +69,10 @@ const memberController = {
             .find(queryField)
             .populate({
                 path: "courseId",
-                select: "courseId courseName courseTerm courseType courseStatus coursePrice createdAt"
+                select: "courseId courseName courseImage courseTerm courseType courseStatus coursePrice createdAt"
             })
             .sort({ createdAt: -1 })
-            .select("courseId courseName courseTerm courseType courseStatus courseImage coursePrice createdAt")
+            .select("courseId createdAt")
             .lean();
 
         // 加入課程時長條件
