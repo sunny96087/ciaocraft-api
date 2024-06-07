@@ -72,7 +72,7 @@ const memberController = {
                 select: "courseId courseName courseTerm courseType courseStatus coursePrice createdAt"
             })
             .sort({ createdAt: -1 })
-            .select("courseId courseName courseTerm courseType courseStatus coursePrice createdAt")
+            .select("courseId courseName courseTerm courseType courseStatus courseImage coursePrice createdAt")
             .lean();
 
         // 加入課程時長條件
