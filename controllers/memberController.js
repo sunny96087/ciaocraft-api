@@ -1,11 +1,12 @@
 const Member = require("../models/member");
 const Collection = require("../models/collection");
 const Order = require("../models/order");
-const {Course} = require("../models/course");
+const { Course } = require("../models/course");
 const tools = require("../utils/tools");
 const appError = require("../utils/appError");
 const handleSuccess = require("../utils/handleSuccess");
 const bcrypt = require("bcryptjs");
+const mongoose = require("mongoose");
 
 const memberController = {
     // 取得所有會員資料 (開發方便查詢用)
@@ -30,22 +31,22 @@ const memberController = {
 
         // 取得會員收藏總數
         const collections = await Collection
-            .find({memberId: memberId})
+            .find({ memberId: memberId })
             .populate({
                 path: "courseId",
                 select: "courseId  courseStatus"
             })
             .sort({ createdAt: -1 })
-            
+
         let collectionCount = 0;
         collections.forEach((collection) => {
-            if(collection.courseId.courseStatus === 1) {
+            if (collection.courseId.courseStatus === 1) {
                 collectionCount++;
             }
         })
 
         member.collectionCount = collectionCount;
-        
+
         // 取得 上過的課程 總數 (只包含 3:已完課 不重複)
         const courses = await Order
             .find({ memberId: memberId, paidStatus: 3 })
@@ -61,26 +62,63 @@ const memberController = {
         const memberId = req.user.id;
         const courseTerm = req.query.courseTerm;
 
-        // 查詢條件
-        let queryField = { memberId: memberId};
-
         // 取得會員收藏
-        let collections = await Collection
-            .find(queryField)
-            .populate({
-                path: "courseId",
-                select: "courseId courseName courseImage courseTerm courseType courseStatus coursePrice createdAt"
-            })
-            .sort({ createdAt: -1 })
-            .select("courseId createdAt")
-            .lean();
+        // let collections = await Collection
+        //     .find(queryField)
+        //     .populate({
+        //         path: "courseId",
+        //         select: "courseId vendorId courseName courseImage courseTerm courseType courseStatus coursePrice createdAt"
+        //     })
+        //     .sort({ createdAt: -1 })
+        //     .select("courseId createdAt")
+        //     .lean();
+
+        // 查詢條件
+        let memberIdObject = new mongoose.Types.ObjectId(memberId);
+        let queryField = { memberId: memberIdObject };
+        let collections = await Collection.aggregate([
+            {
+                $match: queryField
+            },
+            {
+                $lookup: {
+                    from: "courses",
+                    localField: "courseId",
+                    foreignField: "_id",
+                    as: "course",
+                },
+            },
+            { $unwind: "$course" },
+            {
+                $lookup: {
+                    from: "vendors",
+                    localField: "course.vendorId",
+                    foreignField: "_id",
+                    as: "vendor",
+                },
+            },
+            { $unwind: "$vendor" },
+            {
+                $project: {
+                    courseId: 1,
+                    createdAt: 1,
+                    brandName: "$vendor.brandName",
+                    courseName: "$course.courseName",
+                    courseTerm: "$course.courseTerm",
+                    courseType: "$course.courseType",
+                    courseImage: "$course.courseImage",
+                    courseStatus: "$course.courseStatus",
+                    coursePrice: "$course.coursePrice"
+                }
+            }
+        ])
 
         // 加入課程時長條件
         if (courseTerm) {
-            if(!["0","1"].includes(courseTerm)) {
+            if (!["0", "1"].includes(courseTerm)) {
                 return next(appError(400, 'courseTerm 須為 0:體驗課程 或 1:培訓課程'));
             }
-            collections = collections.filter((collection) => collection.courseId.courseTerm === parseInt(courseTerm));
+            collections = collections.filter((collection) => collection.courseTerm === parseInt(courseTerm));
         }
 
         handleSuccess(res, collections, "取得會員收藏成功");
@@ -121,7 +159,7 @@ const memberController = {
     deleteMemberCollection: async (req, res, next) => {
         const memberId = req.user.id;
         const collectionId = req.params.collectionId;
-        
+
         // 驗證 collectionId 格式和是否存在
         const isValidCollectionId = await tools.findModelByIdNext(Collection, collectionId, next);
         if (!isValidCollectionId) {
@@ -150,11 +188,11 @@ const memberController = {
 
         // 查詢條件
         const queryField = { memberId: memberId };
-        
+
         // 加入訂單狀態條件
         if (paidStatus) {
             // 驗證paidStatus值
-            if (!["0","1","2","3","4","5","6"].includes(paidStatus)) {
+            if (!["0", "1", "2", "3", "4", "5", "6"].includes(paidStatus)) {
                 return next(appError(400, 'paidStatus 須為 0, 1, 2, 3, 4, 5, 6'));
             }
             queryField.paidStatus = paidStatus;
@@ -162,7 +200,7 @@ const memberController = {
 
         // 加入課程時長條件
         if (courseTerm) {
-            if(!["0","1".includes(courseTerm)]) {
+            if (!["0", "1".includes(courseTerm)]) {
                 return next(appError(400, 'courseTerm 須為 0:體驗課程 或 1:培訓課程'));
             }
             queryField.courseTerm = courseTerm;
@@ -196,9 +234,9 @@ const memberController = {
         if (name) { updateFields.name = name; }
         if (phone) { updateFields.phone = phone; }
         if (photo) { updateFields.photo = photo; }
-        
+
         // 驗證 point 值需為正整數
-        if(point){
+        if (point) {
             if (Number.isInteger(point) && point >= 0) {
                 updateFields.point = point;
             }
