@@ -1,7 +1,7 @@
 const Member = require("../models/member");
 const Collection = require("../models/collection");
 const Order = require("../models/order");
-const { Course } = require("../models/course");
+const { Course, CourseComment } = require("../models/course");
 const tools = require("../utils/tools");
 const appError = require("../utils/appError");
 const handleSuccess = require("../utils/handleSuccess");
@@ -27,7 +27,7 @@ const memberController = {
 
         // 取得會員資料
         const member = await Member.findById(memberId)
-            .select("nickname name gender birthday phone interests point").lean();
+            .select("nickname account name gender birthday phone interests point").lean();
 
         // 取得會員收藏總數
         const collections = await Collection
@@ -54,13 +54,27 @@ const memberController = {
 
         member.completedCourseCount = courses.length;
 
-        handleSuccess(res, member, "取得會員資料成功");
+        const rtnData = {
+            email: member.account || "",
+            name: member.name || "",
+            nickname: member.nickname || "",
+            gender: member.gender || "",
+            birthday: member.birthday || "",
+            phone: member.phone || "",
+            interests: member.interests || [],
+            point: member.point || 0,
+            photo: member.photo || "",
+            collectionCount: collectionCount,
+            completedCourseCount: courses.length
+        }
+
+        handleSuccess(res, rtnData, "取得會員資料成功");
     },
 
     // 取得會員收藏
     getMemberCollections: async (req, res, next) => {
         const memberId = req.user.id;
-        const courseTerm = req.query.courseTerm;
+        // let { courseTerm, pageNo, pageSize } = req.query;
 
         // 取得會員收藏
         // let collections = await Collection
@@ -73,9 +87,16 @@ const memberController = {
         //     .select("courseId createdAt")
         //     .lean();
 
+        // 分頁查詢 (預設第 1 頁，每頁 100 筆)
+        // pageNo = parseInt(pageNo) || 1;
+        // pageSize = parseInt(pageSize) || 100;
+        // let skip = (pageNo - 1) * pageSize;
+        // let limit = pageSize;
+
         // 查詢條件
         let memberIdObject = new mongoose.Types.ObjectId(memberId);
         let queryField = { memberId: memberIdObject };
+
         let collections = await Collection.aggregate([
             {
                 $match: queryField
@@ -90,6 +111,9 @@ const memberController = {
             },
             { $unwind: "$course" },
             {
+                $match: { "course.courseStatus": 1 } // 只取得上架課程
+            },
+            {
                 $lookup: {
                     from: "vendors",
                     localField: "course.vendorId",
@@ -98,6 +122,15 @@ const memberController = {
                 },
             },
             { $unwind: "$vendor" },
+            // {
+            //     $lookup: {
+            //         from: "courseComments",
+            //         localField: "courseId",
+            //         foreignField: "courseId",
+            //         as: "comment"
+            //     }
+            // },
+            // { $unwind: "$comment" },
             {
                 $project: {
                     courseId: 1,
@@ -110,16 +143,19 @@ const memberController = {
                     courseStatus: "$course.courseStatus",
                     coursePrice: "$course.coursePrice"
                 }
-            }
+            },
+            { $sort: { createdAt: -1 } },
+            // { $skip: skip },
+            // { $limit: limit }
         ])
 
         // 加入課程時長條件
-        if (courseTerm) {
-            if (!["0", "1"].includes(courseTerm)) {
-                return next(appError(400, 'courseTerm 須為 0:體驗課程 或 1:培訓課程'));
-            }
-            collections = collections.filter((collection) => collection.courseTerm === parseInt(courseTerm));
-        }
+        // if (courseTerm) {
+        //     if (!["0", "1"].includes(courseTerm)) {
+        //         return next(appError(400, 'courseTerm 須為 0:體驗課程 或 1:培訓課程'));
+        //     }
+        //     collections = collections.filter((collection) => collection.courseTerm === parseInt(courseTerm));
+        // }
 
         handleSuccess(res, collections, "取得會員收藏成功");
     },
@@ -181,42 +217,69 @@ const memberController = {
         handleSuccess(res, null, "刪除收藏成功");
     },
 
-    // 取得會員訂單
+    // 取得會員訂單 
     getMemberOrders: async (req, res, next) => {
         const memberId = req.user.id;
-        const { paidStatus, courseTerm, createAt } = req.query;
+        // let { courseTerm, pageNo, pageSize, createAt } = req.query;
 
         // 查詢條件
-        const queryField = { memberId: memberId };
+        let memberIdObject = new mongoose.Types.ObjectId(memberId);
+        let queryField = { memberId: memberIdObject };
 
         // 加入訂單狀態條件
-        if (paidStatus) {
-            // 驗證paidStatus值
-            if (!["0", "1", "2", "3", "4", "5", "6"].includes(paidStatus)) {
-                return next(appError(400, 'paidStatus 須為 0, 1, 2, 3, 4, 5, 6'));
-            }
-            queryField.paidStatus = paidStatus;
-        }
+        // if (paidStatus) {
+        //     // 驗證paidStatus值
+        //     if (!["0", "1", "2", "3", "4"].includes(paidStatus)) {
+        //         return next(appError(400, 'paidStatus 須為 0, 1, 2, 3, 4'));
+        //     }
+
+        //     if(paidStatus === "4") {
+        //         queryField.paidStatus = { $in: [4, 5, 6, 7] }
+        //     }
+        //     else {
+        //         queryField.paidStatus = parseInt(paidStatus);
+        //     }
+        // }
 
         // 加入課程時長條件
-        if (courseTerm) {
-            if (!["0", "1".includes(courseTerm)]) {
-                return next(appError(400, 'courseTerm 須為 0:體驗課程 或 1:培訓課程'));
-            }
-            queryField.courseTerm = courseTerm;
-        }
+        // if (courseTerm) {
+        //     if (!["0", "1".includes(courseTerm)]) {
+        //         return next(appError(400, 'courseTerm 須為 0:體驗課程 或 1:培訓課程'));
+        //     }
+        //     queryField.courseTerm = parseInt(courseTerm);
+        // }
+
+        // 分頁查詢 (預設第 1 頁，每頁 100 筆)
+        // pageNo = parseInt(pageNo) || 1;
+        // pageSize = parseInt(pageSize) || 100;
+        // let skip = (pageNo - 1) * pageSize;
+        // let limit = pageSize;
 
         // 加入排序條件。預設為創建日期新到舊
-        const sortByCreateAt = createAt === "asc" ? 1 : -1;
+        // let sortByCreateAt = createAt === "asc" ? 1 : -1;
 
         const orders = await Order
             .find(queryField)
             .populate({
                 path: "courseId",
-                select: "courseId coursePrice courseTerm"
+                select: "coursePrice courseTerm courseImage"
             })
-            .sort({ createdAt: sortByCreateAt })
-            .select("courseId courseName brandName count coursePrice totalPrice paidStatus createdAt");
+            .sort({ createdAt: -1 })
+            // .skip(skip)
+            // .limit(limit)
+            .select("courseId courseName brandName count totalPrice paidStatus createdAt")
+            .lean();
+
+            console.log(orders);
+
+        // 取得會員評論
+        const memberComments = await CourseComment.find({ memberId: memberId });
+
+        // 檢查是否有評論過
+        orders.forEach((order) => {
+            const comment = memberComments.find((comment) => comment.orderId.toString() === order._id.toString());
+            order.commentId = comment ? comment._id : null;
+        })
 
         handleSuccess(res, orders, "取得會員訂單成功");
     },

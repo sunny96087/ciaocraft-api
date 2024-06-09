@@ -68,11 +68,6 @@ router.get(
     /*  #swagger.tags = ['Members-front']
         #swagger.summary = '取得登入會員收藏'
         #swagger.description = '取得登入會員收藏'
-        #swagger.parameters['courseTerm'] = {
-            in: 'query',
-            description: '課程時長；0:體驗課程 1:培訓課程',
-            type: 'string'
-        }
     */
 );
 
@@ -117,12 +112,8 @@ router.get(
     handleErrorAsync(memberController.getMemberOrders)
     /*  #swagger.tags = ['Members-front']
         #swagger.summary = '取得登入會員全部訂單'
-        #swagger.description = '取得登入會員全部訂單'
-        #swagger.parameters['status'] = {
-            in: 'query',
-            description: '訂單狀態；0:未付款, 1:已付款, 2:已確認收款, 3:已完成, 4:已取消, 5:訂單取消(不需退款), 6:訂單取消(待退款), 7:訂單取消(已退款)',
-            type: 'string'
-        }
+        #swagger.description = `取得登入會員全部訂單 <br>
+                                訂單狀態；0:未付款, 1:已付款, 2:已確認收款, 3:已完成, 4:已取消, 5:訂單取消(不需退款), 6:訂單取消(待退款), 7:訂單取消(已退款)`
     */
 );
 
