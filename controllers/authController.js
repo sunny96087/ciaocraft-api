@@ -237,7 +237,6 @@ const authController = {
     googleLoginCallback: async (req, res, next) => {
         // Successful authentication, redirect home.
         let member = await Member.findOne({ googleId: req.user.sub });
-
         if (!member) {
             member = await Member.create({
                 googleId: req.user.sub,
@@ -249,10 +248,7 @@ const authController = {
             if (!member) {
                 return next(appError(500, 'Google 登入失敗'));
             }
-            console.log('CreateMember', member) 
         }
-       
-        console.log('member', member) 
 
         // 產生 token 並加入 cookie
         const token = generateJWT(member);
@@ -262,7 +258,7 @@ const authController = {
             res.redirect(`http://localhost:3000/SSOLogin?user=${token}&memberId=${member._id}&photo=${member.photo}&name=${member.name}`);
         }
         else {
-            res.redirect('https://ciaocraft-website.vercel.app/SSOLogin/?user=${token}');
+            res.redirect(`https://ciaocraft-website.vercel.app/SSOLogin?user=${token}&memberId=${member._id}&photo=${member.photo}&name=${member.name}`);
         }
     },
 
