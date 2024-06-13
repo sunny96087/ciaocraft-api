@@ -254,12 +254,12 @@ const authController = {
         const token = generateJWT(member);
 
         // 重導至首頁
-        if (process.env.NODE_ENV.trim() === 'dev') {
-            res.redirect(`http://localhost:3000/SSOLogin?user=${token}&memberId=${member._id}&photo=${member.photo}&name=${member.name}`);
-        }
-        else {
-            res.redirect(`https://ciaocraft-website.vercel.app/SSOLogin?user=${token}&memberId=${member._id}&photo=${member.photo}&name=${member.name}`);
-        }
+        // if (process.env.NODE_ENV.trim() === 'dev') {
+        //     res.redirect(`http://localhost:3000/SSOLogin?user=${token}&memberId=${member._id}&photo=${member.photo}&name=${member.name}`);
+        // }
+        // else {
+            // }
+        res.redirect(`https://ciaocraft-website.vercel.app/SSOLogin?user=${token}&memberId=${member._id}&photo=${member.photo}&name=${member.name}`);
     },
 
     // 取消連結 Google 帳號
