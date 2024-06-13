@@ -27,7 +27,7 @@ const memberController = {
 
         // 取得會員資料
         const member = await Member.findById(memberId)
-            .select("nickname account name gender birthday phone interests point").lean();
+            .select("nickname account name photo gender birthday phone interests point").lean();
 
         // 取得會員收藏總數
         const collections = await Collection
@@ -53,7 +53,7 @@ const memberController = {
             .distinct("courseId");
 
         member.completedCourseCount = courses.length;
-
+console.log(member)
         const rtnData = {
             email: member.account || "",
             name: member.name || "",

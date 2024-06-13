@@ -80,7 +80,6 @@ const authController = {
 
     // 會員登入
     login: async (req, res, next) => {
-        console.log('login')
         let { account, password } = req.body;
 
         // 驗證必填欄位
@@ -253,13 +252,8 @@ const authController = {
         // 產生 token 並加入 cookie
         const token = generateJWT(member);
 
-        // 重導至首頁
-        // if (process.env.NODE_ENV.trim() === 'dev') {
-        //     res.redirect(`http://localhost:3000/SSOLogin?user=${token}&memberId=${member._id}&photo=${member.photo}&name=${member.name}`);
-        // }
-        // else {
-            // }
-        res.redirect(`https://ciaocraft-website.vercel.app/SSOLogin?user=${token}&memberId=${member._id}&photo=${member.photo}&name=${member.name}`);
+        // res.redirect(`http://localhost:3000/SSOLogin?user=${token}&memberId=${member._id}`);
+        res.redirect(`https://ciaocraft-website.vercel.app/SSOLogin?user=${token}&memberId=${member._id}`);
     },
 
     // 取消連結 Google 帳號

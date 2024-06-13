@@ -1756,22 +1756,6 @@
         ],
         "summary": "Google 登入",
         "description": "Google 登入",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "googleToken": {
-                  "type": "string",
-                  "example": ""
-                }
-              }
-            }
-          }
-        ],
         "responses": {
           "default": {
             "description": ""
@@ -1800,22 +1784,6 @@
         ],
         "summary": "Google 帳號綁定",
         "description": "Google 帳號綁定",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "googleToken": {
-                  "type": "string",
-                  "example": "Google 登入 token"
-                }
-              }
-            }
-          }
-        ],
         "responses": {
           "default": {
             "description": ""

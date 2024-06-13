@@ -10,6 +10,7 @@ passport.use(new GoogleStrategy(
   {
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    // callbackURL: "http://localhost:3666/auth/google/callback"
     callbackURL: "https://ciaocraft-api.onrender.com/auth/google/callback"
   },
   (accessToken, refreshToken, profile, cb) => cb(null, profile._json)
@@ -116,7 +117,8 @@ router.get(
 
 router.get(
   "/google/callback",
-  passport.authenticate("google", { failureRedirect: 'https://ciaocraft-website.vercel.app', session: false}),
+  passport.authenticate("google", { failureRedirect: 'https://ciaocraft-website.vercel.app', session: false }),
+  // passport.authenticate("google", { failureRedirect: 'http://localhost:3000', session: false }),
   handleErrorAsync(authController.googleLoginCallback)
   /** 
     #swagger.tags = ['Auth-front']
@@ -132,13 +134,6 @@ router.post(
     #swagger.tags = ['Auth-front']
     #swagger.summary = 'Google 帳號綁定'
     #swagger.description = 'Google 帳號綁定'
-    #swagger.parameters['body'] = {
-      in: 'body',
-      required: true,
-      schema: {
-        googleToken: 'Google 登入 token'
-      }
-    }
   */
 );
 
