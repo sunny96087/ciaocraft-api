@@ -116,7 +116,7 @@ router.get(
 
 router.get(
   "/google/callback",
-  passport.authenticate("google", { failureRedirect: 'https://https://ciaocraft-website.vercel.app', session: false}),
+  passport.authenticate("google", { failureRedirect: 'https://ciaocraft-website.vercel.app', session: false}),
   handleErrorAsync(authController.googleLoginCallback)
   /** 
     #swagger.tags = ['Auth-front']
