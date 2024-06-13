@@ -10,7 +10,7 @@ passport.use(new GoogleStrategy(
   {
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "http://127.0.0.1:3666/auth/google/callback"
+    callbackURL: "https://ciaocraft-api.onrender.com/auth/google/callback"
   },
   (accessToken, refreshToken, profile, cb) => cb(null, profile._json)
 ));
@@ -116,7 +116,7 @@ router.get(
 
 router.get(
   "/google/callback",
-  passport.authenticate("google", { failureRedirect: 'https://https://ciaocraft-website.vercel.app/', session: false}),
+  passport.authenticate("google", { failureRedirect: 'https://https://ciaocraft-website.vercel.app', session: false}),
   handleErrorAsync(authController.googleLoginCallback)
   /** 
     #swagger.tags = ['Auth-front']
