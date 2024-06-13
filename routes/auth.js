@@ -111,19 +111,12 @@ router.get(
     #swagger.tags = ['Auth-front']
     #swagger.summary = 'Google 登入'
     #swagger.description = 'Google 登入'
-    #swagger.parameters['body'] = {
-      in: 'body',
-      required: true,
-      schema: {
-          googleToken: ""
-      }
-    }
   */
 );
 
 router.get(
   "/google/callback",
-  passport.authenticate("google", { failureRedirect: 'http://localhost:3000', session: false}),
+  passport.authenticate("google", { failureRedirect: 'https://https://ciaocraft-website.vercel.app/', session: false}),
   handleErrorAsync(authController.googleLoginCallback)
   /** 
     #swagger.tags = ['Auth-front']
