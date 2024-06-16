@@ -145,7 +145,8 @@ const authController = {
         const resetTokenExpires = new Date(Date.now() + 3600000); // 1 小時
 
         // 寄送重設密碼郵件
-        const resetPasswordUrl = `https://ciaocraft-website.vercel.app/resetMemberPassword?token=${hashedToken}`;
+        const resetPasswordUrl = `https://ciaocraft-website.vercel.app/member/forgetPwd?token=${hashedToken}`;
+        // const resetPasswordUrl = `http://localhost:3000/member/forgetPwd?token=${hashedToken}`;
 
         // 更新資料庫中的 token
         await Member.findByIdAndUpdate(member._id, {
@@ -210,10 +211,12 @@ const authController = {
             return next(appError(400, "密碼不一致！"));
         }
 
+        const now = new Date();
+
         // 檢查 token 是否有效
         const member = await Member.findOne({
             resetPasswordToken: token,
-            resetPasswordExpires: { $gt: Date.now() },
+            resetPasswordExpires: { $gt: now },
         });
 
         if (!member) {
