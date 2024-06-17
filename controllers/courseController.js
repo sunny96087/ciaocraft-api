@@ -290,6 +290,7 @@ const courseController = {
             brandName: "$vendor.brandName",
             courseType: 1,
             courseTerm: 1,
+            courseImage: 1,
             coursePrice: 1,
             createdAt: 1
           }
@@ -333,6 +334,7 @@ const courseController = {
             brandName: "$vendor.brandName",
             courseType: 1,
             courseTerm: 1,
+            courseImage: 1,
             coursePrice: 1,
             orderCount: {
               $size: {
@@ -391,6 +393,7 @@ const courseController = {
             brandName: { $first: "$vendor.brandName" },
             courseType: { $first: "$courseType" },
             courseTerm: { $first: "$courseTerm" },
+            courseImage: { $first: "$courseImage" },
             coursePrice: { $first: "$coursePrice" },
             averageRate: {
               $avg: {
@@ -412,6 +415,7 @@ const courseController = {
             brandName: 1,
             courseType: 1,
             courseTerm: 1,
+            courseImage: 1,
             coursePrice: 1,
             averageRate: 1,
             commentCount: 1,
