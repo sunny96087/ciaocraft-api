@@ -148,6 +148,21 @@ router.post(
   */
 );
 
+router.get("/checkGoogleAccountExist/:googleId",
+  isAuth,
+  handleErrorAsync(authController.checkGoogleAccountExist));
+/*
+  #swagger.tags = ['Auth-front']
+  #swagger.summary = '檢查 Google 帳號是否已綁定'
+  #swagger.description = '檢查 Google 帳號是否已綁定'
+  #swagger.parameters['googleId'] = {
+    in: 'path',
+    description: 'googleId',
+    required: true,
+    type: 'string'
+  }
+*/
+
 router.get(
   '/login',
   (req, res) => {

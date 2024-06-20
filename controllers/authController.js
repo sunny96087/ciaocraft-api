@@ -235,14 +235,14 @@ const authController = {
         generateSendJWT(member, 200, res, "重設密碼成功");
     },
 
-
     googleLoginCallback: async (req, res, next) => {
         // Successful authentication, redirect home.
         let member = await Member.findOne({ googleId: req.user.sub });
         if (!member) {
             member = await Member.create({
                 googleId: req.user.sub,
-                account: req.user.email,
+                googleAccount: req.user.email,
+                account: '',
                 name: req.user.name,
                 photo: req.user.picture,
             });
@@ -251,7 +251,6 @@ const authController = {
                 return next(appError(500, 'Google 登入失敗'));
             }
         }
-
         // 產生 token 並加入 cookie
         const token = generateJWT(member);
 
@@ -264,7 +263,7 @@ const authController = {
         const memeberId = req.user.id;
 
         // 清除 googleId
-        const member = await Member.findByIdAndUpdate(memeberId, { googleId: null, });
+        const member = await Member.findByIdAndUpdate(memeberId, { googleId: null, googleAccount: null });
 
         if (!member) {
             return next(appError(500, '取消連結 Google 帳號失敗'));
@@ -272,6 +271,23 @@ const authController = {
 
         handleSuccess(res, member, '取消連結 Google 帳號成功');
     },
+
+    checkGoogleAccountExist: async (req, res, next) => {
+        let { googleId } = req.params;
+
+        // 驗證必填欄位
+        if (!googleId) {
+            return next(appError(400, 'googleId 為必填'));
+        }
+
+        // 檢查帳號是否已存在
+        const isGoogleIdExist = await Member.findOne({ googleId: googleId });
+        if (isGoogleIdExist) {
+            return next(appError(400, '此 Google 帳號已綁定其他會員帳號'));
+        }
+
+        handleSuccess(res, isGoogleIdExist, '此 Google 帳號可以使用');
+    }
 };
 
 module.exports = authController;

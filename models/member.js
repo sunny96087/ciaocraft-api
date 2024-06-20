@@ -5,6 +5,10 @@ const memberSchema = new mongoose.Schema(
             type: String,
             unique: true,
         },
+        googleAccount:{
+            type: String,
+            unique: true,
+        },
         account: {
             type: String,
             unique: true,

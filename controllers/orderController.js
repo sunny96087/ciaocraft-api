@@ -357,27 +357,31 @@ const orderController = {
     const memberId = req.user.id;
     const orderId = req.params.orderId;
 
+
+    // 驗證 courseId 格式和是否存在
+    const isValidOrderId = await tools.findModelByIdNext(
+      Order,
+      orderId,
+      next
+    );
+    if (!isValidOrderId) {
+      return;
+    }
+
     // 檢查訂單是否存在
     const order = await Order.findOne({ _id: orderId, memberId: memberId })
       .populate({
         path: "vendorId",
-        select: "bankName bankCode bankBranch bankAccountName bankAccount",
+        select: "representative bankName bankCode bankBranch bankAccountName bankAccount",
       })
       .populate({
         path: "commentId",
         select: "content images tags rating likes createdAt",
       })
-      .select(
-        `_id memberId vendorId courseId courseItemId commentId
-                brandName courseLocation 
-                paymentType paidStatus 
-                count price totalPrice 
-                startTime endTime note 
-                confirmTime refundTime
-                cancelTime cancelReason 
-                createdAt`
-      )
-      .lean();
+      .populate({
+        path: "courseId",
+        select: "courseLocation courseAddress courseImage",
+      });
 
     if (!order) {
       return next(appError(400, "會員無此訂單資料"));

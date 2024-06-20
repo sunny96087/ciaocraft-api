@@ -1812,6 +1812,29 @@
         }
       }
     },
+    "/auth/checkGoogleAccountExist/{googleId}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "googleId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "token",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/auth/login": {
       "get": {
         "description": "",

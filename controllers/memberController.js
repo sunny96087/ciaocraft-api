@@ -27,7 +27,7 @@ const memberController = {
 
         // 取得會員資料
         const member = await Member.findById(memberId)
-            .select("nickname account name photo gender birthday phone interests point").lean();
+            .select("nickname account name photo gender birthday phone interests point googleId googleAccount").lean();
 
         // 取得會員收藏總數
         const collections = await Collection
@@ -65,7 +65,9 @@ console.log(member)
             point: member.point || 0,
             photo: member.photo || "",
             collectionCount: collectionCount,
-            completedCourseCount: courses.length
+            completedCourseCount: courses.length,
+            googleId: member.googleId || null,
+            googleAccount: member.googleAccount || null
         }
 
         handleSuccess(res, rtnData, "取得會員資料成功");
