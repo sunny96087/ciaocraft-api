@@ -15,6 +15,7 @@ const {
 } = require("../models/course");
 const Order = require("../models/order");
 const Member = require("../models/member");
+const Teacher = require("../models/teacher");
 
 const nodemailer = require("nodemailer");
 const { google } = require("googleapis");
@@ -945,6 +946,8 @@ const vendorController = {
   getVendor: async function (req, res, next) {
     const vendorId = req.params.vendorId;
 
+    let { courseTerm, courseType, sortBy, pageNo, pageSize } = req.query;
+
     const vendor = await Vendor.findById(vendorId).select(
       "-reviewLinks -reviewBrief -reviewImages -status -createdAt -updatedAt -__v"
     );
@@ -952,23 +955,230 @@ const vendorController = {
       return next(appError(400, "找不到該賣家"));
     }
 
-    // 計算學員數
-    const students = await Course.find({ vendorId: vendorId });
-    const studentCount = students.reduce((acc, course) => {
-      return acc + course.students.length;
-    }, 0);
+    // ? 取得課程
 
-    // 取得全部課程
-    const courses = await Course.find({ vendorId: vendorId });
+    // 建立查詢條件；預設顯示狀態為 0 或 1 的課程
+    let queryField = { courseStatus: { $in: [0, 1] } };
+
+    // 課程類型(Array)查詢
+    if (courseType) {
+      queryField.courseType = { $in: courseType.split(",") };
+    }
+
+    // 選擇課程時長類型 (0:單堂體驗 1:培訓課程)
+    if (courseTerm) {
+      courseTerm = parseInt(courseTerm);
+      queryField.courseTerm = courseTerm;
+    }
+
+    // 分頁查詢 (預設第 1 頁，每頁 100 筆)
+    pageNo = parseInt(pageNo) || 1;
+    pageSize = parseInt(pageSize) || 100;
+    let skip = (pageNo - 1) * pageSize;
+    let limit = pageSize;
+
+    // 課程
+    let courses = [];
+
+    // 排序查詢 (預設依照最新時間排序)
+    sortBy = sortBy || "newest";
+    if (sortBy === "newest") {
+      // 依照最新時間排序
+      courses = await Course.aggregate([
+        { $match: queryField },
+        {
+          $lookup: {
+            from: "vendors",
+            localField: "vendorId",
+            foreignField: "_id",
+            as: "vendor",
+          },
+        },
+        { $unwind: "$vendor" },
+        {
+          $project: {
+            courseName: 1,
+            brandName: "$vendor.brandName",
+            courseType: 1,
+            courseTerm: 1,
+            courseImage: 1,
+            coursePrice: 1,
+            createdAt: 1,
+          },
+        },
+        { $sort: { createdAt: -1 } },
+        { $skip: skip },
+        { $limit: limit },
+      ]);
+    } else if (sortBy === "mostPopular") {
+      // 依照訂單被預訂數量 status=3(已完課) -> 收藏數量 -> 最新時間
+      courses = await Course.aggregate([
+        { $match: queryField },
+        {
+          $lookup: {
+            from: "vendors",
+            localField: "vendorId",
+            foreignField: "_id",
+            as: "vendor",
+          },
+        },
+        { $unwind: "$vendor" },
+        {
+          $lookup: {
+            from: "orders",
+            localField: "_id",
+            foreignField: "courseId",
+            as: "orders",
+          },
+        },
+        {
+          $lookup: {
+            from: "collections",
+            localField: "_id",
+            foreignField: "courseId",
+            as: "collections",
+          },
+        },
+        {
+          $project: {
+            courseName: 1,
+            brandName: "$vendor.brandName",
+            courseType: 1,
+            courseTerm: 1,
+            courseImage: 1,
+            coursePrice: 1,
+            orderCount: {
+              $size: {
+                $filter: {
+                  input: "$orders",
+                  as: "order",
+                  cond: { $eq: ["$$order.status", 3] }, // order=3(已完課)
+                },
+              },
+            },
+            collectionCount: { $size: "$collections" },
+            createdAt: 1,
+          },
+        },
+        {
+          $sort: { orderCount: -1, collectionCount: -1, createdAt: -1 },
+        },
+        { $skip: skip },
+        { $limit: limit },
+      ]);
+    } else if (sortBy === "highestRate") {
+      // 依照評價高低 -> 評論數最多 -> 最新上架時間
+      courses = await Course.aggregate([
+        {
+          $match: queryField,
+        },
+        {
+          $lookup: {
+            from: "vendors",
+            localField: "vendorId",
+            foreignField: "_id",
+            as: "vendor",
+          },
+        },
+        {
+          $unwind: "$vendor",
+        },
+        {
+          $lookup: {
+            from: "coursecomments",
+            localField: "_id",
+            foreignField: "courseId",
+            as: "comments",
+          },
+        },
+        {
+          $unwind: {
+            path: "$comments",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $group: {
+            _id: "$_id",
+            courseName: { $first: "$courseName" },
+            brandName: { $first: "$vendor.brandName" },
+            courseType: { $first: "$courseType" },
+            courseTerm: { $first: "$courseTerm" },
+            courseImage: { $first: "$courseImage" },
+            coursePrice: { $first: "$coursePrice" },
+            averageRate: {
+              $avg: {
+                $cond: [
+                  { $ifNull: ["$comments.rating", false] },
+                  "$comments.rating",
+                  0,
+                ],
+              },
+            },
+            commentCount: {
+              $sum: { $cond: [{ $ifNull: ["$comments._id", false] }, 1, 0] },
+            },
+            createdAt: { $first: "$createdAt" },
+          },
+        },
+        { $sort: { averageRate: -1, commentCount: -1, createdAt: -1 } },
+        { $skip: skip },
+        { $limit: limit },
+        {
+          $project: {
+            courseName: 1,
+            brandName: 1,
+            courseType: 1,
+            courseTerm: 1,
+            courseImage: 1,
+            coursePrice: 1,
+            averageRate: 1,
+            commentCount: 1,
+            createdAt: 1,
+          },
+        },
+      ]);
+    } else {
+      return next(appError(400, "無效的排序方式"));
+    }
+
+    // ? 計算學員數 > 計算該賣家的訂單總數
+    const orders = await Order.find({ vendorId: vendorId });
+    const totalStudentCount = orders.reduce(
+      (acc, order) => acc + order.count,
+      0
+    );
 
     // 取得師資
-    const teachers = await Course.find({ vendorId: vendorId }).populate(
-      "teacherId"
+    const teachers = await Teacher.find({ vendorId: vendorId });
+
+    // ? 取得平均評分
+    // 1. 查詢該賣家的所有課程 ID
+    const courseAllId = await Course.find({ vendorId: vendorId }).select("_id");
+    const courseIds = courseAllId.map((course) => course._id);
+
+    // 2. 使用課程 ID 查詢所有相關的評論
+    const comments = await CourseComment.find({ courseId: { $in: courseIds } });
+
+    // ? 獲得評論數量
+    const commentCount = comments.length;
+
+    // 3. 處理評論資料，例如計算總和或平均值
+    // 這裡以計算平均評分為例
+    const totalRating = comments.reduce(
+      (acc, comment) => acc + comment.rating,
+      0
     );
+    const averageRating =
+      comments.length > 0 ? totalRating / comments.length : 0;
+
+    // console.log(averageRating); // 輸出平均評分
 
     const data = {
       vendor,
-      studentCount,
+      totalStudentCount,
+      averageRating,
+      commentCount,
       courses,
       teachers,
     };
