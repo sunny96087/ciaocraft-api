@@ -101,12 +101,24 @@ const teacherController = {
     }
 
     const teacher = await Teacher.findById(id)
-      .populate("courseId")
-      .populate("vendorId");
+    .populate("vendorId")
+    .populate({
+      path: "courseId",
+      match: { courseStatus: 1 } // 只包含 courseStatus 為 1 的課程
+    })
+    .exec();
+  
     if (!teacher) {
       return next(appError(400, "找不到老師"));
     }
-    handleSuccess(res, teacher);
+    
+    // 嘗試找到符合條件的課程，但不影響主要查詢結果
+    // const courses = await Course.find({ teacherId: id, courseStatus: 1 });
+    
+    // 將找到的課程附加到老師資料上，即使沒有找到課程也不影響回傳老師資料
+    // teacher.courses = courses;
+
+    handleSuccess(res, teacher, "取得老師資料成功");
   },
 
   // ? 取得單筆老師資料 (Back)

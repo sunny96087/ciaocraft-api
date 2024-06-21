@@ -958,7 +958,7 @@ const vendorController = {
     // ? 取得課程
 
     // 建立查詢條件；預設顯示狀態為 0 或 1 的課程
-    let queryField = { courseStatus: { $in: [0, 1] } };
+    let queryField = { courseStatus: { $in: [1] } };
 
     // 課程類型(Array)查詢
     if (courseType) {
