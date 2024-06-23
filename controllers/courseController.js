@@ -241,8 +241,8 @@ const courseController = {
   getCourses: async (req, res, next) => {
     let { keyword, courseTerm, courseType, sortBy, pageNo, pageSize } = req.query;
 
-    // 建立查詢條件；預設顯示狀態為 0 或 1 的課程
-    let queryField = { courseStatus: { $in: [0, 1] } };
+    // 建立查詢條件；預設顯示狀態為 1 (上架中) 的課程
+    let queryField = { courseStatus: { $in: [1] } };
 
     // 關鍵字查詢
     if (keyword) {

@@ -91,17 +91,19 @@ router.post(
 
 // 刪除登入會員收藏
 router.delete(
-    "/memberOne/collections/:collectionId",
+    "/memberOne/collections",
     isAuth,
     handleErrorAsync(memberController.deleteMemberCollection)
     /*  #swagger.tags = ['Members-front']
         #swagger.summary = '會員刪除收藏'
         #swagger.description = '會員刪除收藏'
-        #swagger.parameters['collectionId'] = {
-            in: 'path',
+        #swagger.parameters['body'] = {
+            in: 'body',
             required: true,
-            type: 'string'
-        }
+            schema: {
+                $courseId: "帶入有效課程 Id"
+            }
+       }
     */
 )
 

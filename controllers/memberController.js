@@ -196,22 +196,23 @@ console.log(member)
     // 刪除會員收藏
     deleteMemberCollection: async (req, res, next) => {
         const memberId = req.user.id;
-        const collectionId = req.params.collectionId;
+        const courseId = req.body.courseId;
 
         // 驗證 collectionId 格式和是否存在
-        const isValidCollectionId = await tools.findModelByIdNext(Collection, collectionId, next);
+        const isValidCollectionId = await tools.findModelByIdNext(Course, courseId, next);
         if (!isValidCollectionId) {
             return;
         }
 
         // 檢查收藏是否為會員所有
-        const isCollectionExist = await Collection.findOne({ _id: collectionId, memberId: memberId });
+        const isCollectionExist = await Collection.findOne({ courseId: courseId, memberId: memberId });
+
         if (!isCollectionExist) {
             return next(appError(400, "會員無此收藏"));
         }
 
         // 刪除收藏
-        const deleteCollection = await Collection.findByIdAndDelete(collectionId);
+        const deleteCollection = await Collection.findByIdAndDelete(isCollectionExist._id);
         if (!deleteCollection) {
             return next(appError(400, "刪除收藏失敗"));
         }
