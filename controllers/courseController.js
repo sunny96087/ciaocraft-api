@@ -671,7 +671,7 @@ const courseController = {
       .populate({
         path: "vendorId",
         match: { status: 1 },
-        select: "brandName intro",
+        select: "brandName intro avatar",
       })
       .populate({
         path: "courseItemId",
@@ -752,7 +752,7 @@ const courseController = {
     const comments = await CourseComment.find({ courseId: courseId })
       .populate({
         path: "memberId",
-        select: "name",
+        select: "name photo",
       })
       .select("content images tags rating likes createAt");
 

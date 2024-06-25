@@ -53,7 +53,7 @@ const memberController = {
             .distinct("courseId");
 
         member.completedCourseCount = courses.length;
-console.log(member)
+        console.log(member)
         const rtnData = {
             email: member.account || "",
             name: member.name || "",
@@ -273,7 +273,6 @@ console.log(member)
             .select("courseId courseName brandName count totalPrice paidStatus createdAt")
             .lean();
 
-            console.log(orders);
 
         // 取得會員評論
         const memberComments = await CourseComment.find({ memberId: memberId });
@@ -284,6 +283,8 @@ console.log(member)
             order.commentId = comment ? comment._id : null;
         })
 
+        console.log(orders);
+        
         handleSuccess(res, orders, "取得會員訂單成功");
     },
 
