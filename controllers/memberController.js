@@ -136,6 +136,7 @@ const memberController = {
             {
                 $project: {
                     courseId: 1,
+                    vendorId: "$vendor._id",
                     createdAt: 1,
                     brandName: "$vendor.brandName",
                     courseName: "$course.courseName",
@@ -223,43 +224,10 @@ const memberController = {
     // 取得會員訂單 
     getMemberOrders: async (req, res, next) => {
         const memberId = req.user.id;
-        // let { courseTerm, pageNo, pageSize, createAt } = req.query;
 
         // 查詢條件
         let memberIdObject = new mongoose.Types.ObjectId(memberId);
         let queryField = { memberId: memberIdObject };
-
-        // 加入訂單狀態條件
-        // if (paidStatus) {
-        //     // 驗證paidStatus值
-        //     if (!["0", "1", "2", "3", "4"].includes(paidStatus)) {
-        //         return next(appError(400, 'paidStatus 須為 0, 1, 2, 3, 4'));
-        //     }
-
-        //     if(paidStatus === "4") {
-        //         queryField.paidStatus = { $in: [4, 5, 6, 7] }
-        //     }
-        //     else {
-        //         queryField.paidStatus = parseInt(paidStatus);
-        //     }
-        // }
-
-        // 加入課程時長條件
-        // if (courseTerm) {
-        //     if (!["0", "1".includes(courseTerm)]) {
-        //         return next(appError(400, 'courseTerm 須為 0:體驗課程 或 1:培訓課程'));
-        //     }
-        //     queryField.courseTerm = parseInt(courseTerm);
-        // }
-
-        // 分頁查詢 (預設第 1 頁，每頁 100 筆)
-        // pageNo = parseInt(pageNo) || 1;
-        // pageSize = parseInt(pageSize) || 100;
-        // let skip = (pageNo - 1) * pageSize;
-        // let limit = pageSize;
-
-        // 加入排序條件。預設為創建日期新到舊
-        // let sortByCreateAt = createAt === "asc" ? 1 : -1;
 
         const orders = await Order
             .find(queryField)
@@ -270,9 +238,8 @@ const memberController = {
             .sort({ createdAt: -1 })
             // .skip(skip)
             // .limit(limit)
-            .select("courseId courseName brandName count totalPrice paidStatus createdAt")
+            .select("vendorId courseId courseName brandName count totalPrice paidStatus createdAt")
             .lean();
-
 
         // 取得會員評論
         const memberComments = await CourseComment.find({ memberId: memberId });
@@ -283,8 +250,6 @@ const memberController = {
             order.commentId = comment ? comment._id : null;
         })
 
-        console.log(orders);
-        
         handleSuccess(res, orders, "取得會員訂單成功");
     },
 
