@@ -3534,6 +3534,7 @@
               "required": [
                 "courseId",
                 "vendorId",
+                "memberId",
                 "ipAddress"
               ]
             }

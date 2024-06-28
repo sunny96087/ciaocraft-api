@@ -938,16 +938,37 @@ const courseController = {
   newClickLog: async (req, res, next) => {
     const { courseId, vendorId, memberId, ipAddress } = req.body;
 
+    if(!courseId || !vendorId || !ipAddress) {
+      return next(appError(400, "courseId, vendorId, ipAddress, memberId 為必填欄位"));
+    }
+
     // 驗證 courseId 格式和是否存在
     const isValidCourseId = await tools.findModelByIdNext(Course, courseId, next);
     if (!isValidCourseId) {
       return;
     }
 
-    // 驗證 memberId 格式和是否存在
-    const isValidMemberId = await tools.findModelByIdNext(Member, memberId, next);
-    if (!isValidMemberId) {
+    const isValidVendorId = await tools.findModelByIdNext(Vendor, vendorId, next);
+    if (!isValidVendorId) {
       return;
+    }
+
+    const insertData = {
+      courseId: courseId,
+      vendorId: vendorId,
+      ipAddress: ipAddress
+    }
+
+    // 驗證 memberId 格式
+    if (memberId) {
+      const isValidMemberId = await tools.findModelByIdNext(Member, memberId, next);
+      if (!isValidMemberId) {
+        return;
+      }
+      else
+      {
+        insertData.memberId = memberId;
+      }
     }
 
     // 今日開始時間和結束時間
@@ -961,30 +982,25 @@ const courseController = {
       {
         courseId: courseId,
         vendorId: vendorId,
-        memberId: memberId,
+        memberId: memberId || null,
         ipAddress: ipAddress,
         createdAt: { $gte: startTime, $lte: endTime }
       },
       {
-        $setOnInsert: {
-          courseId: courseId,
-          memberId: memberId,
-          vendorId: vendorId,
-          ipAddress: ipAddress
-        }
+        $setOnInsert: insertData
       },
       {
-        new: true, 
+        new: true,
         upsert: true, // 如果查詢條件不存在，則新增一筆新的點擊紀錄
-        setDefaultsOnInsert: true 
+        setDefaultsOnInsert: true
       }
     );
 
-    if(newClickLog.createdAt === newClickLog.updatedAt) {
+    if (newClickLog.createdAt.toISOString() === newClickLog.updatedAt.toISOString()) {
       handleSuccess(res, newClickLog, "新增點擊紀錄成功");
     }
-    else{
-      handleSuccess(res, null, "點擊紀錄已存在，將更新 updatedAt");
+    else {
+      handleSuccess(res, null, "點擊紀錄已存在，僅更新 updatedAt 欄位");
     }
   }
 };
