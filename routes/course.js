@@ -400,7 +400,8 @@ router.post(
             schema: {
                 $courseId: '課程 ID',
                 $vendorId: '賣家 ID',
-                memberId: '會員 ID'
+                memberId: '會員 ID',
+                $ipAddress: 'ip 地址'
             }
         }
     */

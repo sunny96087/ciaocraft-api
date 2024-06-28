@@ -1861,7 +1861,7 @@
           "Members-front"
         ],
         "summary": "取得所有會員 (開發查詢用)",
-        "description": "取得所有會員資料 (方便開發查詢用) <br>  body 需帶入管理員密碼",
+        "description": "取得所有會員資料 (方便開發查詢用) <br>\r  body 需帶入管理員密碼",
         "parameters": [
           {
             "name": "body",
@@ -1914,7 +1914,7 @@
           "Members-front"
         ],
         "summary": "修改會員資料",
-        "description": "修改登入會員資料，只需帶入欲修改欄位 <br>  interests 陣列中可帶入值為: ['工藝手作','烹飪烘烤','藝術人文','生活品味'] <br>  gender 可帶入值為: male, female, other <br>  birthday 格式需為 Date 物件格式: YYYY-MM-DD、YYYY-MM-DD HH:mm:ss.SSS 等 <br>",
+        "description": "修改登入會員資料，只需帶入欲修改欄位 <br>\r  interests 陣列中可帶入值為: ['工藝手作','烹飪烘烤','藝術人文','生活品味'] <br>\r  gender 可帶入值為: male, female, other <br>\r  birthday 格式需為 Date 物件格式: YYYY-MM-DD、YYYY-MM-DD HH:mm:ss.SSS 等 <br>",
         "parameters": [
           {
             "name": "token",
@@ -2027,9 +2027,7 @@
             "description": ""
           }
         }
-      }
-    },
-    "/members/memberOne/collections/{collectionId}": {
+      },
       "delete": {
         "tags": [
           "Members-front"
@@ -2038,15 +2036,26 @@
         "description": "會員刪除收藏",
         "parameters": [
           {
-            "name": "collectionId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
             "name": "token",
             "in": "header",
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "courseId": {
+                  "type": "string",
+                  "example": "帶入有效課程 Id"
+                }
+              },
+              "required": [
+                "courseId"
+              ]
+            }
           }
         ],
         "responses": {
@@ -2062,7 +2071,7 @@
           "Members-front"
         ],
         "summary": "取得登入會員全部訂單",
-        "description": "取得登入會員全部訂單 <br>  訂單狀態；0:未付款, 1:已付款, 2:已確認收款, 3:已完成, 4:已取消, 5:訂單取消(不需退款), 6:訂單取消(待退款), 7:訂單取消(已退款)",
+        "description": "取得登入會員全部訂單 <br>\r  訂單狀態；0:未付款, 1:已付款, 2:已確認收款, 3:已完成, 4:已取消, 5:訂單取消(不需退款), 6:訂單取消(待退款), 7:訂單取消(已退款)",
         "parameters": [
           {
             "name": "token",
@@ -2083,7 +2092,7 @@
           "Members-front"
         ],
         "summary": "修改會員密碼",
-        "description": "修改會員密碼 <br>  newPassword: 新密碼需包含英文及數字，且至少 8 碼 <br>  confirmNewPassword: 確認新密碼 <br>",
+        "description": "修改會員密碼 <br>\r  newPassword: 新密碼需包含英文及數字，且至少 8 碼 <br>\r  confirmNewPassword: 確認新密碼 <br>",
         "parameters": [
           {
             "name": "token",
@@ -2238,7 +2247,7 @@
           "Orders-back"
         ],
         "summary": "修改訂單 (賣家確認收到款項) (Back)",
-        "description": "修改訂單 (賣家確認收到款項) (Back) <br>  paidStatus: 課程狀態 (int)；2: 已確認收到款, 5:訂單取消(不需退款), 6:訂單取消(待退款), 7:訂單取消(已退款) <br>  cancelReason: 5 || 6 要備註取消訂單原因",
+        "description": "修改訂單 (賣家確認收到款項) (Back) <br>\r  paidStatus: 課程狀態 (int)；2: 已確認收到款, 5:訂單取消(不需退款), 6:訂單取消(待退款), 7:訂單取消(已退款) <br>\r  cancelReason: 5 || 6 要備註取消訂單原因",
         "parameters": [
           {
             "name": "orderId",
@@ -2453,7 +2462,7 @@
           "Orders-front"
         ],
         "summary": "新增訂單",
-        "description": "新增訂單 <br>  vendorId: 賣家 ID <br>  courseId: 課程 ID <br>  courseItemId: 課程時段 ID <br>  brandName: 品牌名稱 (string) <br>  courseName: 課程名稱 (string)；ex. 培訓課格式: 2024-05-29 課程名稱, 體驗課格式: 2024-05-29 10:00 ~ 12:00 <br>  courseItemName: 課程時段名稱 (string) <br>  count: 購買數量 (int) <br>  price: 單價 (int) <br>  totalPrice: 總價 (int) <br>  courseLocation: 上課地點 (string) <br>  startTime: 上課時間 (string)；帶入 Date 物件格式 ex. 2024-05-29 10:00:00.000 <br>  endTime: 下課時間 (string)；帶入 Date 物件格式 ex. 2024-05-29 12:00:00.000 <br>  note: 備註 (string)",
+        "description": "新增訂單 <br>\r  vendorId: 賣家 ID <br>\r  courseId: 課程 ID <br>\r  courseItemId: 課程時段 ID <br>\r  brandName: 品牌名稱 (string) <br>\r  courseName: 課程名稱 (string)；ex. 培訓課格式: 2024-05-29 課程名稱, 體驗課格式: 2024-05-29 10:00 ~ 12:00 <br>\r  courseItemName: 課程時段名稱 (string) <br>\r  count: 購買數量 (int) <br>\r  price: 單價 (int) <br>\r  totalPrice: 總價 (int) <br>\r  courseLocation: 上課地點 (string) <br>\r  startTime: 上課時間 (string)；帶入 Date 物件格式 ex. 2024-05-29 10:00:00.000 <br>\r  endTime: 下課時間 (string)；帶入 Date 物件格式 ex. 2024-05-29 12:00:00.000 <br>\r  note: 備註 (string)",
         "parameters": [
           {
             "name": "token",
@@ -2702,7 +2711,7 @@
           "Platforms-manage"
         ],
         "summary": "修改平台資訊",
-        "description": "修改平台資訊，只需要帶入要修改的欄位， <br>  此資料將用於網頁顯示，不可為空值 <br>",
+        "description": "修改平台資訊，只需要帶入要修改的欄位， <br>\r  此資料將用於網頁顯示，不可為空值 <br>",
         "parameters": [
           {
             "name": "platformId",
@@ -2961,7 +2970,7 @@
           "Courses-front"
         ],
         "summary": "取得課程列表",
-        "description": "搜尋條件：可帶入「課程時長類型 (courseTerm)、課程類型 (courseType)、課程名稱關鍵字 (keyword)」篩選課程。 <br>  排序條件：sortBy 可帶入「newest (最近日期), mostPopular (最熱門), highestRate (評分最高)」；未選擇則預設 newest 方式排序。 <br>  分頁功能：可帶入頁碼 (pageNo)、筆數 (pageSize) 以使用分頁功能。未帶入則預設 pageNo = 1, pageSize = 20。",
+        "description": "搜尋條件：可帶入「課程時長類型 (courseTerm)、課程類型 (courseType)、課程名稱關鍵字 (keyword)」篩選課程。 <br>\r  排序條件：sortBy 可帶入「newest (最近日期), mostPopular (最熱門), highestRate (評分最高)」；未選擇則預設 newest 方式排序。 <br>\r  分頁功能：可帶入頁碼 (pageNo)、筆數 (pageSize) 以使用分頁功能。未帶入則預設 pageNo = 1, pageSize = 20。",
         "parameters": [
           {
             "name": "courseTerm",
@@ -3017,7 +3026,7 @@
           "Courses-back"
         ],
         "summary": "新增課程 + 項目資料 (Back)",
-        "description": "新增課程 + 項目資料 (Back) <br>  teacherId: 老師 ID (string) <br>  courseType: 課程類型 (array<string>)；可帶入值包含 \"工藝手作\", \"烹飪烘焙\", \"藝術人文\", \"生活品味\" <br>  courseTerm: 課程時長類型 (int)；0: 單堂體驗 1:培訓課程 <br>  courseName: 課程名稱 (string) <br>  coursePrice: 課程價格 (int) <br>  courseStatus: 課程狀態 (int)，預設為 1；0: 下架, 1: 上架, 2: 刪除 <br>  courseCapacity: 課程名額 (int) <br>  courseSummary: 課程摘要 (string) <br>  courseAddress: 課程地址 (string)；詳細活動地址 <br>  courseRemark: 備註 (string)；報名的注意事項 <br>  courseImage: 課程圖片 (array<string>)；圖片連結，最多 5 張 <br>  courseContent: 課程內容 (string)；帶入編輯器內容 <br>  courseItems: 課程項目 (array<object>)；courseDate 為 Date 物件格式<br>",
+        "description": "新增課程 + 項目資料 (Back) <br>\r  teacherId: 老師 ID (string) <br>\r  courseType: 課程類型 (array<string>)；可帶入值包含 \"工藝手作\", \"烹飪烘焙\", \"藝術人文\", \"生活品味\" <br>\r  courseTerm: 課程時長類型 (int)；0: 單堂體驗 1:培訓課程 <br>\r  courseName: 課程名稱 (string) <br>\r  coursePrice: 課程價格 (int) <br>\r  courseStatus: 課程狀態 (int)，預設為 1；0: 下架, 1: 上架, 2: 刪除 <br>\r  courseCapacity: 課程名額 (int) <br>\r  courseSummary: 課程摘要 (string) <br>\r  courseAddress: 課程地址 (string)；詳細活動地址 <br>\r  courseRemark: 備註 (string)；報名的注意事項 <br>\r  courseImage: 課程圖片 (array<string>)；圖片連結，最多 5 張 <br>\r  courseContent: 課程內容 (string)；帶入編輯器內容 <br>\r  courseItems: 課程項目 (array<object>)；courseDate 為 Date 物件格式<br>",
         "parameters": [
           {
             "name": "token",
@@ -3145,7 +3154,7 @@
           "Courses-back"
         ],
         "summary": "編輯課程 + 項目資料 (Back)",
-        "description": "編輯課程 + 項目資料 (Back) <br>  teacherId: 老師 ID (string) <br>  courseType: 課程類型 (array<string>)；可帶入值包含 \"工藝手作\", \"烹飪烘焙\", \"藝術人文\", \"生活品味\" <br>  courseTerm: 課程時長類型 (int)；0: 單堂體驗 1:培訓課程 <br>  courseName: 課程名稱 (string) <br>  coursePrice: 課程價格 (int) <br>  courseStatus: 課程狀態 (int)，預設為 1；0: 下架, 1: 上架, 2: 刪除 <br>  courseCapacity: 課程名額 (int) <br>  courseSummary: 課程摘要 (string) <br>  courseAddress: 課程地址 (string)；詳細活動地址 <br>  courseRemark: 備註 (string)；報名的注意事項 <br>  courseImage: 課程圖片 (array<string>)；圖片連結，最多 5 張 <br>  courseContent: 課程內容 (string)；帶入編輯器內容 <br>  courseItems: 課程項目 (array<object>)；courseDate 為 Date 物件格式。課程項目 (時間), 帶入 id 表示更新, 不帶入 id 表示新增, 若資料庫有的 id, 但資料內沒出現, 則刪除該筆資料 <br>",
+        "description": "編輯課程 + 項目資料 (Back) <br>\r  teacherId: 老師 ID (string) <br>\r  courseType: 課程類型 (array<string>)；可帶入值包含 \"工藝手作\", \"烹飪烘焙\", \"藝術人文\", \"生活品味\" <br>\r  courseTerm: 課程時長類型 (int)；0: 單堂體驗 1:培訓課程 <br>\r  courseName: 課程名稱 (string) <br>\r  coursePrice: 課程價格 (int) <br>\r  courseStatus: 課程狀態 (int)，預設為 1；0: 下架, 1: 上架, 2: 刪除 <br>\r  courseCapacity: 課程名額 (int) <br>\r  courseSummary: 課程摘要 (string) <br>\r  courseAddress: 課程地址 (string)；詳細活動地址 <br>\r  courseRemark: 備註 (string)；報名的注意事項 <br>\r  courseImage: 課程圖片 (array<string>)；圖片連結，最多 5 張 <br>\r  courseContent: 課程內容 (string)；帶入編輯器內容 <br>\r  courseItems: 課程項目 (array<object>)；courseDate 為 Date 物件格式。課程項目 (時間), 帶入 id 表示更新, 不帶入 id 表示新增, 若資料庫有的 id, 但資料內沒出現, 則刪除該筆資料 <br>",
         "parameters": [
           {
             "name": "courseId",
@@ -3376,7 +3385,7 @@
           "Courses-front"
         ],
         "summary": "新增評論",
-        "description": "新增評論 <br>  courseId: 課程 ID <br>  orderId: 訂單 ID <br>  content: 評論內容 <br>  images: 圖片連結 (Array<string>)，最多 5 張 <br>  tags: 評論標籤 (Array<string>)，可帶入值包含 \"師生互動\", \"教學環境\", \"專業度\", \"其他\" <br>  rating: 評分 <br>",
+        "description": "新增評論 <br>\r  courseId: 課程 ID <br>\r  orderId: 訂單 ID <br>\r  content: 評論內容 <br>\r  images: 圖片連結 (Array<string>)，最多 5 張 <br>\r  tags: 評論標籤 (Array<string>)，可帶入值包含 \"師生互動\", \"教學環境\", \"專業度\", \"其他\" <br>\r  rating: 評分 <br>",
         "parameters": [
           {
             "name": "token",
@@ -3456,7 +3465,7 @@
           "Courses-front"
         ],
         "summary": "課程評論按讚/取消按讚",
-        "description": "課程評論按讚/取消按讚 <br>  如果已按讚，則取消按讚；如果未按讚，則按讚 <br>",
+        "description": "課程評論按讚/取消按讚 <br>\r  如果已按讚，則取消按讚；如果未按讚，則按讚 <br>",
         "parameters": [
           {
             "name": "token",
@@ -3516,11 +3525,16 @@
                 "memberId": {
                   "type": "string",
                   "example": "會員 ID"
+                },
+                "ipAddress": {
+                  "type": "string",
+                  "example": "ip 地址"
                 }
               },
               "required": [
                 "courseId",
-                "vendorId"
+                "vendorId",
+                "ipAddress"
               ]
             }
           }
@@ -3725,7 +3739,7 @@
           "Vendors-back"
         ],
         "summary": "賣家儀表板總覽 (Back)",
-        "description": "  近7日 訂單數量 orderCountLast7Days <br>  近7日 訪問用戶數 userCountLast7Days <br>  近7日 每日的日期 & (體驗課 & 培訓課)銷售金額 & % 數佔比 salesDataLast7Days<br>  近7日 體驗課 & 培訓課 銷售總額 & % 數佔比 salesSummaryLast7Days <br>  近30日 訂單收入(NT$) incomeLast30Days <br>  近30日 訂單數量 orderCountLast30Days <br>  近30日 訪問用戶數 visitCountLast30Days <br>  近30日 每日的日期 & (體驗課 & 培訓課)銷售金額 & % 數佔比 salesDataLast30Days <br>  近30日 體驗課 & 培訓課 銷售總額 & % 數佔比 salesSummaryLast30Days <br>  訂單 待退款, 待付款, 待確認 數量 orderStatusCount ",
+        "description": "\r  近7日 訂單數量 orderCountLast7Days <br>\r  近7日 訪問用戶數 userCountLast7Days <br>\r  近7日 每日的日期 & (體驗課 & 培訓課)銷售金額 & % 數佔比 salesDataLast7Days<br>\r  近7日 體驗課 & 培訓課 銷售總額 & % 數佔比 salesSummaryLast7Days <br>\r  近30日 訂單收入(NT$) incomeLast30Days <br>\r  近30日 訂單數量 orderCountLast30Days <br>\r  近30日 訪問用戶數 visitCountLast30Days <br>\r  近30日 每日的日期 & (體驗課 & 培訓課)銷售金額 & % 數佔比 salesDataLast30Days <br>\r  近30日 體驗課 & 培訓課 銷售總額 & % 數佔比 salesSummaryLast30Days <br>\r  訂單 待退款, 待付款, 待確認 數量 orderStatusCount ",
         "parameters": [
           {
             "name": "token",
@@ -4102,7 +4116,7 @@
           "Vendors-front"
         ],
         "summary": "取得單筆賣家綜合資料 (需計算學員數、全部課程、師資) (Front)",
-        "description": "搜尋條件：可帶入「課程時長類型 (courseTerm)、課程類型 (courseType)篩選課程。 <br>  排序條件：sortBy 可帶入「newest (最近日期), mostPopular (最熱門), highestRate (評分最高)」；未選擇則預設 newest 方式排序。 <br>  分頁功能：可帶入頁碼 (pageNo)、筆數 (pageSize) 以使用分頁功能。未帶入則預設 pageNo = 1, pageSize = 20。",
+        "description": "搜尋條件：可帶入「課程時長類型 (courseTerm)、課程類型 (courseType)篩選課程。 <br>\r  排序條件：sortBy 可帶入「newest (最近日期), mostPopular (最熱門), highestRate (評分最高)」；未選擇則預設 newest 方式排序。 <br>\r  分頁功能：可帶入頁碼 (pageNo)、筆數 (pageSize) 以使用分頁功能。未帶入則預設 pageNo = 1, pageSize = 20。",
         "parameters": [
           {
             "name": "vendorId",
@@ -4262,7 +4276,7 @@
           "Teachers-back"
         ],
         "summary": "編輯老師 (Back)",
-        "description": "編輯老師 (Back) <br>  name: 老師名稱 (string) <br>  description: 老師描述 (string) <br>  photo: 老師頭像 (string) <br>  intro: 老師簡述 (編輯器) (string) <br>  socialMediaInfo: 老師社群連結 (object)；platform 可帶入 \"facebook\", \"instagram\", \"website\" <br>  order: 老師排序 (int)；數字越小越前面 <br>",
+        "description": "編輯老師 (Back) <br>\r  name: 老師名稱 (string) <br>\r  description: 老師描述 (string) <br>\r  photo: 老師頭像 (string) <br>\r  intro: 老師簡述 (編輯器) (string) <br>\r  socialMediaInfo: 老師社群連結 (object)；platform 可帶入 \"facebook\", \"instagram\", \"website\" <br>\r  order: 老師排序 (int)；數字越小越前面 <br>",
         "parameters": [
           {
             "name": "teacherId",
@@ -4402,7 +4416,7 @@
           "Teachers-back"
         ],
         "summary": "新增老師 (Back)",
-        "description": "新增老師 (Back) <br>  vendorId: 供應商 ID，由登入資訊取得 <br>  name: 老師名稱 (string) <br>  description: 老師描述 (string) <br>  photo: 老師頭像 (string) <br>  intro: 老師簡述 (編輯器) (string) <br>  socialMediaInfo: 老師社群連結 (object)；platform 可帶入 \"facebook\", \"instagram\", \"website\" <br>  order: 老師排序 (int)；數字越小越前面 <br>",
+        "description": "新增老師 (Back) <br>\r  vendorId: 供應商 ID，由登入資訊取得 <br>\r  name: 老師名稱 (string) <br>\r  description: 老師描述 (string) <br>\r  photo: 老師頭像 (string) <br>\r  intro: 老師簡述 (編輯器) (string) <br>\r  socialMediaInfo: 老師社群連結 (object)；platform 可帶入 \"facebook\", \"instagram\", \"website\" <br>\r  order: 老師排序 (int)；數字越小越前面 <br>",
         "parameters": [
           {
             "name": "token",

@@ -936,8 +936,7 @@ const courseController = {
 
   // 新增課程點擊紀錄 (Front)
   newClickLog: async (req, res, next) => {
-    const { courseId, vendorId, memberId } = req.body;
-    const ipAddress = req.ip;
+    const { courseId, vendorId, memberId, ipAddress } = req.body;
 
     // 驗證 courseId 格式和是否存在
     const isValidCourseId = await tools.findModelByIdNext(Course, courseId, next);

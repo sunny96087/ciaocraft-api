@@ -493,6 +493,20 @@ const orderController = {
     }
     const endTimeDateObj = new Date(endTime);
 
+    const courseItem = await CourseItem.findById(courseItemId);
+    if(courseItem.capacity < count) {
+      return next(appError(400, "課程名額不足"));
+    }
+
+    // 課程項目人數減少
+    const updateCourseItem = await CourseItem.findByIdAndUpdate(courseItemId, {
+      $inc: { capacity: -count },
+    });
+
+    if (!updateCourseItem) {
+      return next(appError(500, "更新課程項目人數失敗"));
+    }
+
     // 新增訂單
     const newOrder = await Order.create({
       memberId: memberId,
@@ -513,14 +527,6 @@ const orderController = {
 
     if (!newOrder) {
       return next(appError(500, "新增訂單失敗"));
-    }
-
-    // 課程項目人數減少
-    const updateCourseItem = await CourseItem.findByIdAndUpdate(courseItemId, {
-      $inc: { capacity: -count },
-    });
-    if (!updateCourseItem) {
-      return next(appError(500, "更新課程項目人數失敗"));
     }
 
     handleSuccess(res, newOrder, "新增訂單成功");
