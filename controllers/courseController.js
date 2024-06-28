@@ -754,7 +754,7 @@ const courseController = {
         path: "memberId",
         select: "name photo",
       })
-      .select("content images tags rating likes createAt");
+      .select("content images tags rating likes createdAt");
 
     handleSuccess(res, comments, "取得單一課程全部評價成功");
   },
