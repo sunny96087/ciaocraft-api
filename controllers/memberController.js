@@ -235,6 +235,10 @@ const memberController = {
                 path: "courseId",
                 select: "coursePrice courseTerm courseImage"
             })
+            .populate({
+                path: "courseItemId",
+                select: "itemName "
+            })
             .sort({ createdAt: -1 })
             // .skip(skip)
             // .limit(limit)
